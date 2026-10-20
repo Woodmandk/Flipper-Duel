@@ -20,8 +20,8 @@ html,body{height:100%;}
 [hidden]{display:none!important;}
 body{background:var(--bg);color:var(--fg);font-family:var(--body);overflow:hidden;-webkit-user-select:none;user-select:none;touch-action:none;}
 canvas#c{position:fixed;inset:0;width:100%;height:100%;display:block;}
-.ov{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding-block:16px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));overflow-y:auto;z-index:5;}
-.card{width:100%;max-width:520px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px 20px;display:flex;flex-direction:column;gap:16px;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);box-shadow:0 0 60px rgba(120,60,255,.18);}
+.ov{position:fixed;inset:0;display:flex;align-items:flex-start;justify-content:center;padding-block:16px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));overflow-y:auto;z-index:5;}
+.card{width:100%;margin-block:auto;max-width:520px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px 20px;display:flex;flex-direction:column;gap:16px;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);box-shadow:0 0 60px rgba(120,60,255,.18);}
 h1{font-family:var(--display);font-weight:400;font-size:clamp(34px,9vw,54px);line-height:.95;margin:0;text-align:center;letter-spacing:.02em;text-wrap:balance;}
 h1 .a{color:var(--p1);text-shadow:0 0 12px rgba(34,230,255,.8),0 0 34px rgba(34,230,255,.45);}
 h1 .b{color:var(--p2);text-shadow:0 0 12px rgba(255,63,210,.8),0 0 34px rgba(255,63,210,.45);}
@@ -74,6 +74,7 @@ button.btn.ghost{background:transparent;font-size:14px;padding:9px;}
 .sup.flip{transform:translate(-50%,-50%) rotate(180deg);}
 @keyframes supP{to{box-shadow:0 0 44px rgba(255,216,74,1);filter:brightness(1.15);}}
 @media (prefers-reduced-motion:reduce){.sup{animation:none;}}
+.quick{margin:0;padding-left:18px;display:grid;gap:6px;line-height:1.45;}
 .hud button{cursor:pointer;width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:rgba(10,8,26,.7);color:var(--fg);font-size:16px;font-family:var(--body);font-weight:700;}
 .big{font-family:var(--display);font-size:clamp(30px,8vw,46px);text-align:center;margin:0;line-height:1.05;text-wrap:balance;}
 .score{font-family:var(--display);font-size:22px;text-align:center;color:var(--muted);}
@@ -124,7 +125,7 @@ button.btn.ghost{background:transparent;font-size:14px;padding:9px;}
     </div>
     <p class="info" id="menuInfo" hidden>Du er inviteret! Skriv dit navn og tryk Deltag.</p>
     <p class="err" id="menuErr" hidden></p>
-    <p class="hint">Flippere: <kbd>A</kbd> <kbd>D</kbd> eller <kbd>←</kbd> <kbd>→</kbd> · SUPER: <kbd>W</kbd> <kbd>↑</kbd> eller <kbd>Mellemrum</kbd> · Mobil: tryk i venstre eller højre side, og på SUPER-knappen<br>Samme skærm: spiller 1 <kbd>A</kbd> <kbd>D</kbd> + <kbd>W</kbd>, spiller 2 <kbd>←</kbd> <kbd>→</kbd> + <kbd>↑</kbd></p>
+    <p class="hint">Flippere <kbd>A</kbd> <kbd>D</kbd> · SUPER <kbd>W</kbd> · Mobil: tryk i venstre/højre side<br>Spiller 2 på samme skærm: <kbd>←</kbd> <kbd>→</kbd> · SUPER <kbd>↑</kbd></p>
   </div>
 </div>
 
@@ -145,8 +146,18 @@ button.btn.ghost{background:transparent;font-size:14px;padding:9px;}
   <div class="card help">
     <h2>Sådan spiller du</h2>
     <section>
+      <h3>Kort fortalt</h3>
+      <ul class="quick">
+        <li><b>Flippere:</b> <kbd>A</kbd> <kbd>D</kbd> eller <kbd>←</kbd> <kbd>→</kbd>. På mobil trykker du i venstre eller højre side.</li>
+        <li><b>Ram ting</b> for at skade modstanderen og lade din gule SUPER-måler op.</li>
+        <li><b>Fuld måler?</b> Tryk <kbd>W</kbd>, <kbd>↑</kbd>, <kbd>Mellemrum</kbd> eller SUPER-knappen, når det passer dig.</li>
+        <li><b>Sekskanter</b> er power-ups. Dem med regnbue-ring er KAOS.</li>
+        <li><b>Mist ikke kuglen</b>. Det koster dig selv liv.</li>
+      </ul>
+    </section>
+    <section>
       <h3><span class="a">DUEL</span> · hvert sit bord, bedst af 3</h3>
-      <p>I starter med 800 liv. Alt du rammer, skader modstanderens liv og lader din gule SUPER-måler op. Når den er fuld, står der hvilket angreb du har klar, og <b>du bestemmer selv hvornår</b> det fyres af (<kbd>W</kbd>, <kbd>↑</kbd>, <kbd>Mellemrum</kbd> eller SUPER-knappen). En SUPER koster modstanderen 40 liv og sender angrebet over. Angreb står i kø, så de aldrig lander oven i hinanden, og efter et kaos-power-up får bordet en pause, før det næste dukker op. Hver runde spilles på en tilfældig ny bane: Neon Klassik, Orbit-loopet, Kaosfabrikken (bevægelige dele) eller Plinko. Efter 2½ min. er der OVERDRIVE, og al skade tæller dobbelt.</p>
+      <p>I starter med 800 liv, og hver runde spilles på en ny tilfældig bane. En SUPER koster modstanderen 40 liv og sender et angreb over. Angreb står i kø, så de ikke lander oven i hinanden, og efter et kaos-power-up får bordet en pause. Efter 2½ minut kommer OVERDRIVE, hvor al skade tæller dobbelt.</p>
       <ul class="legend">
         <li><i style="--c:var(--p1)">◎</i><b>Bumper</b><span>−2 liv</span></li>
         <li><i style="--c:var(--gold)">Z</i><b>ZAP-baner</b><span>−3, alle 3 tændt = −10</span></li>
@@ -977,7 +988,7 @@ function fireSuper(p) {
   return true;
 }
 function useAbility(p, type) {
-  const t = G.tables[0], A = ABIL[type], dir = p === 0 ? -1 : 1;
+  const t = G.tables[0], dir = p === 0 ? -1 : 1;
   if (type === 'fire') { t.grav = dir; t.last = p; t.fire = 2.5; for (const b of t.balls) { b.vx = rnd(-260, 260); b.vy = dir * rnd(1450, 1750); b.held = 0; } }
   else if (type === 'frz') t.frz[1 - p] = 2;
   else t.shield[p] = 1;
@@ -1328,8 +1339,10 @@ function layout() {
   const TOP = 34, HUDH = 94, BOXH = TOP + HUDH + H;
   const L = { cw, ch, rects: [], kind: 'duel2', TOP, HUDH };
   if (G.mode === 'arena') {
-    const s = Math.min((cw - 12) / W, (ch - 12) / (H + 96));
-    const x = (cw - W * s) / 2, y = (ch - (H + 96) * s) / 2 + 48 * s;
+    let s = Math.min((cw - 12) / W, (ch - 12) / (H + 96)), top = 0;
+    // keep the top player's name and score clear of the round buttons in the corner
+    if ((cw + W * s) / 2 > cw - 140) { top = 52; s = Math.min((cw - 12) / W, (ch - 12 - top) / (H + 96)); }
+    const x = (cw - W * s) / 2, y = top + (ch - top - (H + 96) * s) / 2 + 48 * s;
     L.kind = 'arena'; L.rects = [{ x, y, s }];
   } else {
     const portrait = cw / ch < 0.95;
@@ -1345,7 +1358,7 @@ function layout() {
       const s = Math.min((cw - 12) / W, (ch - 12) / (BOXH + 30));
       const x = (cw - W * s) / 2, y0 = (ch - (BOXH + 30) * s) / 2;
       L.rects = [{ x, y: y0 + (TOP + HUDH + 30) * s, s }, { x: x + 4 * s, y: y0 + (TOP + HUDH + 34) * s, s: s * .17, mini: true }];
-      L.timer = { x: cw / 2, y: y0 + 20 * s, s };
+      L.timer = { x: 10, y: y0 + 20 * s, s, left: true };
       L.kind = 'duelPortrait';
     }
   }
@@ -1682,10 +1695,10 @@ function drawCenter() {
   const cw = LAY.cw, ch = LAY.ch;
   if (G.mode === 'duel' && LAY.timer && !G.demo) {
     const T = LAY.timer, s = T.s, rem = Math.max(0, ROUND_TIME - G.t);
-    ctx.save(); ctx.translate(T.x, T.y); ctx.scale(s, s); ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.save(); ctx.translate(T.x, T.y); ctx.scale(s, s); ctx.textAlign = T.left ? 'left' : 'center'; ctx.textBaseline = 'middle';
     ctx.font = '20px Bungee, sans-serif'; ctx.fillStyle = G.overdrive ? '#ff7a30' : '#ece9ff';
     const mm = Math.floor(rem / 60), ss = String(Math.floor(rem % 60)).padStart(2, '0');
-    ctx.fillText(`RUNDE ${G.round} · ${duelL().name} · ${mm}:${ss}${G.overdrive ? ' · OVERDRIVE' : ''}`, 0, 0);
+    ctx.fillText(T.left ? `R${G.round} · ${mm}:${ss}${G.overdrive ? ' · OVERDRIVE' : ' · ' + duelL().name}` : `RUNDE ${G.round} · ${duelL().name} · ${mm}:${ss}${G.overdrive ? ' · OVERDRIVE' : ''}`, 0, 0);
     ctx.restore();
   }
   if (G.phase === 'count' && !G.demo) {
@@ -1774,7 +1787,7 @@ function frame(now) {
 
 /* ================= UI ================= */
 const $ = id => document.getElementById(id);
-const show = id => { $(id).hidden = false; }, hide = id => { $(id).hidden = true; };
+const show = id => { $(id).hidden = false; $(id).scrollTop = 0; }, hide = id => { $(id).hidden = true; };
 const myName = () => clean($('name').value.trim() || 'Spiller');
 $('name').value = store.get('fd-name', '');
 $('name').addEventListener('input', () => store.set('fd-name', $('name').value));
