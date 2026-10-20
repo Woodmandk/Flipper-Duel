@@ -6,14 +6,23 @@ Et neon-flipperspil for to spillere, der kører direkte i browseren. Ingen insta
 
 ## Spiltyper
 
-- **Duel** – I har hvert jeres bord. Bumpere, ZAP-banerne og de grønne targets skader modstanderens liv. Når den gule angrebsmåler er fuld, sendes et tilfældigt angreb over: spejlvendte flippere, tåge, sort hul, bombe, bomberegn, mini-flippere eller jordskælv. Bedst af 3 runder, og hver runde spilles på en ny bane (Neon Klassik, Diamanten, Kaosfabrikken). Efter 80 sekunder går runden i OVERDRIVE, hvor al skade tæller dobbelt. 5 hurtige træf i træk giver combo med +50% skade.
-- **Arena** – Ét bord med flippere i begge ender. Tyngdekraften peger mod den, der skal forsvare. Først til 7 mål, og banen skifter for hver 3 mål.
+- **Duel** – I har hvert jeres bord og 800 liv hver. Bumpere, ZAP-banerne, targets, orbit-loopet og kaos-hullet skader modstanderens liv. Bedst af 3 runder, og hver runde spilles på en tilfældig bane (Neon Klassik, Orbit-loopet, Kaosfabrikken eller Plinko). Efter 2½ minut går runden i OVERDRIVE, hvor al skade tæller dobbelt. 5 hurtige træf i træk giver combo med +25% skade.
+- **Arena** – Ét bord med flippere i begge ender. Tyngdekraften peger mod den, der skal forsvare. Først til 10 mål, og banen skifter for hver 3 mål.
+
+## SUPER-angreb
+
+Alt du rammer, lader din gule SUPER-måler op. Når den er fuld, kan du se hvilket angreb du har klar, og **du bestemmer selv hvornår du fyrer det af**.
+
+- **Duel:** SUPER koster modstanderen 40 liv og sender et angreb over: spejlvendte flippere, tåge, sort hul, bombe, bomberegn, mini-flippere eller jordskælv. Angreb står i kø, så de aldrig lander oven i hinanden.
+- **Arena:** Ildkugle (alle kugler brager mod modstanderens mål), Frys (modstanderens flippere fryser i 2 sek.) eller Mur (et skjold foran dit mål).
+
+Efter et kaos-power-up får bordet en pause, før det næste dukker op: kaos, så ro, så kaos igen.
 
 ## Power-ups
 
 Sekskanter dukker op på bordet. Ram dem med kuglen. I Arena går de til den, der sidst ramte kuglen.
 
-- **Almindelige:** KAOS ×5 (4 ekstra kugler), Skjold, Dobbelt skade, Reparér (+15 liv), Kæmpe-flippere, Sløv modstander og Turbo.
+- **Almindelige:** Multiball, Skjold, Dobbelt skade, Reparér (+50 liv), Kæmpe-flippere, Sløv modstander og Turbo. Ekstra kugler forsvinder igen efter kort tid.
 - **KAOS-power-ups** (med regnbue-ring): Mega-kaos +10 kugler, Kæmpekugler, Måne-tyngde, Bumper-raseri, Lynstorm og Kuglekanon.
 
 Tryk på **?** i spillet for at se en forklaring på alt.
@@ -29,12 +38,12 @@ Man kan også spille mod computeren eller to på samme skærm.
 
 ## Styring
 
-| | Venstre flipper | Højre flipper |
-|---|---|---|
-| Én spiller | `A` eller `←` | `D` eller `→` |
-| Spiller 1 (samme skærm) | `A` | `D` |
-| Spiller 2 (samme skærm) | `←` | `→` |
-| Mobil/tablet | Tryk i venstre side | Tryk i højre side |
+| | Venstre flipper | Højre flipper | SUPER |
+|---|---|---|---|
+| Én spiller | `A` eller `←` | `D` eller `→` | `W`, `↑` eller `Mellemrum` |
+| Spiller 1 (samme skærm) | `A` | `D` | `W` |
+| Spiller 2 (samme skærm) | `←` | `→` | `↑` |
+| Mobil/tablet | Tryk i venstre side | Tryk i højre side | SUPER-knappen |
 
 ## Teknik
 
