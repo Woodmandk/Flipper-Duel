@@ -2,7 +2,7 @@
 
 Et neon-flipperspil for to spillere, der kører direkte i browseren. Ingen installation og intet login.
 
-**Spil her:** https://woodmandk.github.io/flipper-duel/
+**Spil her:** https://woodmandk.github.io/Flipper-Duel/
 
 ## Spiltyper
 
