@@ -6,8 +6,19 @@ Et neon-flipperspil for to spillere, der kører direkte i browseren. Ingen insta
 
 ## Spiltyper
 
-- **Duel** – I har hvert jeres bord og 800 liv hver. Bumpere, ZAP-banerne, targets, orbit-loopet og kaos-hullet skader modstanderens liv. Bedst af 3 runder, og hver runde spilles på en tilfældig bane (Neon Klassik, Orbit-loopet, Kaosfabrikken eller Plinko). Efter 2½ minut går runden i OVERDRIVE, hvor al skade tæller dobbelt. 5 hurtige træf i træk giver combo med +25% skade.
-- **Arena** – Ét bord med flippere i begge ender. Tyngdekraften peger mod den, der skal forsvare. Først til 10 mål, og banen skifter for hver 3 mål.
+- **Duel** – I har hvert jeres bord og 1200 liv hver. Alt du rammer, skader modstanderens liv. Bedst af 3 runder, og hver runde spilles på en tilfældig bane (Neon Klassik, Orbit-loopet, Kaosfabrikken, Plinko eller Portal-labyrinten). Efter 2½ minut går runden i OVERDRIVE, hvor al skade tæller dobbelt. 5 hurtige træf i træk giver combo med +25% skade.
+- **Arena** – Ét bord med flippere i begge ender. Tyngdekraften peger mod den, der skal forsvare. Først til 5 mål, og banen skifter for hver 2 mål. Hver spiller har sin egen rampe, der skyder mod modstanderens mål.
+
+## Kæmpe baner
+
+Banerne er næsten dobbelt så høje som skærmen. Kameraet følger kuglen og zoomer ud ved multiball. På bordene finder du:
+
+- **Ramper** – skyd hårdt ind i indgangen, så kører kuglen på skinner over bordet. Flere ramper i træk giver mere skade.
+- **Portaler** – orange og blå hænger sammen og teleporterer kuglen.
+- **Ekstra flipper** midt på nogle baner.
+- **BOSS** – i Duel dukker Øjet, Krabben eller Spøgelset op i toppen. Besejr den, så mister modstanderen 80 liv.
+- **Missioner** – små opgaver med tidsfrist, fx "Ram 8 bumpere". Klarer du dem, mister modstanderen 30 liv.
+- **Ryst bordet** med `S` eller `↓`. Ryster du for meget, kommer der TILT.
 
 ## SUPER-angreb
 
@@ -38,12 +49,12 @@ Man kan også spille mod computeren eller to på samme skærm.
 
 ## Styring
 
-| | Venstre flipper | Højre flipper | SUPER |
-|---|---|---|---|
-| Én spiller | `A` eller `←` | `D` eller `→` | `W`, `↑` eller `Mellemrum` |
-| Spiller 1 (samme skærm) | `A` | `D` | `W` |
-| Spiller 2 (samme skærm) | `←` | `→` | `↑` |
-| Mobil/tablet | Tryk i venstre side | Tryk i højre side | SUPER-knappen |
+| | Venstre flipper | Højre flipper | SUPER | Ryst |
+|---|---|---|---|---|
+| Én spiller | `A` eller `←` | `D` eller `→` | `W`, `↑` eller `Mellemrum` | `S` eller `↓` |
+| Spiller 1 (samme skærm) | `A` | `D` | `W` | `S` |
+| Spiller 2 (samme skærm) | `←` | `→` | `↑` | `↓` |
+| Mobil/tablet | Tryk i venstre side | Tryk i højre side | SUPER-knappen | – |
 
 ## Teknik
 
