@@ -6,8 +6,17 @@ Et neon-flipperspil for to spillere, der kører direkte i browseren. Ingen insta
 
 ## Spiltyper
 
-- **Duel** – I har hvert jeres bord. Bumpere, ZAP-banerne og de grønne targets skader modstanderens energi. Når den gule angrebsmåler er fuld, sendes et angreb over: spejlvendte flippere, tåge, sort hul eller en bombe-kugle. Bedst af 3 runder. Efter 80 sekunder går runden i OVERDRIVE, hvor al skade tæller dobbelt.
-- **Arena** – Ét bord med flippere i begge ender. Tyngdekraften peger væk fra den, der sidst ramte kuglen. Først til 5 mål. Skjold og multiball dukker op undervejs.
+- **Duel** – I har hvert jeres bord. Bumpere, ZAP-banerne og de grønne targets skader modstanderens liv. Når den gule angrebsmåler er fuld, sendes et tilfældigt angreb over: spejlvendte flippere, tåge, sort hul, bombe, bomberegn, mini-flippere eller jordskælv. Bedst af 3 runder, og hver runde spilles på en ny bane (Neon Klassik, Diamanten, Kaosfabrikken). Efter 80 sekunder går runden i OVERDRIVE, hvor al skade tæller dobbelt. 5 hurtige træf i træk giver combo med +50% skade.
+- **Arena** – Ét bord med flippere i begge ender. Tyngdekraften peger mod den, der skal forsvare. Først til 7 mål, og banen skifter for hver 3 mål.
+
+## Power-ups
+
+Sekskanter dukker op på bordet. Ram dem med kuglen. I Arena går de til den, der sidst ramte kuglen.
+
+- **Almindelige:** KAOS ×5 (4 ekstra kugler), Skjold, Dobbelt skade, Reparér (+15 liv), Kæmpe-flippere, Sløv modstander og Turbo.
+- **KAOS-power-ups** (med regnbue-ring): Mega-kaos +10 kugler, Kæmpekugler, Måne-tyngde, Bumper-raseri, Lynstorm og Kuglekanon.
+
+Tryk på **?** i spillet for at se en forklaring på alt.
 
 ## Sådan spiller I mod hinanden
 
