@@ -123,6 +123,8 @@ button.btn.ghost{background:transparent;font-size:14px;padding:9px;}
 </style>
 </head>
 <body>
+
+
 <canvas id="c" aria-label="Flipperbord"></canvas>
 
 <div class="hud" id="hud" hidden>
@@ -232,10 +234,11 @@ button.btn.ghost{background:transparent;font-size:14px;padding:9px;}
         <li><b>Evne klar?</b> Når en af dine 2 bjælker er fuld, står der KLAR! Brug den med <kbd>Q</kbd> eller <kbd>E</kbd> eller knappen ved bordet.</li>
         <li><b>Sekskanter</b> er power-ups. Dem med regnbue-ring er KAOS.</li>
         <li><b>Mist ikke kuglen</b>. Det koster dig selv liv.</li>
-        <li><b>Hver bane har sin egen form og sit eget tema:</b> Neon Klassik, Ruminvasion (Space Invaders), Kaosfabrikken, Dybhavet og Spøgelseshuset. Kameraet følger kuglen.</li>
+        <li><b>Hver bane har sin egen særlige mekanik</b>, som står på skærmen før runden. Neon Klassik: tænd alle bumpere for en lys-jackpot. Ruminvasion: skyd UFO'en ned. Kaosfabrikken: transportbånd. Dybhavet: lav tyngde og boblesøjler. Spøgelseshuset: lyset går ud. Kameraet følger kuglen.</li>
+        <li><b>Kæmpebaner</b> dukker op en gang imellem: KÆMPEHALLEN i Duel og MEGASTADION i Arena er meget større end de andre baner.</li>
         <li><b>Ryst bordet</b> med <kbd>S</kbd> eller <kbd>↓</kbd> for at redde en kugle. Ryster du for meget, kommer der TILT.</li>
         <li><b>Evner:</b> du vælger selv 2 evner i menuen (fx Homing, Vampyr, Tåge) og i kampagnen (fx Lyn, Sneglefart, Meteor). Hver evne lader op for sig selv, når du rammer ting, og dyre evner tager længere tid. Brug dem med <kbd>Q</kbd> og <kbd>E</kbd> (eller <kbd>1</kbd> <kbd>2</kbd>) eller knapperne. Spiller 2 på samme skærm bruger <kbd>I</kbd> og <kbd>O</kbd>.</li>
-        <li><b>Kampagnen</b> har en mega-boss på hver 5. bane. Slår du den, låser du nye evner op.</li>
+        <li><b>Kampagnen</b> har 20 baner og en mega-boss på hver 5. Slår du den, låser du nye evner op. Mange baner har en særlig regel, fx stormvind, mørke eller bomberegn, og mega-bosser går i fase 2 med en invasion.</li>
         <li><b>Indstillinger og statistik</b> i menuen: vælg computerens sværhedsgrad, din kugle og dine flippers farve. Nye kugler låses op, når du spiller.</li>
         <li><b>Online</b> kan du sende emojis til modstanderen med tasterne <kbd>6</kbd>–<kbd>0</kbd> eller knapperne øverst til venstre.</li>
       </ul>
@@ -277,7 +280,7 @@ button.btn.ghost{background:transparent;font-size:14px;padding:9px;}
     </section>
     <section>
       <h3><span class="b">ARENA</span> · flipper-fodbold, først til 5</h3>
-      <p>Banen er en fodboldbane. Du har en målmand (to flippere foran dit mål) og to angribere ude på modstanderens halvdel, ligesom i bordfodbold. Dine knapper styrer dem alle på én gang. Der er ingen tyngdekraft, så kuglen flyver frit. Banen skifter for hver 2 mål: Stadion, Ishallen, Retro-arkaden eller Vulkanen. På Stadion har hver spiller sin egen rampe, der skyder kuglen mod modstanderens mål.</p>
+      <p>Banen er en fodboldbane. Du har en målmand (to flippere foran dit mål) og to angribere ude på modstanderens halvdel, ligesom i bordfodbold. Dine knapper styrer dem alle på én gang. Der er ingen tyngdekraft, så kuglen flyver frit. Banen skifter for hver 2 mål, og hver bane har sin egen mekanik: Stadion har en dommer, der går frem og tilbage, og en rampe til hver spiller. I Ishallen er isen glat, så kuglen suser hurtigere. Retro-arkaden har murstene, du kan smadre for energi. Vulkanen får udbrud, der slynger kuglerne væk (se efter den røde advarsel). En gang imellem kommer kæmpebanen MEGASTADION.</p>
       <p>Din energi lader op, når du rammer kuglen, rammer bumpere og når du får mål imod dig. Du vælger selv 2 evner, fx:</p>
       <ul class="legend">
         <li><i style="--c:#ff7a30">🔥</i><b>Ildkugle</b><span>Alle kugler brager mod modstanderens mål</span></li>
@@ -512,6 +515,13 @@ function arcSegs(cx, cy, R, a0, a1, n) {
   for (let i = 1; i <= n; i++) { const a = a0 + (a1 - a0) * i / n, x = cx + R * Math.cos(a), y = cy + R * Math.sin(a); out.push(sg(px, py, x, y)); px = x; py = y; }
   return out;
 }
+// each table has its own signature mechanic (L.sig); this is the one-line explanation shown before the round
+const SIG_TXT = { lights: 'TÆND ALLE BUMPERE: LYS-JACKPOT', ufo: "SKYD UFO'EN NED, NÅR DEN FLYVER FORBI", belt: 'TRANSPORTBÅND SKUBBER KUGLEN', sea: 'LAV TYNGDE OG BOBLESØJLER',
+  dark: 'LYSET GÅR UD EN GANG IMELLEM', ref: 'DOMMEREN PATRULJERER MIDTEN', ice: 'GLAT IS: KUGLEN SUSER AFSTED', bricks: 'SMADR MURSTENENE FOR ENERGI', erupt: 'VULKANUDBRUD SLYNGER KUGLERNE' };
+function sigSetup(L, cfg) {
+  L.sig = cfg.sig || null; L.grav = cfg.grav || 1; L.ufo = cfg.ufo || null; L.belts = cfg.belts || []; L.bubbles = cfg.bubbles || []; L.bricks = cfg.bricks || null; L.erupts = cfg.erupts || null;
+  L.sigTxt = SIG_TXT[L.sig] || '';
+}
 function finishLayout(L) {
   const p = new Path2D();
   for (const w of L.walls) { p.moveTo(w.ax, w.ay); p.lineTo(w.bx, w.by); }
@@ -596,16 +606,20 @@ function duelLayout(name, cfg) {
   for (const r of L.ramps) L.labels.push({ x: r.ent.x, y: r.ent.y, txt: 'RAMPE: SKYD HÅRDT OP −8' });
   for (const p of L.portals) L.labels.push({ x: p.a.x, y: p.a.y, txt: 'PORTAL: TELEPORTERER KUGLEN' });
   for (const f of L.flippers.slice(2)) L.labels.push({ x: f.px, y: f.py, txt: 'EKSTRA FLIPPER' });
+  sigSetup(L, cfg);
+  if (L.ufo) L.labels.push({ x: L.cx, y: L.ufo.y, txt: 'UFO: SKYD DEN NED −12' });
+  for (const z of L.belts) L.labels.push({ x: (z.x0 + z.x1) / 2, y: z.y0, txt: 'TRANSPORTBÅND' });
+  for (const c of L.bubbles) L.labels.push({ x: c.x, y: (c.y0 + c.y1) / 2, txt: 'BOBLER: LØFTER KUGLEN' });
   return finishLayout(L);
 }
 const DUELS = [
-  duelLayout('NEON KLASSIK', { theme: 'neon',
+  duelLayout('NEON KLASSIK', { theme: 'neon', sig: 'lights',
     bumpers: [{ x: 190, y: 470, r: 20, k: 520 }, { x: 325, y: 470, r: 20, k: 520 }, { x: DCX, y: 550, r: 20, k: 520 }],
     ramps: [RAMP_L],
     saucers: [{ x: DCX, y: 690 }],
   }),
   // Space Invaders: angular ceiling, an orbit lane, invader bumpers and two bunkers
-  duelLayout('RUMINVASION', { theme: 'space', top: 'oct',
+  duelLayout('RUMINVASION', { theme: 'space', top: 'oct', sig: 'ufo', ufo: { y: 232, x0: 60, x1: 455 },
     islands: arcSegs(272.5, 272.5, 205, Math.PI * 1.15, Math.PI * 1.85, 4),
     posts: [237, 307],
     sensors: [{ x: 272, y: 36, r: 18, ev: 'orbit' }],
@@ -616,7 +630,8 @@ const DUELS = [
     saucers: [{ x: DCX, y: 720 }],
   }),
   // a flat-roofed factory hall with pistons sticking out of the walls and gears turning in the middle
-  duelLayout('KAOSFABRIKKEN', { theme: 'fabrik', top: 'flat',
+  duelLayout('KAOSFABRIKKEN', { theme: 'fabrik', top: 'flat', sig: 'belt',
+    belts: [{ x0: 25, y0: 528, x1: 195, y1: 562, dir: 1 }, { x0: 320, y0: 528, x1: 492, y1: 562, dir: -1 }],
     movers: [{ kind: 'ob', cx: DCX, cy: 480, R: 70, w: 1.7, ph: 0, r: 15, k: 560 }, { kind: 'ob', cx: DCX, cy: 480, R: 70, w: 1.7, ph: Math.PI, r: 15, k: 560 },
       { kind: 'bar', cx: DCX, cy: 660, len: 84, w: 2.6, ph: 0 }],
     ramps: [RAMP_L, RAMP_R],
@@ -627,7 +642,8 @@ const DUELS = [
     blocks: [[[15, 360], [70, 400], [15, 440]], [[500, 360], [445, 400], [500, 440]]],
   }),
   // under water: a scalloped shell ceiling, jellyfish bumpers, rocks and a flipper on each side
-  duelLayout('DYBHAVET', { theme: 'hav', top: 'shell',
+  duelLayout('DYBHAVET', { theme: 'hav', top: 'shell', sig: 'sea', grav: .72,
+    bubbles: [{ x: 120, y0: 380, y1: 760, w: 22 }, { x: 395, y0: 380, y1: 760, w: 22 }],
     bumpers: [{ x: 185, y: 450, r: 18, k: 520 }, { x: 330, y: 450, r: 18, k: 520 }, { x: DCX, y: 525, r: 15, k: 480 }, { x: 150, y: 590, r: 12, k: 440 }, { x: 365, y: 590, r: 12, k: 440 }],
     upper: 'both',
     saucers: [{ x: DCX, y: 680 }],
@@ -636,7 +652,7 @@ const DUELS = [
     blocks: [rock(95, 330, 22), rock(420, 330, 22)],
   }),
   // a haunted house: pointed roof, pumpkin bumpers, tombstones and portals
-  duelLayout('SPØGELSESHUSET', { theme: 'spook', top: 'roof', postY: 170,
+  duelLayout('SPØGELSESHUSET', { theme: 'spook', top: 'roof', postY: 170, sig: 'dark',
     bumpers: [{ x: 170, y: 450, r: 18, k: 520 }, { x: 345, y: 450, r: 18, k: 520 }, { x: DCX, y: 520, r: 22, k: 540 }, { x: 195, y: 610, r: 13, k: 460 }, { x: 320, y: 610, r: 13, k: 460 }],
     portals: [{ a: { x: 100, y: 470 }, b: { x: 425, y: 290 } }, { a: { x: 415, y: 470 }, b: { x: 90, y: 290 } }],
     kaos: sg(452, 590, 452, 642),
@@ -644,6 +660,37 @@ const DUELS = [
     blocks: [tomb(150, 690), tomb(365, 690)],
   }),
 ];
+// a giant version of a table: everything except the ball is scaled up, so the table feels huge
+function scaleLayout(L, k, name, theme) {
+  const S = q => sg(q.ax * k, q.ay * k, q.bx * k, q.by * k), P = o => Object.assign({}, o, { x: o.x * k, y: o.y * k }), PT = q => [q[0] * k, q[1] * k];
+  const N = Object.assign({}, L, { name, theme: theme || L.theme, giant: k, W: L.W * k, H: L.H * k, cx: L.cx * k });
+  N.walls = L.walls.map(S); N.slings = L.slings.map(S); N.islands = L.islands.map(S); N.drops = L.drops.map(S);
+  if (L.kaos) N.kaos = S(L.kaos); if (L.gate) N.gate = S(L.gate); if (L.shield) N.shield = S(L.shield); if (L.shields) N.shields = L.shields.map(S);
+  N.bumpers = L.bumpers.map(u => Object.assign(P(u), { r: u.r * k }));
+  N.movers = L.movers.map(m => Object.assign({}, m, { cx: m.cx * k, cy: m.cy * k, R: m.R && m.R * k, len: m.len && m.len * k, r: m.r && m.r * k, A: m.A && m.A * k }));
+  N.pegs = L.pegs.map(q => Object.assign(P(q), { r: q.r * k })); N.saucers = L.saucers.map(P); N.sensors = L.sensors.map(q => Object.assign(P(q), { r: q.r * k })); N.rolls = L.rolls.map(P);
+  N.portals = L.portals.map(q => ({ a: P(q.a), b: P(q.b) }));
+  N.ramps = L.ramps.map(r => mkRamp({ pts: r.pts.map(PT), own: r.own, col: r.col }));
+  N.flippers = L.flippers.map(f => Object.assign({}, f, { px: f.px * k, py: f.py * k, len: f.len * k }));
+  if (L.bh) N.bh = P(L.bh); if (L.boss) N.boss = { y: L.boss.y * k, x0: L.boss.x0 * k, x1: L.boss.x1 * k };
+  if (L.top) N.top = L.top.map(PT); if (L.slingTri) N.slingTri = L.slingTri.map(t => t.map(PT));
+  N.blocks = (L.blocks || []).map(b => b.map(PT)); N.area = L.area.map(v => v * k); N.labels = L.labels.map(P);
+  if (L.arc) N.arc = { x: L.arc.x * k, y: L.arc.y * k, r: L.arc.r * k }; if (L.laneX) N.laneX = L.laneX * k;
+  if (L.ufo) N.ufo = { y: L.ufo.y * k, x0: L.ufo.x0 * k, x1: L.ufo.x1 * k };
+  N.belts = L.belts.map(z => Object.assign({}, z, { x0: z.x0 * k, y0: z.y0 * k, x1: z.x1 * k, y1: z.y1 * k }));
+  N.bubbles = L.bubbles.map(c => ({ x: c.x * k, y0: c.y0 * k, y1: c.y1 * k, w: c.w * k }));
+  if (L.bricks) N.bricks = L.bricks.map(b => ({ x: b.x * k, y: b.y * k, w: b.w * k, h: b.h * k }));
+  if (L.erupts) N.erupts = L.erupts.map(PT);
+  N.labels.push({ x: N.cx, y: N.H * .45, txt: 'KÆMPEBANE: ALT ER STØRRE' });
+  return finishLayout(N);
+}
+// giant tables show up now and then; they sit at the end of the list so online play can still send the index
+DUELS.push(scaleLayout(duelLayout('KÆMPEHALLEN', { theme: 'titan', sig: 'lights',
+  bumpers: [{ x: 190, y: 470, r: 20, k: 520 }, { x: 325, y: 470, r: 20, k: 520 }, { x: DCX, y: 550, r: 20, k: 520 }, { x: 150, y: 600, r: 13, k: 460 }, { x: 365, y: 600, r: 13, k: 460 }],
+  ramps: [RAMP_L], upper: 'r',
+  saucers: [{ x: DCX, y: 690 }],
+  portals: [{ a: { x: 100, y: 660 }, b: { x: DCX, y: 250 } }],
+}), 1.35, 'KÆMPEHALLEN'));
 // Arena: a football pitch, no gravity (the ball flies freely). Each player has a keeper pair in front of their goal
 // and two strikers out in the opponent's half, like table football.
 const ACX = AW / 2, ACY = AH / 2, AFX = 82, AFL = 61, ASX = 135, ASY = 250, ASL = 52;
@@ -667,33 +714,39 @@ function arenaLayout(name, cfg) {
   for (const m of L.movers) if (m.kind === 'bar') L.labels.push({ x: m.cx, y: m.cy - 40, txt: 'MØLLE: ROTERER HELE TIDEN' });
   if (L.ramps.length) L.labels.push({ x: L.ramps[0].ent.x, y: L.ramps[0].ent.y, txt: 'DIN RAMPE: SKYDER MOD MÅLET' });
   for (const p of L.portals) L.labels.push({ x: p.a.x, y: p.a.y, txt: 'PORTAL' });
+  sigSetup(L, cfg);
+  for (const m of L.movers) if (m.kind === 'lin') L.labels.push({ x: m.cx, y: m.cy - 40, txt: 'DOMMEREN: GÅR FREM OG TILBAGE' });
+  if (L.bricks) L.labels.push({ x: L.bricks[2].x, y: L.bricks[2].y, txt: 'MURSTEN: SMADR DEM' });
   return finishLayout(L);
 }
 const ARENAS = [
-  arenaLayout('STADION', { theme: 'grass',
-    bumpers: [{ x: ACX, y: ACY, r: 24, k: 480 }, { x: 170, y: 330, r: 15, k: 420 }, { x: 390, y: 330, r: 15, k: 420 }, { x: 170, y: 470, r: 15, k: 420 }, { x: 390, y: 470, r: 15, k: 420 }],
+  arenaLayout('STADION', { theme: 'grass', sig: 'ref',
+    movers: [{ kind: 'lin', cx: ACX, cy: ACY, A: 150, w: 1.15, ph: 0, r: 18, k: 520 }],
+    bumpers: [{ x: 170, y: 330, r: 15, k: 420 }, { x: 390, y: 330, r: 15, k: 420 }, { x: 170, y: 470, r: 15, k: 420 }, { x: 390, y: 470, r: 15, k: 420 }],
     ramps: true,
   }),
   // ice rink: a spinning mill in the middle and boards sticking out from the sides
-  arenaLayout('ISHALLEN', { theme: 'ice',
+  arenaLayout('ISHALLEN', { theme: 'ice', sig: 'ice',
     movers: [{ kind: 'bar', cx: ACX, cy: ACY, len: 130, w: 1.6, ph: 0 }, { kind: 'ob', cx: ACX, cy: ACY, R: 135, w: -1.1, ph: 0, r: 14, k: 430 }, { kind: 'ob', cx: ACX, cy: ACY, R: 135, w: -1.1, ph: Math.PI, r: 14, k: 430 }],
     portals: [{ a: { x: 60, y: 330 }, b: { x: AW - 60, y: 470 } }, { a: { x: AW - 60, y: 330 }, b: { x: 60, y: 470 } }],
     blocks: [[[15, 340], [70, 400], [15, 460]], [[AW - 15, 340], [AW - 70, 400], [AW - 15, 460]]],
   }),
   // 8-bit arcade: an hourglass pitch with a diamond in the middle
-  arenaLayout('RETRO-ARKADEN', { theme: 'retro',
+  arenaLayout('RETRO-ARKADEN', { theme: 'retro', sig: 'bricks',
+    bricks: [300, 500].flatMap(y => [0, 1, 2, 3, 4].map(i => ({ x: 208 + i * 36, y, w: 32, h: 14 }))),
     bumpers: [{ x: 150, y: 320, r: 16, k: 450 }, { x: 410, y: 320, r: 16, k: 450 }, { x: 150, y: 480, r: 16, k: 450 }, { x: 410, y: 480, r: 16, k: 450 }],
     blocks: [[[ACX, ACY - 65], [ACX + 45, ACY], [ACX, ACY + 65], [ACX - 45, ACY]], [[15, 310], [100, 400], [15, 490]], [[AW - 15, 310], [AW - 100, 400], [AW - 15, 490]]],
     saucers: [{ x: ACX, y: 250 }, { x: ACX, y: 550 }],
   }),
   // volcano: lava rocks orbiting the crater and two walls of rock splitting the middle into lanes
-  arenaLayout('VULKANEN', { theme: 'lava',
+  arenaLayout('VULKANEN', { theme: 'lava', sig: 'erupt', erupts: [[ACX, ACY], [190, 285], [370, 515], [370, 285], [190, 515]],
     movers: [{ kind: 'ob', cx: ACX, cy: ACY, R: 60, w: 1.5, ph: 0, r: 16, k: 500 }, { kind: 'ob', cx: ACX, cy: ACY, R: 60, w: 1.5, ph: Math.PI, r: 16, k: 500 }],
     bumpers: [{ x: ACX, y: ACY, r: 14, k: 420 }, { x: 120, y: 330, r: 14, k: 440 }, { x: 440, y: 330, r: 14, k: 440 }, { x: 120, y: 470, r: 14, k: 440 }, { x: 440, y: 470, r: 14, k: 440 }],
     portals: [{ a: { x: 60, y: ACY }, b: { x: AW - 60, y: ACY } }],
     blocks: [box(ACX - 118, 355, ACX - 104, 445), box(ACX + 104, 355, ACX + 118, 445)],
   }),
 ];
+ARENAS.push(scaleLayout(ARENAS[0], 1.28, 'MEGASTADION', 'titanG'));
 // look of each table: playfield colours, wall/bumper colour, bumper skin and background decoration
 const THEMES = {
   neon: { bg: ['rgba(20,12,48,.92)', 'rgba(14,9,36,.93)', 'rgba(8,6,22,.95)'], grid: 1 },
@@ -704,10 +757,13 @@ const THEMES = {
   grass: { bg: ['rgba(4,32,18,.93)', 'rgba(3,24,13,.93)', 'rgba(2,16,9,.95)'], stripe: 'rgba(70,255,150,.05)', line: 'rgba(255,255,255,.28)' },
   ice: { bg: ['rgba(20,40,62,.95)', 'rgba(26,48,72,.95)', 'rgba(20,40,62,.95)'], wall: '#bfefff', bc: '#bfefff', stripe: 'rgba(220,245,255,.035)', line: 'rgba(120,200,255,.4)', deco: 'ice' },
   retro: { bg: ['rgba(0,0,0,.97)', 'rgba(0,4,0,.97)', 'rgba(0,0,0,.97)'], wall: '#33ff66', bc: '#33ff66', bump: 'pixel', stripe: 'rgba(51,255,102,.03)', line: 'rgba(51,255,102,.35)', deco: 'scan' },
+  titan: { bg: ['rgba(30,14,44,.94)', 'rgba(22,10,34,.95)', 'rgba(10,5,18,.96)'], wall: '#ffd84a', grid: 1, deco: 'giant' },
+  titanG: { bg: ['rgba(6,30,24,.94)', 'rgba(4,22,18,.95)', 'rgba(6,30,24,.94)'], wall: '#ffd84a', stripe: 'rgba(255,216,74,.04)', line: 'rgba(255,230,150,.32)', deco: 'giant' },
   lava: { bg: ['rgba(44,8,2,.95)', 'rgba(30,5,2,.95)', 'rgba(44,8,2,.95)'], wall: '#ff5a1f', bc: '#ffb020', bump: 'rock', stripe: 'rgba(255,90,30,.04)', line: 'rgba(255,170,80,.3)', deco: 'embers' },
 };
 function moverState(m, time) {
   const a = m.w * time + m.ph;
+  if (m.kind === 'lin') return { x: m.cx + m.A * Math.sin(a), y: m.cy, vx: m.A * m.w * Math.cos(a), vy: 0, a };
   if (m.kind === 'ob') return { x: m.cx + m.R * Math.cos(a), y: m.cy + m.R * Math.sin(a), vx: -m.R * m.w * Math.sin(a), vy: m.R * m.w * Math.cos(a), a };
   const c = Math.cos(a) * m.len / 2, s = Math.sin(a) * m.len / 2;
   return { ax: m.cx - c, ay: m.cy - s, bx: m.cx + c, by: m.cy + s, a };
@@ -735,6 +791,8 @@ const MIS = {
   sling: { d: n => `Ram slyngerne ${n} gange`, n: [5, 8], t: 25, ev: ['sling'] },
   orbit: { d: () => 'Skyd et orbit-loop', n: [1, 1], t: 25, ev: ['orbit'], ok: L => L.sensors.length },
   hole: { d: () => 'Ram kaos-hullet', n: [1, 1], t: 25, ev: ['saucer'], ok: L => L.saucers.length },
+  ufo: { d: () => "Skyd UFO'en ned", n: [1, 1], t: 30, ev: ['ufo'], ok: L => !!L.ufo },
+  lights: { d: () => 'Tænd alle bumpere på én gang', n: [1, 1], t: 30, ev: ['lightsAll'], ok: L => L.sig === 'lights' },
   upper: { d: n => `Skyd ${n} gange med ekstra-flipperen`, n: [2, 3], t: 25, ev: ['upper'], ok: L => L.flippers.length > 2 },
 };
 
@@ -831,9 +889,27 @@ class Table {
     this.rampN = 0; this.rampT = 0; this.tilt = 0; this.tiltW = 0;
     this.combo = 0; this.comboT = 0; this.flash = 0; this.flashCol = '#fff'; this.punch = 0; this.labelT = 6;
     this.parts.length = 0; this.texts.length = 0; this.rings.length = 0; this.banner = null;
+    this.sigReset(); this.mod = null; this.gmul = 1; this.modT = 8; this.darkWas = false;
     if (this.kind === 'duel') this.spawnLane(); else this.serve(Math.random() < .5 ? 1 : -1);
   }
-  setLayout(L) { this.L = L; this.bf = L.bumpers.map(() => 0); this.mf = L.movers.map(() => 0); this.labelT = 5; this.tokens = []; }
+  setLayout(L) { this.L = L; this.bf = L.bumpers.map(() => 0); this.mf = L.movers.map(() => 0); this.labelT = 5; this.tokens = []; this.sigReset(); }
+  sigReset() { const L = this.L; this.lit = L.bumpers.map(() => 0); this.lightT = 0; this.ufoDead = -1; this.bricks = (L.bricks || []).map(() => 0); }
+  // UFO (Ruminvasion): crosses the top every 13 s unless it was shot down on this pass
+  ufoPos() {
+    const U = this.L.ufo; if (!U || this.time < 4) return null;
+    const c = Math.floor(this.time / 13), ph = this.time - c * 13; if (ph > 6 || c === this.ufoDead) return null;
+    const k = ph / 6, dir = c % 2 ? -1 : 1, x = dir > 0 ? U.x0 + (U.x1 - U.x0) * k : U.x1 - (U.x1 - U.x0) * k;
+    return { x, y: U.y + 8 * Math.sin(this.time * 4), vx: dir * (U.x1 - U.x0) / 6, c };
+  }
+  beltDir() { return Math.floor(this.time / 10) % 2 ? -1 : 1; }
+  bubbleOn(i) { return Math.floor(this.time / 3.5) % 2 === i % 2; }
+  // lights out (Spøgelseshuset, or the MØRKE campaign rule): 5 dark seconds in every 17
+  darkAmt() {
+    if (this.L.sig !== 'dark' && this.mod !== 'dark') return 0;
+    const ph = this.time % 17; return this.time < 10 || ph < 11 || ph > 16 ? 0 : clamp(Math.min(ph - 11, 16 - ph) * 3, 0, 1);
+  }
+  eruptAt(c) { const E = this.L.erupts; return E[Math.floor(hash(c * 7 + 3) * E.length) % E.length]; }
+  wind() { return this.mod === 'wind' ? 560 * Math.sin(this.time * .5) : 0; }
   ball(x, y, vx = 0, vy = 0) { return { x, y, vx, vy, r: BR, trail: [], still: 0, lane: false, bomb: false, extra: false, life: 0, held: 0, scd: 0, ramp: null, rcd: 0, pcd: 0 }; }
   spawnLane() { const b = this.ball(this.L.laneX + 14, this.L.H - 28); b.lane = true; this.balls.push(b); this.laneRest = 0; }
   spawnBomb(x, y) { if (this.balls.length >= MAXBALLS) return; const b = this.ball(x == null ? this.L.cx + rnd(-80, 80) : x, y == null ? 300 : y, rnd(-220, 220), 60); b.bomb = true; b.life = 9; this.balls.push(b); }
@@ -886,7 +962,7 @@ class Table {
     for (let i = 0; i < this.fl.length; i++) {
       const f = this.fl[i];
       let lm = 1, sm = 1;
-      if (this.kind === 'duel') { if (this.eff.big > 0) lm *= 1.3; if (this.eff.small > 0) lm *= .6; }
+      if (this.kind === 'duel') { if (this.eff.big > 0) lm *= 1.3; if (this.eff.small > 0) lm *= .6; if (this.mod === 'tiny') lm *= .78; }
       else { const p = f.p; if (this.bigP[p] > 0) lm *= 1.3; if (this.slowP[p] > 0) sm = .4; if (this.frz[p] > 0) sm = 0; }
       f.len += (f.base * lm - f.len) * Math.min(1, h * 12);
       const o = f.a; f.a = f.on ? Math.max(f.up, f.a - FUP * sm * h) : Math.min(f.rest, f.a + FDN * sm * h); f.w = (f.a - o) / h;
@@ -895,7 +971,7 @@ class Table {
   step(dt) {
     this.time += dt;
     const N = 5, h = dt / N, duel = this.kind === 'duel';
-    const g = duel ? 1350 * (this.eff.moon > 0 ? .22 : 1) * (this.eff.flip > 0 ? -.8 : 1) : this.turbo > 0 ? 1100 * this.grav : 0, br = this.eff.giant > 0 ? BR_BIG : BR;
+    const g = duel ? 1350 * (this.eff.moon > 0 ? .22 : 1) * (this.eff.flip > 0 ? -.8 : 1) * this.L.grav * this.gmul : this.turbo > 0 ? 1100 * this.grav : 0, br = this.eff.giant > 0 ? BR_BIG : BR;
     if (duel && this.eff.quake > 0) {
       this.quakeT -= dt;
       if (this.quakeT <= 0) { this.quakeT = .4; this.shake = 9; for (const b of this.balls) if (!b.lane) { b.vx += rnd(-520, 520); b.vy -= rnd(100, 520); } }
@@ -957,7 +1033,7 @@ class Table {
     }
     for (let i = 0; i < L.movers.length; i++) {
       const m = L.movers[i], st = moverState(m, this.time);
-      if (m.kind === 'ob') {
+      if (m.kind !== 'bar') {
         const imp = resolve(b, st.x, st.y, m.r, .6, st.vx, st.vy);
         if (imp > 1) { b.vx += LNX * m.k; b.vy += LNY * m.k; this.mf[i] = 1; this.hook('bumper', { x: st.x + LNX * m.r, y: st.y + LNY * m.r }); }
       } else {
@@ -990,6 +1066,17 @@ class Table {
         this.hook('bossHit', { x: bo.x + LNX * R, y: bo.y + LNY * R });
         if (!this.hurtBoss(this.eff.pow2 > 0 ? 2 : 1) && bo.k === 'crab') bo.vx *= 1.08;
       }
+    }
+    if (L.ufo && !b.bomb) {
+      const u = this.ufoPos();
+      if (u && resolve(b, u.x, u.y, 18, .8, u.vx, 0) > 1) { this.ufoDead = u.c; b.vx += LNX * 300; b.vy += LNY * 300; this.hook('ufo', { x: u.x, y: u.y }); }
+    }
+    if (L.bricks) for (let i = 0; i < L.bricks.length; i++) {
+      if (this.bricks[i] > 0) continue;
+      const k = L.bricks[i], x0 = k.x - k.w / 2, x1 = k.x + k.w / 2, y0 = k.y - k.h / 2, y1 = k.y + k.h / 2;
+      if (b.x < x0 - 12 || b.x > x1 + 12 || b.y < y0 - 12 || b.y > y1 + 12) continue;
+      const qx = clamp(b.x, x0, x1), qy = clamp(b.y, y0, y1);
+      if (resolve(b, qx, qy, 1, .95, 0, 0) > 1) { this.bricks[i] = 10; this.hook('brick', { x: k.x, y: k.y, i }); if (this.bricks.every(v => v > 0)) this.hook('bricksAll', { x: this.L.cx, y: this.L.H / 2 }); }
     }
     if (this.inv && !b.bomb) {
       const v = this.inv;
@@ -1039,7 +1126,8 @@ class Table {
     }
     for (let i = 0; i < L.bumpers.length; i++) {
       const u = L.bumpers[i], imp = resolve(b, u.x, u.y, u.r, .6, 0, 0);
-      if (imp > 1) { const kk = u.k * (this.eff.rage > 0 ? 1.7 : 1), ja = rnd(-.22, .22), nx = LNX * Math.cos(ja) - LNY * Math.sin(ja), ny = LNX * Math.sin(ja) + LNY * Math.cos(ja); b.vx += nx * kk; b.vy += ny * kk; this.bf[i] = 1; this.hook('bumper', { x: u.x + LNX * u.r, y: u.y + LNY * u.r, i, small: u.r < 12 }); }
+      if (imp > 1) { const kk = u.k * (this.eff.rage > 0 ? 1.7 : 1), ja = rnd(-.22, .22), nx = LNX * Math.cos(ja) - LNY * Math.sin(ja), ny = LNX * Math.sin(ja) + LNY * Math.cos(ja); b.vx += nx * kk; b.vy += ny * kk; this.bf[i] = 1; this.hook('bumper', { x: u.x + LNX * u.r, y: u.y + LNY * u.r, i, small: u.r < 12 });
+        if (L.sig === 'lights' && this.lightT <= 0) { this.lit[i] = 9; if (this.lit.every(v => v > 0)) { this.lit = this.lit.map(() => 0); this.lightT = 1.2; this.hook('lightsAll', { x: u.x, y: u.y }); } } }
     }
     for (let i = 0; i < this.fl.length; i++) {
       const f = this.fl[i], c = Math.cos(f.a), s = Math.sin(f.a);
@@ -1054,7 +1142,7 @@ class Table {
   hurtBoss(n) {
     const bo = this.boss; if (!bo) return false;
     bo.hp = Math.max(0, bo.hp - n); bo.f = 1;
-    if (!bo.rage && bo.hp > 0 && bo.hp <= bo.max / 2) { bo.rage = 1; bo.vx *= 1.5; bo.atk = Math.min(bo.atk, 1.5); this.hook('bossRage', { x: bo.x, y: bo.y }); }
+    if (!bo.rage && bo.hp > 0 && bo.hp <= bo.max / 2) { bo.rage = 1; bo.vx *= 1.5; bo.atk = Math.min(bo.atk, 1.5); this.hook('bossRage', { x: bo.x, y: bo.y }); if (bo.mega && this.solo) { this.spawnInv(); this.hook('bossPhase2', { x: bo.x, y: bo.y }); } }
     if (bo.hp > 0) return false;
     this.hook('bossDown', { x: bo.x, y: bo.y, k: bo.k }); this.boss = null; this.bossT = this.solo ? 3.5 : rnd(55, 70); this.calm = Math.max(this.calm, 8); if (this.rush) this.rush.shift();
     return true;
@@ -1081,7 +1169,7 @@ class Table {
         if (b.lane && b.x < this.L.laneX - 6) { b.lane = false; this.save = Math.max(this.save, 2.5); }
         if (b.x > this.L.laneX && b.y > this.L.H - 80 && sp < 40) {
           this.laneRest += dt;
-          if (this.laneRest > .75) { b.vy = -rnd(1640, 1740); b.vx = 0; b.lane = true; this.laneRest = 0; this.hook('launch', { x: b.x, y: this.L.H - 40 }); }
+          if (this.laneRest > .75) { b.vy = -rnd(1640, 1740) * Math.sqrt(this.L.giant || 1); b.vx = 0; b.lane = true; this.laneRest = 0; this.hook('launch', { x: b.x, y: this.L.H - 40 }); }
         }
         if (b.bomb) { b.life -= dt; if (b.life <= 0) { this.balls.splice(i, 1); this.hook('bombPop', { x: b.x, y: b.y }); continue; } }
         if (b.extra && b.held <= 0) { b.life -= dt; if (b.life <= 0) { this.balls.splice(i, 1); this.hook('fade', { x: b.x, y: b.y }); continue; } }
@@ -1105,11 +1193,12 @@ class Table {
       if (sp < 25 && b.held <= 0 && !b.ramp && !(duel && b.x > this.L.laneX)) { b.still += dt; if (b.still > 2) { b.vx = rnd(-300, 300); b.vy = duel ? -600 : -this.grav * 500; b.still = 0; } } else b.still = 0;
       if (!duel && !b.ramp && b.held <= 0) {
         // no gravity in the Arena: keep the ball moving and never let it drift sideways forever
-        const mn = this.turbo > 0 ? 700 : 400, mx = 1150;
+        const ice = this.L.sig === 'ice', gk = Math.sqrt(this.L.giant || 1), mn = (this.turbo > 0 ? 700 : ice ? 560 : 400) * gk, mx = (ice ? 1350 : 1150) * gk;
         if (sp > 1 && sp < mn) { const k = Math.min(mn / sp, 1 + dt * 3); b.vx *= k; b.vy *= k; }
         else if (sp > mx) { const k = Math.max(mx / sp, 1 - dt * .6); b.vx *= k; b.vy *= k; }
         if (Math.abs(b.vy) < Math.max(150, sp * .4)) b.vy += (b.vy === 0 ? this.grav : Math.sign(b.vy)) * 900 * dt;
       }
+      if (!b.ramp && !b.lane && b.held <= 0) this.sigBall(b, dt);
       if ((duel ? this.eff.home : this.eff.ahome) > 0 && !b.ramp && !b.lane && b.held <= 0 && (!duel || b.y < this.L.H - 230)) {
         let tx, ty;
         if (!duel) { tx = this.L.cx; ty = this.homeP === 0 ? 0 : this.L.H; }
@@ -1148,6 +1237,7 @@ class Table {
     this.tilt = Math.max(0, this.tilt - dt); this.tiltW = Math.max(0, this.tiltW - dt * .6);
     this.rampT -= dt; if (this.rampT <= 0) this.rampN = 0;
     if (duel) this.directors(dt);
+    this.sigStep(dt);
     // incoming attacks wait in line so they never land on top of each other
     this.atkCalm -= dt;
     if (this.atkQ.length && this.atkCalm <= 0) { const ty = this.atkQ.shift(); this.atkCalm = (ty === 'fog' ? 7 : ty === 'bomb' || ty === 'rain' ? 6 : 6) + 3; this.hook('atkHit', { type: ty }); }
@@ -1185,6 +1275,36 @@ class Table {
       else if (v.t <= 0) { this.hook('invGone', { x: this.L.cx, y: v.y }); this.inv = null; }
     }
   }
+  // forces from the table's own mechanic (and the campaign's wind) on one ball
+  sigBall(b, dt) {
+    const L = this.L;
+    for (const z of L.belts) if (b.x > z.x0 && b.x < z.x1 && b.y > z.y0 && b.y < z.y1) { const d = z.dir * this.beltDir(); if (b.vx * d < 650) b.vx += d * 2600 * dt; }
+    L.bubbles.forEach((c, i) => { if (this.bubbleOn(i) && Math.abs(b.x - c.x) < c.w && b.y > c.y0 && b.y < c.y1) { if (b.vy > -620) b.vy -= 3000 * dt; b.vx += Math.sin(this.time * 9 + b.y * .05) * 160 * dt; } });
+    if (this.mod === 'wind' && this.kind === 'duel' && b.x < L.laneX) b.vx += this.wind() * dt;
+  }
+  sigStep(dt) {
+    const L = this.L;
+    for (let i = 0; i < this.lit.length; i++) this.lit[i] = Math.max(0, this.lit[i] - dt);
+    this.lightT = Math.max(0, this.lightT - dt);
+    for (let i = 0; i < this.bricks.length; i++) if (this.bricks[i] > 0) { this.bricks[i] -= dt; if (this.bricks[i] <= 0) { this.bricks[i] = 0; const k = L.bricks[i]; this.burst(k.x, k.y, '#33ff66', 6, 120, .3); } }
+    if (L.erupts && this.time > 8) {
+      const c = Math.floor(this.time / 9), ph = this.time - c * 9;
+      if (ph >= 7 && ph - dt < 7) {
+        const sp = this.eruptAt(c);
+        for (const b of this.balls) { if (b.ramp || b.held > 0) continue; const dx = b.x - sp[0], dy = b.y - sp[1], d = Math.hypot(dx, dy); if (d < 115) { const n = d || 1, f = 1300 * (1 - d / 170); b.vx += dx / n * f; b.vy += dy / n * f; if (!d) b.vy += rnd(-900, 900); } }
+        this.shake = Math.max(this.shake, 10); this.hook('erupt', { x: sp[0], y: sp[1] });
+      }
+    }
+    const dk = this.darkAmt() > 0; if (dk && !this.darkWas) this.hook('dark', {}); this.darkWas = dk;
+    // campaign rules that need a timer
+    if (this.mod === 'bombs' || this.mod === 'mirror') {
+      this.modT -= dt;
+      if (this.modT <= 0) {
+        if (this.mod === 'bombs') { this.modT = 14; this.spawnBomb(); this.spawnBomb(); this.hook('modBomb', {}); }
+        else { this.modT = 18; this.eff.mir = 4; this.hook('modMir', {}); }
+      }
+    }
+  }
   directors(dt) {
     const L = this.L, bo = this.boss;
     // boss: arrives during a calm stretch, stays ~35 s, then a long break
@@ -1199,7 +1319,7 @@ class Table {
         bo.sw -= dt; if (bo.sw <= -2.6) bo.sw = bo.rage ? 3.5 : 5.5;
         const dive = bo.sw < 0, home = L.boss.y + 50 * Math.sin(bo.t * (bo.k === 'crab' ? 1.3 : .8));
         if (dive && bo.sw > -dt * 1.5) this.hook('bossAtk', { x: bo.x, y: bo.y, txt: 'DEN DYKKER NED!' });
-        bo.yy += ((dive ? L.boss.y + 250 : home) - bo.yy) * Math.min(1, dt * 3);
+        bo.yy += ((dive ? L.boss.y + 250 * (L.giant || 1) : home) - bo.yy) * Math.min(1, dt * 3);
         const ny = bo.yy; bo.vy = (ny - bo.y) / Math.max(dt, 1e-3); bo.y = ny; bo.x += bo.vx * dt; if (bo.x < L.boss.x0) { bo.x = L.boss.x0; bo.vx = Math.abs(bo.vx); } if (bo.x > L.boss.x1) { bo.x = L.boss.x1; bo.vx = -Math.abs(bo.vx); } }
       // its special attack
       bo.atk -= dt;
@@ -1227,7 +1347,7 @@ class Table {
       this.bossT -= dt;
       if (this.bossT <= 0 && (this.solo ? !this.rush || this.rush.length : this.calm <= 0 && this.atkCalm <= 2 && !this.mis)) {
         const k = this.rush ? this.rush[0] : this.forceBoss || pick(THEME_BOSS[L.theme] || BOSS_KEYS), BI = BOSS[k], hp = Math.round(BI.hp * this.bossMul);
-        this.boss = { k, mega: this.mega ? 1 : 0, R: BI.r * (this.mega ? 1.45 : 1), x: (L.boss.x0 + L.boss.x1) / 2, y: L.boss.y, vy: 0, vx: BI.sp * (this.mega ? 1.2 : 1) * (Math.random() < .5 ? -1 : 1), hp, max: hp, f: 0, t: 0, cd: 0, tp: 2.6, atk: 4, hurt: 9, sw: 4, yy: L.boss.y, sh: 0, inv: 0, dash: 0, rage: 0, laser: null };
+        this.boss = { k, mega: this.mega ? 1 : 0, R: BI.r * (this.mega ? 1.45 : 1) * (L.giant || 1), x: (L.boss.x0 + L.boss.x1) / 2, y: L.boss.y, vy: 0, vx: BI.sp * (this.mega ? 1.2 : 1) * (Math.random() < .5 ? -1 : 1), hp, max: hp, f: 0, t: 0, cd: 0, tp: 2.6, atk: 4, hurt: 9, sw: 4, yy: L.boss.y, sh: 0, inv: 0, dash: 0, rage: 0, laser: null };
         this.calm = Math.max(this.calm, 6); this.tokens = this.tokens.filter(t => !POW[t.type].k);
         this.hook('bossIn', { k, x: this.boss.x, y: this.boss.y });
       }
@@ -1301,20 +1421,33 @@ const G = {
   nextAtk: [null, null], aiFire: [0, 0], supReq: 0, supSeen: 0,
   big: 0, sk: [[0, 0], [0, 0]], skCd: [0, 0], lo: [null, null], aiSk: [null, null], skReqK: 0, unlocks: [], emSeq: 0, emIdx: 0, emSeen: 0, emCd: 0, emoList: [],
 };
-const DMG = { alien: 5, alienAll: 20, bumper: 2, sling: 1, roll: 3, rollAll: 10, drop: 4, dropAll: 12, kaos: 3, strike: 2, saucer: 3, orbit: 6, spin: 1, ramp: 8, portal: 2, bossHit: 4 };
+const DMG = { lightsAll: 15, ufo: 12, alien: 5, alienAll: 20, bumper: 2, sling: 1, roll: 3, rollAll: 10, drop: 4, dropAll: 12, kaos: 3, strike: 2, saucer: 3, orbit: 6, spin: 1, ramp: 8, portal: 2, bossHit: 4 };
 const BOSS_DMG = 100, BOSS_HURT = 15, MIS_DMG = 30;
 const ROUND_TIME = 240, OVERDRIVE_AT = 150, ARENA_GOALS = 5, DRAIN = 50;
 let MAXHP = 1200;
 // campaign: you alone against each table's boss (with lots of HP); the finale is a boss rush on Neon Klassik
+// mod: a special rule for that level (see MODS). Levels 16-20 are played on the giant table.
 const CAMP = [
-  { li: 0, boss: 'eye', mul: 3 }, { li: 1, boss: 'ufo', mul: 3 }, { li: 0, boss: 'crab', mul: 3.2 }, { li: 3, boss: 'kraken', mul: 3.4 },
+  { li: 0, boss: 'eye', mul: 3 }, { li: 1, boss: 'ufo', mul: 3, mod: 'moon' }, { li: 0, boss: 'crab', mul: 3.2, mod: 'wind' }, { li: 3, boss: 'kraken', mul: 3.4, mod: 'dark' },
   { li: 0, boss: 'eye', mul: 6, mega: 1, time: 360 },
-  { li: 2, boss: 'robot', mul: 3.5 }, { li: 4, boss: 'ghost', mul: 4 }, { li: 1, boss: 'ufo', mul: 4.2 }, { li: 2, boss: 'crab', mul: 4.4 },
+  { li: 2, boss: 'robot', mul: 3.5, mod: 'bombs' }, { li: 4, boss: 'ghost', mul: 4, mod: 'tiny' }, { li: 1, boss: 'ufo', mul: 4.2, mod: 'heavy' }, { li: 2, boss: 'crab', mul: 4.4, mod: 'wind' },
   { li: 1, boss: 'ufo', mul: 7, mega: 1, time: 360 },
-  { li: 3, boss: 'kraken', mul: 4.8 }, { li: 2, boss: 'robot', mul: 5 }, { li: 4, boss: 'ghost', mul: 5.5 },
-  { li: 0, rush: ['eye', 'crab', 'ufo', 'kraken'], mul: 2.4, time: 420 },
+  { li: 3, boss: 'kraken', mul: 4.8, mod: 'mirror' }, { li: 2, boss: 'robot', mul: 5, mod: 'dark' }, { li: 4, boss: 'ghost', mul: 5.5, mod: 'bombs' },
+  { li: 0, rush: ['eye', 'crab', 'ufo', 'kraken'], mul: 2.4, time: 420, mod: 'moon' },
   { li: 3, boss: 'kraken', mul: 8, mega: 1, time: 420 },
+  { li: 5, boss: 'crab', mul: 5.5, mod: 'wind' }, { li: 3, boss: 'kraken', mul: 6, mod: 'bombs' }, { li: 5, boss: 'robot', mul: 6, mod: 'heavy' },
+  { li: 4, rush: ['ghost', 'robot', 'ufo'], mul: 3, time: 420, mod: 'dark' },
+  { li: 5, boss: 'ufo', mul: 9, mega: 1, time: 480, mod: 'mirror' },
 ];
+const MODS = {
+  moon: { n: 'LAV TYNGDE', d: 'Kuglen svæver: tyngden er næsten halveret', c: '#c8c8ff' },
+  wind: { n: 'STORMVIND', d: 'Vinden skifter retning og skubber kuglen', c: '#9fd8ff' },
+  dark: { n: 'MØRKE', d: 'Lyset går ud en gang imellem', c: '#b98cff' },
+  bombs: { n: 'BOMBEREGN', d: 'To bomber falder ned hvert 14. sekund', c: '#ff9040' },
+  tiny: { n: 'MINI-FLIPPERE', d: 'Mindre flippere, men bossen har mindre liv', c: '#ff4060' },
+  heavy: { n: 'TUNG KUGLE', d: 'Kuglen er tung og falder hurtigt', c: '#ffb020' },
+  mirror: { n: 'SPEJLKAOS', d: 'Flipperne bytter side en gang imellem', c: '#ff7a30' },
+};
 const MEGA_LV = CAMP.map((C, i) => C.mega ? i : -1).filter(i => i >= 0);
 // how many mega bosses you have beaten decides which skills are unlocked
 const megaWins = () => { const st = campStars(); return MEGA_LV.filter(i => (st[i] | 0) > 0).length; };
@@ -1328,11 +1461,13 @@ const SKILLS = {
   mag: { n: 'MAGNET', d: 'Kuglerne trækkes mod bossen i 4 sek.', c: '#ff5cf0', i: 'M', cost: 70, boss: 1, m: 'b', u: 2 },
   pow2: { n: 'KRAFTSLAG', d: 'Hvert træf på bossen tæller dobbelt i 8 sek.', c: '#ff5c8a', i: '×2', cost: 85, boss: 1, m: 'b', u: 2 },
   meteor: { n: 'METEOR', d: 'Kæmpe slag: bossen mister 4 liv', c: '#ff7a30', i: '☄', cost: 160, boss: 1, m: 'b', u: 3 },
+  nova: { n: 'SUPERNOVA', d: 'Bossen mister 6 liv, og alle kugler skydes op', c: '#ffffff', i: '✺', cost: 210, boss: 1, m: 'b', u: 4 },
   // Duel (m: d)
   home: { n: 'HOMING', d: 'Kuglerne styrer selv mod bumpere og bossen i 8 sek.', c: '#7dffea', i: '➶', cost: 55, m: 'd', u: 0 },
   x2: { n: 'SUPER-SKADE', d: 'Al din skade ×2 i 10 sek.', c: '#ff5c8a', i: '×2', cost: 60, m: 'd', u: 0 },
   storm: { n: 'LYNSTORM', d: '8 lyn rammer dit bord for −2 hver', c: '#fff36b', i: '⚡', cost: 70, m: 'd', u: 1 },
   mega: { n: 'MEGA-SLAG', d: 'Modstanderen mister 60 liv med det samme', c: '#ff7a30', i: '☄', cost: 140, m: 'd', u: 3 },
+  twin: { n: 'DOBBELTANGREB', d: 'Send to tilfældige angreb på én gang (−30)', c: '#ff3fd2', i: '⚔', cost: 130, m: 'd', u: 4 },
   fog: { n: 'TÅGE', d: 'Send tåge over modstanderens bord (−15)', c: '#b98cff', i: '≋', cost: 60, m: 'd', u: 0, atk: 1 },
   bomb: { n: 'BOMBE', d: 'Send en bombe til modstanderen (−15)', c: '#ff4060', i: '✸', cost: 55, m: 'd', u: 0, atk: 1 },
   quake: { n: 'JORDSKÆLV', d: 'Ryst modstanderens kugler rundt (−15)', c: '#ff9a3c', i: '≈', cost: 45, m: 'd', u: 0, atk: 1 },
@@ -1359,12 +1494,13 @@ const SKILLS = {
   slow: { n: 'SLØV MODSTANDER', d: 'Modstanderens flippere går langsomt i 6 sek.', c: '#b98cff', i: 'Z', cost: 60, m: 'a', u: 2 },
   amega: { n: 'KUGLEREGN', d: '4 ekstra kugler i 6 vilde sekunder', c: '#ff3fd2', i: '10', cost: 85, m: 'a', u: 2 },
   dbl: { n: 'DOBBELT MÅL', d: 'Dit næste mål tæller 2', c: '#ffd84a', i: '2', cost: 70, m: 'a', u: 3 },
+  tri: { n: 'TREDOBBELT SKUD', d: '3 kugler skydes mod modstanderens mål', c: '#ff9a3c', i: '⫸', cost: 75, m: 'a', u: 4 },
 };
 const SKILL_KEYS = Object.keys(SKILLS), SK_ATK_DMG = 15;
 const LO_KEY = { b: 'skills', d: 'dsk', a: 'ask' }, LO_DEF = { b: ['zap', 'multi'], d: ['home', 'fog'], a: ['afire', 'ahome'] }, NSK = 2;
 const skPool = m => SKILL_KEYS.filter(k => SKILLS[k].m.includes(m));
 const skOpen = k => !!SKILLS[k] && SKILLS[k].u <= megaWins();
-const MEGA_NAMES = ['første', 'anden', 'tredje'];
+const MEGA_NAMES = ['første', 'anden', 'tredje', 'fjerde'];
 // settings, lifetime stats and unlockable balls (all kept on this device)
 const CPU_LV = [{ n: 'Let', s: .6, f: [4, 8] }, { n: 'Normal', s: .9, f: [1.5, 5] }, { n: 'Svær', s: .95, f: [.8, 2.5] }, { n: 'Umulig', s: 1, f: [.2, .6] }];
 const BALLS = [
@@ -1434,16 +1570,19 @@ function doSkill(p, k, t) {
     else if (k === 'agiant') t.eff.giant = 8;
     else if (k === 'acannon') { const dir = p === 0 ? -1 : 1; t.grav = dir; t.last = p; for (const b of t.balls) { b.vx = rnd(-400, 400); b.vy = dir * rnd(1300, 1700); b.held = 0; } }
     else if (k === 'amega') t.spawnMulti(4, cx, t.L.H / 2, p === 0 ? 1 : -1, 6);
+    else if (k === 'tri') { t.spawnMulti(3, cx, p === 0 ? t.L.H - 230 : 230, p === 0 ? 1 : -1, 6); t.last = p; t.grav = p === 0 ? -1 : 1; }
     skillFx(t, p, k); pushFx('K', 200, 360, p, SKILL_KEYS.indexOf(k));
     return;
   }
   if (S.atk) { G.dealt[p] += SK_ATK_DMG; sendAttack(p, k); return; }
+  if (k === 'twin') { const A = ['fog', 'bomb', 'quake', 'mir', 'small', 'ice'], a = pick(A); let b2; do b2 = pick(A); while (b2 === a); G.dealt[p] += 2 * SK_ATK_DMG; sendAttack(p, a); sendAttack(p, b2); return; }
   const bo = t.boss, cy = t.cam.y + t.cam.h * .45;
   skillFx(t, p, k);
   if (k === 'zap') { t.zapB = 3; t.zapBT = .1; }
   else if (k === 'frz') { t.eff.frzB = 5; SFX.zap(); t.ring(bo.x, bo.y, 80, '#7de8ff', .5, 5); }
   else if (k === 'mag') { t.eff.mag = 4; t.ring(bo.x, bo.y, 120, '#ff5cf0', .6, 4); }
   else if (k === 'pow2') t.eff.pow2 = 8;
+  else if (k === 'nova') { SFX.boom(); t.boom(bo.x, bo.y, '#ffffff', true); t.boom(bo.x, bo.y, '#ffd84a', true); t.shake = 20; for (const b of t.balls) if (!b.lane && !b.ramp) { b.vx = rnd(-400, 400); b.vy = -rnd(1300, 1700); b.held = 0; } t.hurtBoss(6); }
   else if (k === 'meteor') { SFX.boom(); t.bolts.push({ x: bo.x, y: bo.y, life: .4, seed: Math.random() * 1000 }); t.boom(bo.x, bo.y, '#ff7a30', true); t.shake = 16; t.hurtBoss(4); }
   else if (k === 'multi') t.spawnMulti(3, cx, t.L.H - 380, 1, 10);
   else if (k === 'big') t.eff.big = G.type === 'boss' ? 12 : 10;
@@ -1506,10 +1645,11 @@ function resetRoundState() {
   SFX.music(true, 112);
 }
 function startRound() {
-  G.rid++; let li; do { li = Math.floor(Math.random() * DUELS.length); } while (li === G.li && DUELS.length > 1); G.li = li;
+  G.rid++; let li; do { li = Math.floor(Math.random() * DUELS.length); } while ((li === G.li || (DUELS[li].giant && Math.random() < .4)) && DUELS.length > 1); G.li = li;
   const C = CAMP[G.camp]; if (C) G.li = C.li;
   resetRoundState(); G.countT = 3.2;
-  if (C) { const t = G.tables[0]; t.solo = true; t.rush = C.rush ? C.rush.slice() : null; t.forceBoss = C.boss || null; t.bossMul = C.mul; t.mega = !!C.mega; t.bossT = 1.5; t.misT = 1e9; }
+  if (C) { const t = G.tables[0]; t.solo = true; t.rush = C.rush ? C.rush.slice() : null; t.forceBoss = C.boss || null; t.bossMul = C.mul * (C.mod === 'tiny' ? .85 : 1); t.mega = !!C.mega; t.bossT = 1.5; t.misT = 1e9;
+    t.mod = C.mod || null; t.gmul = C.mod === 'moon' ? .55 : C.mod === 'heavy' ? 1.3 : 1; t.modT = 9; }
 }
 function goPlay() { G.phase = 'play'; SFX.beep(true); for (const t of G.tables) t.ban('KØR!', '#ffd84a', .8); }
 function endRound(w) {
@@ -1545,6 +1685,13 @@ function featureFx(t, type, d, c) {
     case 'alien': SFX.bumper(); t.burst(d.x, d.y, '#7dff6b', 22, 340, .5, 4); t.ring(d.x, d.y, 40, '#7dff6b', .35, 3); return true;
     case 'alienAll': SFX.jackpot(); t.boom(d.x, d.y, '#7dff6b', true); t.ban('INVASION SLÅET!', '#7dff6b', 1.6, t.kind === 'duel' ? 'Modstanderen mister 20 liv' : 'Fuld fart på SUPER-måleren'); return true;
     case 'invGone': t.ban('INVASIONEN FLYGTEDE', '#b8f0b0', 1.2); return true;
+    case 'dark': SFX.alarm(); t.ban('LYSET GÅR UD!', '#b98cff', 1.4, 'Kun lyset omkring kuglen kan ses'); return true;
+    case 'modBomb': SFX.alarm(); t.text(t.L.cx, t.cam.y + 140, 'BOMBEREGN!', '#ff9040', 24); return true;
+    case 'modMir': SFX.alarm(); t.ban('SPEJLKAOS!', '#ff7a30', 1.2, 'Flipperne er byttet om i 4 sek.'); return true;
+    case 'bossPhase2': SFX.bossIn(); t.ban('FASE 2!', '#ff2040', 2, 'Mega-bossen raser og kalder på en invasion'); t.flash = .7; t.flashCol = '#ff2040'; t.shake = 16; return true;
+    case 'brick': SFX.peg(); t.burst(d.x, d.y, '#33ff66', 16, 300, .4, 4); t.ring(d.x, d.y, 30, '#33ff66', .3, 3); return true;
+    case 'bricksAll': SFX.jackpot(); t.boom(d.x, d.y, '#33ff66', true); t.ban('ALLE MURSTEN!', '#33ff66', 1.4, 'Fuld fart på evne-måleren'); return true;
+    case 'erupt': SFX.boom(); t.boom(d.x, d.y, '#ff5a1f', true); t.burst(d.x, d.y, '#ffd84a', 30, 600, .7, 4, 300); return true;
   }
   return false;
 }
@@ -1555,7 +1702,7 @@ function fxOnly(t, i, type, d) {
   else if (type === 'sling') t.burst(d.x, d.y, c, 6, 200, .3);
   else if (type === 'power') applyPower(t, i, d);
   else if (type === 'goal') t.boom(d.x, d.y, '#ffffff', true);
-  else if (type === 'dropAll' || type === 'rollAll') t.boom(d.x, d.y, '#ffd84a', false);
+  else if (type === 'dropAll' || type === 'rollAll' || type === 'lightsAll' || type === 'ufo') t.boom(d.x, d.y, '#ffd84a', false);
 }
 function applyPower(t, p, d) {
   const ty = d.type;
@@ -1612,6 +1759,7 @@ function onEvent(i, type, d) {
       G.dealt[p] += MIS_DMG; chargeMeter(p, 35);
     }
   }
+  if (G.type === 'boss' && playing && t.boss) { const hb = { lightsAll: 2, ufo: 2, alienAll: 3 }[type]; if (hb) { t.hurtBoss(hb); t.text(d.x, d.y - 46, 'BOSS −' + hb, '#ffd84a', 22); } }
   if (type === 'bossZap') { SFX.zap(); t.boom(d.x, d.y, '#fff36b', false); t.flash = .25; t.flashCol = '#fff36b'; t.text(d.x, d.y - 40, 'LYN −1', '#fff36b', 22); return; }
   if (type === 'bossHurt') {
     t.burst(d.x, d.y, '#ff4060', 16, 260, .4);
@@ -1647,6 +1795,8 @@ function onEvent(i, type, d) {
     else if (type === 'ramp') { t.ring(d.x, d.y, 60, '#7dffea', .4, 4); if (t.rampN > 1) t.ban('RAMPE ×' + t.rampN, '#7dffea', .9, 'Ramper i træk giver ekstra skade'); else t.text(d.x, d.y - 30, 'RAMPE!', '#7dffea', 20); }
     else if (type === 'portal' || type === 'alien' || type === 'alienAll') { }
     else if (type === 'bossHit') { SFX.bossHit(); t.burst(d.x, d.y, '#ff6060', 14, 320, .4); t.punch = Math.max(t.punch, .4); }
+    else if (type === 'lightsAll') { SFX.jackpot(); t.boom(d.x, d.y, '#ffd84a', true); t.ban('LYS-JACKPOT!', '#ffd84a', 1.2, 'Alle bumpere tændt'); }
+    else if (type === 'ufo') { SFX.jackpot(); t.boom(d.x, d.y, '#7dff6b', true); t.ban('UFO SKUDT NED!', '#7dff6b', 1.2, 'Lige i skroget'); }
     else if (type === 'strike') { SFX.zap(); t.bolts.push({ x: d.x, y: d.y, life: .3, seed: Math.random() * 1000 }); t.boom(d.x, d.y, '#fff36b', false); t.flash = .3; t.flashCol = '#fff36b'; }
     else { SFX.jackpot(); t.boom(d.x, d.y, '#ffd84a', true); t.ban(type === 'rollAll' ? 'ZAP COMBO!' : 'JACKPOT!', '#ffd84a', 1.1, type === 'rollAll' ? 'Alle 3 ZAP-baner tændt' : 'Alle 3 targets ramt'); }
     if (t.combo === 5 || (t.combo > 5 && t.combo % 10 === 0)) { t.ban('COMBO ×' + t.combo, '#ffd84a', .9, t.combo === 5 ? '+25% skade så længe du holder den' : 'Helt vildt!'); t.ring(d.x, d.y, 120, '#ffd84a', .5, 5); }
@@ -1686,6 +1836,9 @@ function onArenaEvent(t, type, d) {
   switch (type) {
     case 'bumper': SFX.bumper(); t.burst(d.x, d.y, COL[Math.max(0, t.last)], 12, 300, .4); t.ring(d.x, d.y, 44, COL[Math.max(0, t.last)], .3, 3); pushFx('b', d.x, d.y); if (t.last >= 0) chargeMeter(t.last, 5); break;
     case 'fhit': chargeMeter(d.p, 4); break;
+    case 'brick': featureFx(t, type, d); pushFx('k', d.x, d.y); if (t.last >= 0) chargeMeter(t.last, 6); break;
+    case 'bricksAll': featureFx(t, type, d); pushFx('B', d.x, d.y); if (t.last >= 0) chargeMeter(t.last, 40); break;
+    case 'erupt': featureFx(t, type, d); pushFx('E', d.x, d.y); break;
     case 'alien': featureFx(t, type, d); pushFx('a', d.x, d.y); if (t.last >= 0) chargeMeter(t.last, 8); break;
     case 'alienAll': featureFx(t, type, d); pushFx('A', d.x, d.y); if (t.last >= 0) chargeMeter(t.last, 35); break;
     case 'invGone': featureFx(t, type, d); break;
@@ -1696,7 +1849,7 @@ function onArenaEvent(t, type, d) {
       { const two = t.dbl[d.p] > 0; t.score[d.p] = Math.min(goalsNeeded(), t.score[d.p] + (two ? 2 : 1)); t.dbl[d.p] = 0; t.goals++; t.ban(two ? 'DOBBELT MÅL!' : 'MÅL!', COL[d.p], 1.3, clean(G.names[d.p === G.me ? 0 : 1]).toUpperCase() + ' SCORER'); } pushFx('g', d.x, d.y, d.p); vibrate(150);
       chargeMeter(1 - d.p, 20);
       if (t.score[d.p] >= goalsNeeded()) endRound(d.p);
-      else if (t.goals % 2 === 0) { let li; do { li = Math.floor(Math.random() * ARENAS.length); } while (ARENAS[li] === t.L); t.queueL = li; }
+      else if (t.goals % 2 === 0) { let li; do { li = Math.floor(Math.random() * ARENAS.length); } while (ARENAS[li] === t.L || (ARENAS[li].giant && Math.random() < .4)); t.queueL = li; }
       break;
     case 'power':
       powerFx(t, d); applyPower(t, d.p, d); pushFx('p', d.x, d.y, d.p, POW_KEYS.indexOf(d.type));
@@ -1879,13 +2032,13 @@ function netSend(now) {
     const t = G.tables[0], e = t.eff;
     Object.assign(P, { tt: r1(t.time), dealt: G.dealt[0], drain: G.drain[0], meter: Math.round(G.meter[0]), atk: G.atkList,
       b: t.balls.slice(0, MAXBALLS).map(b => [Math.round(b.x), Math.round(b.y), b.bomb ? 1 : 0]), f: t.fl.map(f => Math.round(f.a * 100) / 100), fl: Math.round(t.fl[0].len),
-      e: [r1(e.mir), r1(e.fog), r1(e.bh), r1(e.small), r1(e.quake), r1(e.x2), r1(e.big), r1(e.giant), r1(e.moon), r1(e.rage), r1(e.flip)], iv: invOut(t.inv), bo: t.bolts.map(b => [Math.round(b.x), Math.round(b.y)]), rl: t.rolls.map(Number), dr: t.drops.map(Number), tk: tokOut(t), sh: t.dshield,
+      e: [r1(e.mir), r1(e.fog), r1(e.bh), r1(e.small), r1(e.quake), r1(e.x2), r1(e.big), r1(e.giant), r1(e.moon), r1(e.rage), r1(e.flip)], iv: invOut(t.inv), bo: t.bolts.map(b => [Math.round(b.x), Math.round(b.y)]), rl: t.rolls.map(Number), dr: t.drops.map(Number), tk: tokOut(t), sh: t.dshield, sg: [t.lit.reduce((m, v, i) => m | ((v > 0 ? 1 : 0) << i), 0), t.ufoDead],
       bs: t.boss ? [Math.round(t.boss.x), t.boss.hp, t.boss.max, BOSS_KEYS.indexOf(t.boss.k), Math.round(t.boss.y), (t.boss.rage ? 1 : 0) | (t.boss.sh > 0 ? 2 : 0) | (t.boss.inv > 0 ? 4 : 0), t.boss.laser ? Math.round(t.boss.laser.x) : -1, t.boss.laser ? r1(t.boss.laser.t) : 0, r1(t.boss.t)] : 0 });
   }
   if (G.mode === 'arena' && G.tables[0]) {
     const t = G.tables[0];
     if (Net.role === 'host') P.ar = { b: t.balls.slice(0, MAXBALLS).map(b => [Math.round(b.x), Math.round(b.y), Math.round(b.vx), Math.round(b.vy)]), f: t.fl.map(f => Math.round(f.a * 100) / 100),
-      g: t.grav, sc: t.score, tk: tokOut(t), sh: t.shield, fx: G.fxList, l: t.last, li: ARENAS.indexOf(t.L), bp: t.bigP.map(r1), sp: t.slowP.map(r1), tb: r1(t.turbo), ef: [r1(t.eff.giant), r1(t.eff.moon), r1(t.eff.rage), r1(t.eff.ahome || 0)], tt: r1(t.time), iv: invOut(t.inv), db: t.dbl.map(r1) };
+      g: t.grav, sc: t.score, tk: tokOut(t), sh: t.shield, fx: G.fxList, l: t.last, li: ARENAS.indexOf(t.L), bp: t.bigP.map(r1), sp: t.slowP.map(r1), tb: r1(t.turbo), ef: [r1(t.eff.giant), r1(t.eff.moon), r1(t.eff.rage), r1(t.eff.ahome || 0)], tt: r1(t.time), iv: invOut(t.inv), db: t.dbl.map(r1), bk: t.bricks.reduce((m, v, i) => m | ((v > 0 ? 1 : 0) << i), 0) };
     else { P.inp = ['l', 'r'].map(sd => t.fl.some(f => f.p === 1 && f.side === sd && f.on) ? 1 : 0); P.sx = G.supReq; P.sk = G.skReqK; P.lo = loadout(0).map(k => SKILL_KEYS.indexOf(k)); }
     if (Net.role === 'host') Object.assign(P.ar, { ak: G.sk.map(a => a.map(Math.round)), am: G.meter.map(Math.round), an: G.nextAtk.map(k => ABIL_KEYS.indexOf(k)), fz: t.frz.map(r1), fi: r1(t.fire) });
   }
@@ -1934,7 +2087,8 @@ function oppDuel(op) {
   if (Array.isArray(o.rl)) g.rolls = [0, 1, 2].map(i => !!o.rl[i]);
   if (Array.isArray(o.dr)) g.drops = [0, 1, 2].map(i => !!o.dr[i]);
   tokIn(g, o.tk); g.dshield = o.sh ? 1 : 0;
-  g.boss = Array.isArray(o.bs) && BOSS_KEYS[o.bs[3]] ? { k: BOSS_KEYS[o.bs[3]], x: +o.bs[0] || g.L.cx, y: +o.bs[4] || g.L.boss.y, hp: o.bs[1] | 0, max: o.bs[2] | 0, vx: 0, f: 0, t: +o.bs[8] || 1, cd: 1, rage: o.bs[5] & 1, sh: o.bs[5] & 2 ? 1 : 0, inv: o.bs[5] & 4 ? 1 : 0, laser: o.bs[6] >= 0 ? { x: +o.bs[6], t: +o.bs[7] || 0 } : null } : null;
+  if (Array.isArray(o.sg)) { g.lit = g.L.bumpers.map((_, i) => (o.sg[0] >> i) & 1 ? 1 : 0); g.ufoDead = o.sg[1] | 0; }
+  g.boss = Array.isArray(o.bs) && BOSS_KEYS[o.bs[3]] ? { k: BOSS_KEYS[o.bs[3]], R: BOSS[BOSS_KEYS[o.bs[3]]].r * (g.L.giant || 1), x: +o.bs[0] || g.L.cx, y: +o.bs[4] || g.L.boss.y, hp: o.bs[1] | 0, max: o.bs[2] | 0, vx: 0, f: 0, t: +o.bs[8] || 1, cd: 1, rage: o.bs[5] & 1, sh: o.bs[5] & 2 ? 1 : 0, inv: o.bs[5] & 4 ? 1 : 0, laser: o.bs[6] >= 0 ? { x: +o.bs[6], t: +o.bs[7] || 0 } : null } : null;
 }
 function oppArenaGuest(op) {
   if (!op) return;
@@ -1959,6 +2113,7 @@ function oppArenaGuest(op) {
   if (Array.isArray(a.an)) G.nextAtk = [ABIL_KEYS[a.an[0]] || null, ABIL_KEYS[a.an[1]] || null];
   if (Array.isArray(a.fz)) t.frz = [+a.fz[0] || 0, +a.fz[1] || 0];
   t.fire = +a.fi || 0;
+  if (typeof a.bk === 'number') t.bricks = (t.L.bricks || []).map((_, i) => (a.bk >> i) & 1 ? 1 : 0);
   t.inv = invIn(a.iv); if (Array.isArray(a.db)) t.dbl = [+a.db[0] || 0, +a.db[1] || 0];
   if (Array.isArray(a.ef)) { t.eff.giant = +a.ef[0] || 0; t.eff.moon = +a.ef[1] || 0; t.eff.rage = +a.ef[2] || 0; t.eff.ahome = +a.ef[3] || 0; }
   for (const b of t.balls) b.r = t.eff.giant > 0 ? BR_BIG : BR;
@@ -1973,6 +2128,9 @@ function oppArenaGuest(op) {
     else if (ty === 'r') { SFX.ramp(); t.ring(x, y, 34, '#7dffea', .35, 3); }
     else if (ty === 'R') { SFX.rampOut(); t.burst(x, y, COL[p], 18, 320, .4); }
     else if (ty === 'a') featureFx(t, 'alien', { x, y });
+    else if (ty === 'k') featureFx(t, 'brick', { x, y });
+    else if (ty === 'B') featureFx(t, 'bricksAll', { x, y });
+    else if (ty === 'E') featureFx(t, 'erupt', { x, y });
     else if (ty === 'A') featureFx(t, 'alienAll', { x, y });
     else if (ty === 'P') featureFx(t, 'portal', { x, y, x2: Math.floor(ex / 2000), y2: ex % 2000 });
     else if (ty === 'S') { if (ABIL_KEYS[ex]) abilityFx(t, p, ABIL_KEYS[ex]); }
@@ -2252,6 +2410,9 @@ function themeDeco(TT, L, TH, now) {
     ctx.globalAlpha = .12; ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 1;
     for (let k = 0; k < 18; k++) { const x = 30 + hash(k) * (L.W - 60), y = 30 + hash(k + 4) * (TH - 60), a = hash(k + 8) * TAU; ctx.beginPath(); ctx.arc(x, y, 40 + hash(k + 2) * 80, a, a + 1.2); ctx.stroke(); }
     ctx.globalAlpha = .4; ctx.strokeStyle = '#ff5070'; ctx.lineWidth = 3; for (const y of [TH * .32, TH * .68]) { ctx.beginPath(); ctx.moveTo(15, y); ctx.lineTo(L.W - 15, y); ctx.stroke(); }
+  } else if (d === 'giant') {
+    for (let k = 0; k < 2; k++) { const a = Math.sin(now * .35 + k * 2.4) * .5, x = k ? L.W * .82 : L.W * .18; ctx.save(); ctx.translate(x, TH); ctx.rotate(a); const g = ctx.createLinearGradient(0, 0, 0, -TH); g.addColorStop(0, 'rgba(255,216,74,.12)'); g.addColorStop(1, 'rgba(255,216,74,0)'); ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(-20, 0); ctx.lineTo(20, 0); ctx.lineTo(160, -TH); ctx.lineTo(-160, -TH); ctx.fill(); ctx.restore(); }
+    ctx.globalAlpha = .05; ctx.fillStyle = '#ffd84a'; ctx.font = `${Math.round(L.W * .2)}px Bungee, sans-serif`; ctx.textAlign = 'center'; ctx.fillText('XXL', L.W / 2, TH * .62);
   } else if (d === 'scan') {
     ctx.globalAlpha = .12; ctx.fillStyle = '#33ff66'; for (let y = (now * 20) % 6; y < TH; y += 6) ctx.fillRect(15, y, L.W - 30, 1);
   } else if (d === 'embers') {
@@ -2260,6 +2421,74 @@ function themeDeco(TT, L, TH, now) {
     for (let k = 0; k < 30; k++) { const sp = 25 + hash(k) * 45, y = TH - ((now * sp + hash(k + 5) * TH) % TH), x = 25 + hash(k + 3) * (L.W - 50) + Math.sin(now * 3 + k) * 6; ctx.globalAlpha = .7 * (y / TH); ctx.fillStyle = k % 3 ? '#ff8a30' : '#ffd84a'; ctx.fillRect(x, y, 2.5, 2.5); }
   }
   ctx.restore();
+}
+// signature mechanics, drawn on the playfield under the balls
+function drawSig(t, L, now) {
+  ctx.save();
+  for (const z of L.belts) {
+    const d = z.dir * t.beltDir(), w = z.x1 - z.x0, h = z.y1 - z.y0, my = (z.y0 + z.y1) / 2, hh = h * .28;
+    ctx.fillStyle = 'rgba(24,16,4,.8)'; ctx.fillRect(z.x0, z.y0, w, h);
+    ctx.save(); ctx.beginPath(); ctx.rect(z.x0, z.y0, w, h); ctx.clip();
+    ctx.strokeStyle = '#ffb020'; ctx.globalAlpha = .6; ctx.lineWidth = 3;
+    const off = ((t.time * 70 * d) % 26 + 26) % 26;
+    for (let x = z.x0 - 26 + off; x < z.x1 + 26; x += 26) { ctx.beginPath(); ctx.moveTo(x - 6 * d, my - hh); ctx.lineTo(x + 6 * d, my); ctx.lineTo(x - 6 * d, my + hh); ctx.stroke(); }
+    ctx.restore(); ctx.strokeStyle = 'rgba(255,176,32,.7)'; ctx.lineWidth = 2; ctx.strokeRect(z.x0, z.y0, w, h);
+  }
+  L.bubbles.forEach((c, i) => {
+    const on = t.bubbleOn(i), g = ctx.createLinearGradient(0, c.y0, 0, c.y1);
+    g.addColorStop(0, 'rgba(120,230,255,0)'); g.addColorStop(1, `rgba(120,230,255,${on ? .26 : .07})`); ctx.fillStyle = g; ctx.fillRect(c.x - c.w, c.y0, c.w * 2, c.y1 - c.y0);
+    if (on) { ctx.strokeStyle = 'rgba(210,250,255,.8)'; ctx.lineWidth = 1.4; for (let k = 0; k < 10; k++) { const y = c.y1 - ((now * (170 + hash(k + i * 9) * 90) + hash(k) * 400) % (c.y1 - c.y0)), x = c.x + Math.sin(now * 5 + k) * c.w * .6; ctx.beginPath(); ctx.arc(x, y, 2 + hash(k + 3) * 4, 0, TAU); ctx.stroke(); } }
+  });
+  if (L.sig === 'lights') L.bumpers.forEach((u, i) => {
+    const on = t.lit[i] > 0 || t.lightT > 0; ctx.strokeStyle = on ? '#ffd84a' : 'rgba(255,216,74,.2)'; ctx.lineWidth = on ? 4 : 2;
+    ctx.globalAlpha = on ? (t.lightT > 0 ? .5 + .5 * Math.sin(now * 30) : .8 + .2 * Math.sin(now * 8 + i)) : 1; ctx.beginPath(); ctx.arc(u.x, u.y, u.r + 9, 0, TAU); ctx.stroke(); ctx.globalAlpha = 1;
+  });
+  if (L.ufo) {
+    const u = t.ufoPos();
+    if (u) {
+      ctx.save(); ctx.translate(u.x, u.y);
+      ctx.globalAlpha = .18 + .1 * Math.sin(now * 10); ctx.fillStyle = '#7dff6b'; ctx.beginPath(); ctx.moveTo(-10, 6); ctx.lineTo(10, 6); ctx.lineTo(30, 90); ctx.lineTo(-30, 90); ctx.fill(); ctx.globalAlpha = 1;
+      ctx.fillStyle = 'rgba(160,255,160,.85)'; ctx.beginPath(); ctx.ellipse(0, -6, 10, 9, 0, Math.PI, TAU); ctx.fill();
+      ctx.fillStyle = '#9aa4b8'; ctx.beginPath(); ctx.ellipse(0, 0, 24, 8, 0, 0, TAU); ctx.fill(); ctx.strokeStyle = '#7dff6b'; ctx.lineWidth = 2; ctx.stroke();
+      for (let k = 0; k < 5; k++) { ctx.fillStyle = (Math.floor(now * 8) + k) % 2 ? '#ffd84a' : '#ff3fd2'; ctx.beginPath(); ctx.arc(-16 + k * 8, 1, 2.2, 0, TAU); ctx.fill(); }
+      ctx.restore();
+    }
+  }
+  if (L.bricks) L.bricks.forEach((k, i) => {
+    const dead = t.bricks[i] > 0, x = k.x - k.w / 2, y = k.y - k.h / 2;
+    if (dead) { if (t.bricks[i] < 1.5) { ctx.globalAlpha = .3 + .3 * Math.sin(now * 20); ctx.strokeStyle = '#33ff66'; ctx.lineWidth = 1; ctx.strokeRect(x, y, k.w, k.h); ctx.globalAlpha = 1; } return; }
+    const c = ['#ff3f6a', '#ffb020', '#ffd84a', '#33ff66', '#22e6ff'][i % 5];
+    ctx.fillStyle = c; ctx.globalAlpha = .85; ctx.fillRect(x, y, k.w, k.h); ctx.globalAlpha = 1;
+    ctx.fillStyle = 'rgba(255,255,255,.45)'; ctx.fillRect(x, y, k.w, 3); ctx.fillStyle = 'rgba(0,0,0,.35)'; ctx.fillRect(x, y + k.h - 3, k.w, 3);
+  });
+  if (L.erupts && t.time > 8) {
+    const c = Math.floor(t.time / 9), ph = t.time - c * 9, sp = t.eruptAt(c);
+    if (ph >= 5.6 && ph < 7) {
+      const k = (ph - 5.6) / 1.4; ctx.globalAlpha = .25 + .35 * Math.abs(Math.sin(now * 14)); ctx.fillStyle = '#ff3a10'; ctx.beginPath(); ctx.arc(sp[0], sp[1], 115, 0, TAU); ctx.fill();
+      ctx.globalAlpha = .9; ctx.strokeStyle = '#ffd84a'; ctx.lineWidth = 3; ctx.setLineDash([10, 8]); ctx.beginPath(); ctx.arc(sp[0], sp[1], 115 * (1 - k * .6), 0, TAU); ctx.stroke(); ctx.setLineDash([]);
+      ctx.font = '26px Bungee, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = '#ffd84a'; ctx.fillText('!', sp[0], sp[1]); ctx.globalAlpha = 1;
+    } else if (ph >= 7 && ph < 7.8) {
+      const k = (ph - 7) / .8, g = ctx.createRadialGradient(sp[0], sp[1], 5, sp[0], sp[1], 30 + k * 120);
+      g.addColorStop(0, `rgba(255,240,180,${1 - k})`); g.addColorStop(.5, `rgba(255,120,30,${.8 * (1 - k)})`); g.addColorStop(1, 'rgba(255,60,10,0)');
+      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(sp[0], sp[1], 30 + k * 120, 0, TAU); ctx.fill();
+    }
+  }
+  ctx.restore();
+}
+// lights out: a dark layer with soft holes around the balls (drawn in viewport space)
+let darkCv = null;
+function drawDark(t, tf, z, amt) {
+  if (!darkCv) { darkCv = document.createElement('canvas'); darkCv.width = W * 2; darkCv.height = H * 2; }
+  const g = darkCv.getContext('2d');
+  g.setTransform(2, 0, 0, 2, 0, 0); g.globalCompositeOperation = 'source-over'; g.clearRect(0, 0, W, H);
+  const [x0, y0] = tf(10, 0), [x1, y1] = tf(t.L.W - 5, t.L.H);
+  g.fillStyle = `rgba(4,1,10,${.95 * amt})`; g.fillRect(Math.min(x0, x1), Math.min(y0, y1), Math.abs(x1 - x0), Math.abs(y1 - y0)); g.globalCompositeOperation = 'destination-out';
+  const hole = (wx, wy, r, a) => { const [x, y] = tf(wx, wy), rr2 = r * z, gr = g.createRadialGradient(x, y, rr2 * .3, x, y, rr2); gr.addColorStop(0, `rgba(0,0,0,${a})`); gr.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = gr; g.beginPath(); g.arc(x, y, rr2, 0, TAU); g.fill(); };
+  for (const b of t.balls) hole(b.x, b.y, b.bomb ? 70 : 125, 1);
+  for (const f of t.fl) hole(f.px + f.sx * f.len * .5, f.py, 55, .5);
+  if (t.boss) hole(t.boss.x, t.boss.y, 70, .45);
+  g.globalCompositeOperation = 'source-over';
+  ctx.drawImage(darkCv, 0, 0, W, H);
 }
 function neon(path, col, w, glow = 1) {
   ctx.lineCap = 'round'; ctx.lineJoin = 'round';
@@ -2398,23 +2627,23 @@ function drawTable(t, R, pi, opt = {}) {
   for (let x = 40; x < L.W - 20; x += 40) { ctx.moveTo(x, duel ? 60 : 10); ctx.lineTo(x, TH - 10); }
   ctx.stroke(); ctx.restore();
   if (!duel) {
-    const MY = TH / 2;
+    const MY = TH / 2, gk = L.giant || 1;
     // football pitch: mown stripes, white lines, centre circle, boxes and goal nets
     ctx.save();
     for (let k = 0; k * 80 < TH; k++) if (k % 2) { ctx.fillStyle = TT.stripe || 'rgba(70,255,150,.045)'; ctx.fillRect(15, k * 80, L.W - 30, 80); }
     ctx.strokeStyle = TT.line || 'rgba(255,255,255,.26)'; ctx.lineWidth = 2.5; ctx.beginPath();
     ctx.moveTo(15, MY); ctx.lineTo(L.W - 15, MY);
-    ctx.moveTo(L.cx + 72, MY); ctx.arc(L.cx, MY, 72, 0, TAU);
+    ctx.moveTo(L.cx + 72 * gk, MY); ctx.arc(L.cx, MY, 72 * gk, 0, TAU);
     for (const e of [1, -1]) {
       const gy = e > 0 ? TH - 12 : 12;
-      ctx.rect(L.cx - 150, e > 0 ? gy - 175 : gy, 300, 175);
-      ctx.rect(L.cx - 70, e > 0 ? gy - 70 : gy, 140, 70);
-      ctx.moveTo(L.cx + 55, gy - e * 175); ctx.arc(L.cx, gy - e * 175, 55, e > 0 ? Math.PI : 0, e > 0 ? TAU : Math.PI, e < 0);
+      ctx.rect(L.cx - 150 * gk, e > 0 ? gy - 175 * gk : gy, 300 * gk, 175 * gk);
+      ctx.rect(L.cx - 70 * gk, e > 0 ? gy - 70 * gk : gy, 140 * gk, 70 * gk);
+      ctx.moveTo(L.cx + 55 * gk, gy - e * 175 * gk); ctx.arc(L.cx, gy - e * 175 * gk, 55 * gk, e > 0 ? Math.PI : 0, e > 0 ? TAU : Math.PI, e < 0);
     }
     ctx.stroke();
     ctx.fillStyle = 'rgba(255,255,255,.4)'; ctx.beginPath(); ctx.arc(L.cx, MY, 5, 0, TAU); ctx.fill();
     for (let p = 0; p < 2; p++) {
-      const e = p === 0 ? 1 : -1, gy = e > 0 ? TH - 14 : 0, gw = 104;
+      const e = p === 0 ? 1 : -1, gy = e > 0 ? TH - 14 : 0, gw = 104 * gk;
       ctx.fillStyle = `rgba(${COLRGB[p]},.12)`; ctx.fillRect(L.cx - gw / 2, gy, gw, 14);
       ctx.strokeStyle = `rgba(${COLRGB[p]},.45)`; ctx.lineWidth = 1; ctx.beginPath();
       for (let x = L.cx - gw / 2; x <= L.cx + gw / 2; x += 8) { ctx.moveTo(x, gy); ctx.lineTo(x, gy + 14); }
@@ -2499,7 +2728,15 @@ function drawTable(t, R, pi, opt = {}) {
   // moving parts
   for (let i = 0; i < L.movers.length; i++) {
     const m = L.movers[i], st = moverState(m, t.time), f = t.mf ? t.mf[i] : 0;
-    if (m.kind === 'ob' && TT.bump) {
+    if (m.kind === 'lin') {
+      // the referee: walks along the halfway line in a striped shirt
+      ctx.save(); ctx.strokeStyle = 'rgba(255,255,255,.14)'; ctx.lineWidth = 2; ctx.setLineDash([6, 8]); ctx.beginPath(); ctx.moveTo(m.cx - m.A, m.cy); ctx.lineTo(m.cx + m.A, m.cy); ctx.stroke(); ctx.setLineDash([]);
+      const r = m.r * (1 + f * .2); ctx.translate(st.x, st.y);
+      ctx.beginPath(); ctx.arc(0, 0, r, 0, TAU); ctx.fillStyle = '#f4f4f4'; ctx.fill(); ctx.save(); ctx.clip(); ctx.fillStyle = '#111'; for (let x = -r; x < r; x += r * .5) ctx.fillRect(x, -r, r * .25, r * 2); ctx.restore();
+      neon(new Path2D(`M${-r} 0a${r} ${r} 0 1 0 ${2 * r} 0a${r} ${r} 0 1 0 ${-2 * r} 0`), f > .1 ? '#ffd84a' : '#ffffff', 2.5);
+      if (f > .1) { ctx.fillStyle = '#ffd84a'; ctx.fillRect(r * .6, -r * 1.6, 9, 13); }
+      ctx.restore();
+    } else if (m.kind === 'ob' && TT.bump) {
       ctx.strokeStyle = 'rgba(255,255,255,.08)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(m.cx, m.cy, m.R, 0, TAU); ctx.stroke();
       skinBumper(TT.bump === 'gear' || TT.bump === 'rock' ? TT.bump : 'gear', st.x, st.y, m.r * (1 + f * .2), TT.bump === 'rock' ? '#ff5a1f' : '#ffd84a', f, now, i + 7);
     } else if (m.kind === 'ob') {
@@ -2525,6 +2762,7 @@ function drawTable(t, R, pi, opt = {}) {
     neon(p, f > .1 ? '#ffffff' : col, u.r > 12 ? 3 : 2);
     if (u.r > 12) { ctx.strokeStyle = 'rgba(255,255,255,.35)'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(u.x, u.y, r * .55, 0, TAU); ctx.stroke(); }
   }
+  drawSig(t, L, now);
   if (duel && t.boss) {
     drawBoss(t, now);
     if (t.boss.mega) { const bo = t.boss, r = bo.R + 14 + 4 * Math.sin(now * 5); ctx.save(); ctx.globalAlpha = .7; neon(new Path2D(`M${bo.x - r} ${bo.y}a${r} ${r} 0 1 0 ${2 * r} 0a${r} ${r} 0 1 0 ${-2 * r} 0`), '#ff3050', 3); ctx.globalAlpha = 1; ctx.font = '13px Bungee, sans-serif'; ctx.textAlign = 'center'; ctx.fillStyle = '#ffd84a'; ctx.fillText('♛ MEGA', bo.x, bo.y - r - 8); ctx.restore(); }
@@ -2613,6 +2851,7 @@ function drawTable(t, R, pi, opt = {}) {
   }
   ctx.globalAlpha = 1;
   ctx.restore();
+  { const dk = duel && !opt.mini ? t.darkAmt() : 0; if (dk > 0) drawDark(t, tf, z, dk); }
   // ---- everything below is drawn upright in the 400 x 720 viewport ----
   const inView = y => y > -40 && y < H + 40;
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
@@ -2649,6 +2888,8 @@ function drawTable(t, R, pi, opt = {}) {
       if (e.x2 > 0) chips.push(['×2 SKADE', e.x2, '#ff5c8a']); if (e.big > 0) chips.push(['KÆMPE', e.big, '#ffd84a']); if (t.dshield) chips.push(['SKJOLD', 0, '#5cf2ff']);
       if (e.flip > 0) chips.push(['OMVENDT TYNGDE', e.flip, '#c070ff']); if (t.save > 3) chips.push(['REDNINGSNET', t.save, '#7dff9a']); if (t.inv) chips.push(['INVASION', t.inv.t, '#7dff6b']);
       if (t.atkQ.length) chips.push(['ANGREB I KØ ×' + t.atkQ.length, 0, '#ff4060']);
+      if (t.mod) { const M = MODS[t.mod], w = t.wind(); chips.push([t.mod === 'wind' ? (w < -60 ? '← ' : '') + M.n + (w > 60 ? ' →' : '') : M.n, 0, M.c]); }
+      if (t.darkAmt() > 0) chips.push(['MØRKE', 0, '#b98cff']);
       if (t.combo >= 3) chips.push(['COMBO ×' + t.combo + (t.combo >= 5 ? ' (+25%)' : ''), 0, '#ffd84a']);
       if (t.rampN > 1) chips.push(['RAMPE ×' + t.rampN, t.rampT, '#7dffea']);
     } else {
@@ -2771,11 +3012,15 @@ function drawCenter() {
     const txt = n > 0 ? String(n) : 'KØR!';
     ctx.save(); ctx.translate(cw / 2, ch / 2); const sc = Math.min(cw, ch) / 500; ctx.scale(sc, sc);
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.fillStyle = 'rgba(5,3,15,.7)'; ctx.fillRect(-260, -170, 520, 70);
+    const CL = G.mode === 'arena' ? G.tables[0].L : duelL(), CM = G.type === 'boss' && CAMP[G.camp] && MODS[CAMP[G.camp].mod];
+    ctx.fillStyle = 'rgba(5,3,15,.7)'; ctx.fillRect(-260, -170, 520, 70 + (CL.sigTxt ? 26 : 0) + (CM ? 46 : 0));
     ctx.font = '22px Bungee, sans-serif'; ctx.fillStyle = '#ffd84a';
     ctx.fillText(G.mode === 'arena' ? `FØRST TIL ${goalsNeeded()} MÅL` : G.type === 'boss' ? (CAMP[G.camp] && CAMP[G.camp].rush ? 'BOSS-RUSH' : CAMP[G.camp] && CAMP[G.camp].mega ? 'MEGA-BOSS!' : 'BOSS-KAMP ' + (G.camp + 1)) : `RUNDE ${G.round}`, 0, -150);
     ctx.font = '16px Bungee, sans-serif'; ctx.fillStyle = '#ece9ff';
-    ctx.fillText('BANE: ' + (G.mode === 'arena' ? G.tables[0].L.name : duelL().name), 0, -120);
+    ctx.fillText('BANE: ' + CL.name + (CL.giant ? ' · KÆMPEBANE!' : ''), 0, -120);
+    let ly = -94; ctx.font = '13px Bungee, sans-serif';
+    if (CL.sigTxt) { ctx.fillStyle = '#7dffea'; ctx.fillText(CL.sigTxt, 0, ly); ly += 26; }
+    if (CM) { ctx.fillStyle = CM.c; ctx.fillText('REGEL: ' + CM.n, 0, ly); ctx.font = '600 15px "Chakra Petch", sans-serif'; ctx.fillText(CM.d, 0, ly + 21); }
     ctx.scale(1 + k * .5, 1 + k * .5); ctx.font = '110px Bungee, sans-serif';
     ctx.globalAlpha = .4; ctx.fillStyle = '#ff3fd2'; ctx.fillText(txt, 4, 4); ctx.fillStyle = '#22e6ff'; ctx.fillText(txt, -4, -4);
     ctx.globalAlpha = 1; ctx.fillStyle = '#fff'; ctx.fillText(txt, 0, 0);
@@ -3010,7 +3255,7 @@ function showCamp() {
     const n = document.createElement('span'); n.className = 'n'; n.textContent = open ? String(i + 1) : '🔒';
     const mid = document.createElement('span'), nb = document.createElement('b'), sm = document.createElement('small');
     nb.textContent = C.rush ? 'BOSS-RUSH' : C.mega ? 'MEGA-BOSS: MEGA-' + BOSS[C.boss].n : BOSS[C.boss].n;
-    sm.textContent = C.rush ? C.rush.length + ' bosser i træk på ' + L.name : L.name + ' · ' + Math.round(BOSS[C.boss].hp * C.mul) + ' træf' + (C.mega ? ' · låser nye evner op' : '');
+    sm.textContent = (C.rush ? C.rush.length + ' bosser i træk på ' + L.name : L.name + ' · ' + Math.round(BOSS[C.boss].hp * C.mul * (C.mod === 'tiny' ? .85 : 1)) + ' træf' + (C.mega ? ' · låser nye evner op' : '')) + (C.mod ? ' · ' + MODS[C.mod].n : '');
     mid.append(nb, sm);
     const s2 = document.createElement('span'); s2.className = 'st'; s2.textContent = st[i] ? '★'.repeat(st[i]) + '☆'.repeat(3 - st[i]) : '';
     b.append(n, mid, s2); b.onclick = () => startCamp(i);
@@ -3155,6 +3400,7 @@ if (/^[a-z0-9]{4}$/i.test(hc)) { $('joinCode').value = hc.toUpperCase(); $('menu
 if (document.fonts && document.fonts.load) document.fonts.load('20px Bungee').catch(() => {});
 requestAnimationFrame(frame);
 </script>
+
 
 </body>
 </html>
