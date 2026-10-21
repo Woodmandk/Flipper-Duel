@@ -1,101 +1,75 @@
 # Flipper Duel
 
-Et neon-flipperspil for to spillere, der kører direkte i browseren. Ingen installation og intet login.
+A neon pinball game for two players that runs right in the browser. No install, no login.
 
-**Spil her:** https://woodmandk.github.io/Flipper-Duel/
+**Play here:** https://woodmandk.github.io/Flipper-Duel/
 
-## Spiltyper
+## Game modes
 
-- **Duel** – I har hvert jeres bord og 1200 liv hver. Alt du rammer, skader modstanderens liv. Bedst af 3 runder, og hver runde spilles på en tilfældig bane (Neon Klassik, Ruminvasion, Kaosfabrikken, Dybhavet eller Spøgelseshuset). Efter 2½ minut går runden i OVERDRIVE, hvor al skade tæller dobbelt. 5 hurtige træf i træk giver combo med +25% skade.
-- **Kampagne** – dig alene mod bosserne i 20 boss-kampe. Hver 5. bane er en **mega-boss**, der er større, har alle bossernes angreb, går i fase 2 med en invasion ved halv HP og låser nye evner op, når du slår den. Mange baner har en særlig regel: lav tyngde, stormvind, mørke, bomberegn, mini-flippere, tung kugle eller spejlkaos. De sidste 5 baner spilles på kæmpebanen. Du har 300 liv og 5–7 minutter, og bossen tærer på dine liv. Vind for at låse næste bane op, og få 1–3 stjerner efter hvor mange liv du har tilbage. Power-ups i kampagnen er kun dem, der hjælper mod bossen.
-- **Arena** – Flipper-fodbold: banen er en fodboldbane uden tyngdekraft. Hver spiller har en målmand (to flippere foran målet) og to angribere ude på modstanderens halvdel, ligesom i bordfodbold. Først til 5 mål, og banen skifter for hver 2 mål. Hver spiller har sin egen rampe, der skyder mod modstanderens mål.
+- **Duel** – you each have your own table and 1200 HP. Everything you hit damages your opponent. Best of 3 rounds, each played on a random table (Neon Classic, Space Invasion, Chaos Factory, Deep Sea or Haunted House). After 2½ minutes the round goes into OVERDRIVE, where all damage counts double. 5 quick hits in a row give a combo with +25% damage.
+- **Campaign** – you alone against the bosses in 20 boss fights. Every 5th level is a **mega boss**: bigger, with every boss's attacks, a phase 2 invasion at half HP, and new skills unlocked when you beat it. Many levels have a special rule: low gravity, storm wind, darkness, bomb rain, mini flippers, heavy ball or mirror chaos. The last 5 levels are played on the giant table. You have 300 HP and 5–7 minutes, and the boss wears your HP down. Win to unlock the next level and earn 1–3 stars depending on how much HP you have left.
+- **Arena** – pinball football: the table is a pitch with no gravity. Each player has a goalkeeper (two flippers in front of the goal) and two strikers up on the opponent's half, just like table football. First to 5 goals, and the table changes every 2 goals. Each player has a ramp that shoots at the opponent's goal.
 
-## Brede baner
+## Tables
 
-Banerne er brede og zoomet godt ud. I Duel følger kameraet kuglen og viser hele bordet ved multiball. Hver bane har sin egen form og sit eget tema: Ruminvasion er Space Invaders med rumvæsen-bumpere og bunkere, Kaosfabrikken har flat loft, stempler og tandhjul, Dybhavet har vandmænd og klipper, og Spøgelseshuset har spidst tag, græskar og gravsten. Arena-banerne er Stadion, Ishallen, Retro-arkaden (timeglas-form) og Vulkanen.
+The tables are wide and zoomed out. In Duel the camera follows the ball and shows the whole table during multiball. Each table has its own shape, theme and music, and its own mechanic (shown on screen before the round):
 
-Hver bane har også sin egen mekanik, så de spiller forskelligt (den står på skærmen før runden):
+- **Neon Classic** – light all bumpers at once for a light jackpot (−15).
+- **Space Invasion** – a UFO flies across the top. Shoot it down for −12.
+- **Chaos Factory** – conveyor belts push the ball sideways and switch direction.
+- **Deep Sea** – low gravity and bubble columns that lift the ball.
+- **Haunted House** – the lights go out now and then, so you only see around the ball.
+- **Stadium** – a referee walks back and forth across the middle.
+- **Ice Rink** – slippery ice: the ball zooms faster.
+- **Retro Arcade** – bricks you can smash for energy. They come back after 10 seconds.
+- **Volcano** – eruptions fling the balls away. Watch for the red warning.
 
-- **Neon Klassik** – tænd alle bumpere på én gang for en lys-jackpot (−15).
-- **Ruminvasion** – en UFO flyver forbi i toppen. Skyd den ned for −12.
-- **Kaosfabrikken** – transportbånd skubber kuglen til siden og skifter retning.
-- **Dybhavet** – lav tyngde og boblesøjler, der løfter kuglen.
-- **Spøgelseshuset** – lyset går ud en gang imellem, så du kun ser omkring kuglen.
-- **Stadion** – en dommer går frem og tilbage på midten.
-- **Ishallen** – glat is: kuglen suser hurtigere.
-- **Retro-arkaden** – murstene, du kan smadre for energi. De kommer igen efter 10 sekunder.
-- **Vulkanen** – udbrud slynger kuglerne væk. Se efter den røde advarsel.
+**Giant tables** show up now and then: GIANT HALL in Duel and MEGA STADIUM in Arena are much bigger than the others.
 
-**Kæmpebaner** dukker op en gang imellem: KÆMPEHALLEN i Duel og MEGASTADION i Arena er langt større end de andre baner. I kampagnen giver lys-jackpot, UFO og invasioner også skade på bossen.
+On the tables you'll find ramps, portals, extra flippers, missions with a time limit, and a **boss** on every Duel table that fights back with its own attack. Beat it and your opponent loses 100 HP. Nudge the table with `S` or `↓`, but nudge too much and you get TILT.
 
-På bordene finder du:
+## Skills
 
-- **Ramper** – skyd hårdt ind i indgangen, så kører kuglen på skinner over bordet. Flere ramper i træk giver mere skade.
-- **Portaler** – orange og blå hænger sammen og teleporterer kuglen.
-- **Ekstra flipper** midt på nogle baner.
-- **BOSS** – i Duel har hver bane sin egen boss: Øjet og Krabben (Neon Klassik), Moderskibet (Ruminvasion), Robotten (Kaosfabrikken), Kraken (Dybhavet) og Spøgelset (Spøgelseshuset). Bossen kæmper imod med sit eget angreb (bomber, laser, skjold, blæk, usynlighed eller et hurtigt udfald), skader dig så længe den lever, og dykker jævnligt ned mod flipperne, så du kan ramme den. Ved halv HP bliver den RASENDE og hurtigere. Besejr den, så mister modstanderen 100 liv. Ellers flygter den efter 45 sekunder.
-- **Missioner** – små opgaver med tidsfrist, fx "Ram 8 bumpere". Klarer du dem, mister modstanderen 30 liv.
-- **Ryst bordet** med `S` eller `↓`. Ryster du for meget, kommer der TILT.
-
-## Lyd, slowmotion og indstillinger
-
-- **Musik til hvert tema** – hver bane har sin egen musik og sin egen bumper-lyd: invader-march i Ruminvasion, maskinlarm i Kaosfabrikken, drømmende toner i Dybhavet, uhyggeligt orgel i Spøgelseshuset, stadion-stomp, isklokker, 8-bit og tromme-tribal i Arena.
-- **Slowmotion** – boss-drab, mål og den afgørende sejr spilles i slowmotion med filmstriber.
-- **Indstillinger og statistik** (i menuen) – vælg computerens sværhedsgrad (Let, Normal, Svær, Umulig), din kugle og din flipperfarve. Statistikken viser sejre, bosser, bedste combo, mål, skade og kampagne-stjerner.
-- **Kugler at låse op** – Guld (vind 3 kampe), Ild (besejr 5 bosser), Slim (combo på 20), Galakse (25 mål i Arena) og Regnbue (12 kampagne-stjerner).
-- **Emojis online** – send 😂 😮 🔥 😈 👏 til modstanderen med tasterne 6–0 eller knapperne øverst til venstre.
-
-## Evner (du vælger selv)
-
-Du vælger selv **2 evner** (under "Dine evner" i menuen og i kampagnen). Du har én energibar, der fyldes, når du rammer ting, og hver evne koster en del af den (mærkerne på bjælken viser prisen). Du vælger selv, om du bruger energien på en billig evne nu eller sparer op til en dyr. Baren rummer 100 energi, og evnerne koster fra 20 til 100. Bruger du den samme evne flere gange, lægges tiden oven i (fx 2× Vampyr = 20 sekunder). Når du har råd, står der KLAR!, og du bruger evnen med `Q` / `E` (eller `1` / `2`) eller knappen ved bordet. Computeren vælger også sine egne evner.
-
-- **Duel:** Homing, Super-skade, Lynstorm, Vampyr (skade bliver til liv), Redningsnet, Multiball, Kæmpe-flippere, Skjold, Helbred, Mega-slag, Dobbeltangreb og angreb du sender over (Tåge, Bombe, Jordskælv, Spejlvendt, Mini-flippere, Frys modstander, Sort hul, Energityv, Bomberegn).
-- **Arena:** Ildkugle, Frys, Mur, Homing, Kæmpekugler, Kanon, Sløv modstander, Kugleregn, Dobbelt mål, Tredobbelt skud, Multiball og Kæmpe-flippere.
-- **Kampagne:** Lyn, Sneglefart, Frys bossen, Magnet, Kraftslag, Meteor, Supernova, Vampyr, Redningsnet, Multiball, Kæmpe-flippere, Skjold og Helbred.
-
-Nogle evner er låst, indtil du slår mega-bosserne i kampagnen.
-
-Efter et kaos-power-up får bordet en pause, før det næste dukker op: kaos, så ro, så kaos igen.
+You pick **2 skills** (under "Your skills" in the menu and in the campaign). You have one energy bar that fills when you hit things, and each skill costs part of it (the marks on the bar show the price). The bar holds 100 energy and skills cost from 20 to 100. Use the same skill again and its time stacks. When you can afford a skill it says READY!, and you fire it with `Q` / `E` (or `1` / `2`) or the button by the table. Some skills unlock when you beat the mega bosses.
 
 ## Power-ups
 
-Sekskanter dukker op på bordet. Ram dem med kuglen. I Arena går de til den, der sidst ramte kuglen.
+Hexagons pop up on the table. Hit them with the ball. Regular ones include Multiball, Shield, Double damage, Repair, Giant flippers, Safety net and Double goal. **CHAOS power-ups** (with a rainbow ring) include Mega chaos +10 balls, Giant balls, Moon gravity, Invasion, Reverse gravity, Bumper rage, Lightning storm and Ball cannon.
 
-- **Almindelige:** Multiball, Skjold (teleporterer kuglen væk fra hullet), Dobbelt skade, Reparér (+50 liv), Kæmpe-flippere, ZAP-bonus, Redningsnet (gratis kugler i 15 sek.), Sløv modstander, Turbo og Dobbelt mål. Ekstra kugler forsvinder igen efter kort tid.
-- **KAOS-power-ups** (med regnbue-ring): Mega-kaos +10 kugler, Kæmpekugler, Måne-tyngde (kun Duel), Invasion (rumvæsner marcherer ind, skyd dem ned), Omvendt tyngde (kun Duel), Bumper-raseri, Lynstorm og Kuglekanon.
+Press **?** in the game for an explanation of everything.
 
-Tryk på **?** i spillet for at se en forklaring på alt.
+## Daily challenge, shop and Chaos Friday
 
-## Dagens udfordring, butik og Kaos-fredag
+- **Daily challenge:** a new boss fight every day. The table, boss and rule come from the date, so everyone gets the same one. The game keeps today's record and your streak of days in a row.
+- **Shop:** you earn coins in every match (most for wins and the daily challenge) and buy new balls, flippers, backgrounds (Sunset, Deep Sea, Matrix, Galaxy) and victory dances (Confetti, Fireworks, Lightning Show, Disco).
+- **Chaos Friday:** every Friday all chaos power-ups are on, they show up much more often, and you get 50% more coins. Add `#kaos` to the address to try it on another day.
 
-- **Dagens udfordring:** en ny boss-kamp hver dag. Bane, boss og regel bestemmes af datoen, så alle får den samme. Spillet gemmer dagens rekord og din stime af dage i træk.
-- **Butik:** du tjener mønter i alle kampe (mest for sejre og dagens udfordring) og køber nye kugler, flippere, baggrunde (Solnedgang, Dybhav, Matrix, Galakse) og sejrsdanse (Konfetti, Fyrværkeri, Lynshow, Disco).
-- **Kaos-fredag:** hver fredag er alle kaos-power-ups tændt, de kommer meget oftere, og du får 50% flere mønter. Tilføj `#kaos` til adressen for at prøve det en anden dag.
+Coins, purchases, records and stats are stored only on your device.
 
-Mønter, køb og rekorder gemmes kun på din enhed.
+## Playing against each other
 
-## Sådan spiller I mod hinanden
+**Find an opponent online:** press **Find an opponent online** and you're paired with a random player searching for the same mode right now. It runs without a server of its own (via PeerJS). If nobody is online, you can play the computer instead.
 
-**Find en modstander online:** tryk **Find en modstander online**, så bliver du sat sammen med en tilfældig spiller, der søger samme spiltype lige nu. Det kører uden egen server (via PeerJS). Er der ingen online, kan du spille mod computeren i stedet.
+**Against a friend:**
 
-**Mod en ven:**
+1. Open the game, type your name, pick a mode and press **Challenge a friend online**.
+2. Press **Copy invite** and send the link to your friend.
+3. Your friend opens the link (the code is already filled in) and presses **Join**.
+4. Press **Start the match**.
 
-1. Åbn spillet, skriv dit navn, vælg spiltype og tryk **Udfordr en ven online**.
-2. Tryk **Kopiér invitation** og send linket til din ven.
-3. Din ven åbner linket (koden er allerede udfyldt) og trykker **Deltag**.
-4. Tryk **Start kampen**.
+You can also play the computer or two players on one screen.
 
-Man kan også spille mod computeren eller to på samme skærm.
+## Controls
 
-## Styring
-
-| | Venstre flipper | Højre flipper | SUPER | Ryst |
+| | Left flipper | Right flipper | Skill / SUPER | Nudge |
 |---|---|---|---|---|
-| Én spiller | `A` eller `←` | `D` eller `→` | `W`, `↑` eller `Mellemrum` | `S` eller `↓` |
-| Spiller 1 (samme skærm) | `A` | `D` | `W` | `S` |
-| Spiller 2 (samme skærm) | `←` | `→` | `↑` | `↓` |
-| Mobil/tablet | Tryk i venstre side | Tryk i højre side | SUPER-knappen | – |
+| One player | `A` or `←` | `D` or `→` | `Q` / `E` | `S` or `↓` |
+| Player 1 (same screen) | `A` | `D` | `Q` / `E` | `S` |
+| Player 2 (same screen) | `←` | `→` | `I` / `O` | `↓` |
+| Phone/tablet | Tap the left side | Tap the right side | Skill buttons | – |
 
-## Teknik
+Online you can send emojis to your opponent with the keys 6–0.
 
-Hele spillet er én fil, `index.html`: Canvas-grafik, egen flipperfysik og lyd lavet med Web Audio. Online-spil går direkte mellem de to browsere via WebRTC ([PeerJS](https://peerjs.com)), så der er ingen server at drive. På meget lukkede netværk (fx nogle firma- eller mobilnet) kan en direkte forbindelse fejle.
+## Tech
+
+The whole game is one file, `index.html`: canvas graphics, custom pinball physics and sound made with Web Audio. Online play goes directly between the two browsers over WebRTC ([PeerJS](https://peerjs.com)), so there is no server to run. On very locked-down networks (some company or mobile networks) a direct connection can fail.
