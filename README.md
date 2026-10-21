@@ -7,7 +7,7 @@ Et neon-flipperspil for to spillere, der kører direkte i browseren. Ingen insta
 ## Spiltyper
 
 - **Duel** – I har hvert jeres bord og 1200 liv hver. Alt du rammer, skader modstanderens liv. Bedst af 3 runder, og hver runde spilles på en tilfældig bane (Neon Klassik, Orbit-loopet, Kaosfabrikken, Tvillingerne eller Portal-labyrinten). Efter 2½ minut går runden i OVERDRIVE, hvor al skade tæller dobbelt. 5 hurtige træf i træk giver combo med +25% skade.
-- **Arena** – Ét bord med flippere i begge ender og ingen tyngdekraft: kuglen flyver frit, og hele banen kan ses på én gang. Først til 5 mål, og banen skifter for hver 2 mål. Hver spiller har sin egen rampe, der skyder mod modstanderens mål.
+- **Arena** – Flipper-fodbold: banen er en fodboldbane uden tyngdekraft. Hver spiller har en målmand (to flippere foran målet) og to angribere ude på modstanderens halvdel, ligesom i bordfodbold. Først til 5 mål, og banen skifter for hver 2 mål. Hver spiller har sin egen rampe, der skyder mod modstanderens mål.
 
 ## Brede baner
 

@@ -107,7 +107,7 @@ button.btn.ghost{background:transparent;font-size:14px;padding:9px;}
       <span class="lbl">Spiltype</span>
       <div class="modes">
         <button class="mode" type="button" id="mDuel" aria-pressed="true"><b>DUEL</b><span>Hvert sit bord. Gode skud skader modstanderen og sender angreb over. Bedst af 3.</span></button>
-        <button class="mode" type="button" id="mArena" aria-pressed="false"><b>ARENA</b><span>Ét bord, to ender. Få kuglen forbi modstanderens flippere. Først til 5.</span></button>
+        <button class="mode" type="button" id="mArena" aria-pressed="false"><b>ARENA</b><span>Flipper-fodbold på én bane. Skyd kuglen i modstanderens mål. Først til 5.</span></button>
       </div>
     </div>
     <div class="btns">
@@ -193,8 +193,8 @@ button.btn.ghost{background:transparent;font-size:14px;padding:9px;}
       </ul>
     </section>
     <section>
-      <h3><span class="b">ARENA</span> · ét bord, først til 5</h3>
-      <p>Få kuglen forbi modstanderens flippere. Der er ingen tyngdekraft, så kuglen flyver frit rundt, og hele banen kan ses på én gang. Banen skifter for hver 2 mål: Klassik, Møllen, Diamanten eller Bumper-stormen. På nogle baner har hver spiller sin egen rampe, der skyder kuglen mod modstanderens mål.</p>
+      <h3><span class="b">ARENA</span> · flipper-fodbold, først til 5</h3>
+      <p>Banen er en fodboldbane. Du har en målmand (to flippere foran dit mål) og to angribere ude på modstanderens halvdel, ligesom i bordfodbold. Dine knapper styrer dem alle på én gang. Der er ingen tyngdekraft, så kuglen flyver frit. Banen skifter for hver 2 mål: Klassik, Møllen, Diamanten eller Bumper-stormen. På nogle baner har hver spiller sin egen rampe, der skyder kuglen mod modstanderens mål.</p>
       <p>Din SUPER-måler lader op, når du rammer kuglen, rammer bumpere og når du får mål imod dig. Fyr den af, når det passer dig:</p>
       <ul class="legend">
         <li><i style="--c:#ff7a30">🔥</i><b>Ildkugle</b><span>Alle kugler brager mod modstanderens mål</span></li>
@@ -377,9 +377,9 @@ function duelLayout(name, cfg) {
     portals: cfg.portals || [], ramps: (cfg.ramps || []).map(mkRamp), rolls: [], drops: cfg.drops || [sg(45, 560, 45, 592), sg(45, 602, 45, 634), sg(45, 644, 45, 676)],
     kaos: cfg.kaos || sg(472, 560, 472, 612), flippers: [], bh: cfg.bh || { x: DCX, y: 520 }, boss: { y: cfg.bossY || 350, x0: 130, x1: 385 } };
   L.walls.push(...arcSegs(272.5, 272.5, 257.5, Math.PI, TAU, 34));
-  L.walls.push(sg(15, 272, 15, 1040), sg(15, 752, 182, 920), sg(500, 320, 500, 985), sg(500, 752, 333, 920), sg(530, 272, 530, 985), sg(500, 985, 530, 985));
+  L.walls.push(sg(15, 272, 15, 1040), sg(15, 752, 185, 911), sg(500, 320, 500, 985), sg(500, 752, 330, 911), sg(530, 272, 530, 985), sg(500, 985, 530, 985));
   for (const x of (cfg.posts || [167, 237, 307, 377])) L.walls.push(sg(x, 118, x, 150));
-  const sl = [[127, 760], [127, 832], [162, 865]], sr = sl.map(([x, y]) => [2 * DCX - x, y]);
+  const sl = [[134, 760], [134, 832], [167, 862]], sr = sl.map(([x, y]) => [2 * DCX - x, y]);
   for (const s of [sl, sr]) { L.walls.push(sg(s[0][0], s[0][1], s[1][0], s[1][1]), sg(s[1][0], s[1][1], s[2][0], s[2][1])); L.slings.push(sg(s[0][0], s[0][1], s[2][0], s[2][1])); }
   L.slingTri = [sl, sr];
   L.islands = cfg.islands || [];
@@ -388,8 +388,8 @@ function duelLayout(name, cfg) {
   L.rolls = [{ x: 202, y: 134 }, { x: 272, y: 134 }, { x: 342, y: 134 }];
   L.flippers = [{ px: 182, py: 920, sx: 1, sy: 1, len: 70, rest: .52, up: -.48, side: 'l' }, { px: 333, py: 920, sx: -1, sy: 1, len: 70, rest: .52, up: -.48, side: 'r' }];
   // optional third flipper half-way up, fed by a small ledge from the side wall
-  if (cfg.upper === 'r' || cfg.upper === 'both') { L.flippers.push({ px: 468, py: 480, sx: -1, sy: 1, len: 54, rest: .52, up: -.48, side: 'r' }); L.walls.push(sg(500, 450, 476, 474)); }
-  if (cfg.upper === 'l' || cfg.upper === 'both') { L.flippers.push({ px: 47, py: 480, sx: 1, sy: 1, len: 54, rest: .52, up: -.48, side: 'l' }); L.walls.push(sg(15, 450, 39, 474)); }
+  if (cfg.upper === 'r' || cfg.upper === 'both') { L.flippers.push({ px: 468, py: 480, sx: -1, sy: 1, len: 54, rest: .52, up: -.48, side: 'r' }); L.walls.push(sg(500, 450, 465, 471)); }
+  if (cfg.upper === 'l' || cfg.upper === 'both') { L.flippers.push({ px: 47, py: 480, sx: 1, sy: 1, len: 54, rest: .52, up: -.48, side: 'l' }); L.walls.push(sg(15, 450, 50, 471)); }
   L.shield = sg(212, 984, 303, 984);
   L.area = cfg.area || [80, 420, 440, 660];
   const big = L.bumpers.find(b => b.r > 12) || (L.movers[0] && { x: L.movers[0].cx, y: L.movers[0].cy });
@@ -444,22 +444,24 @@ const DUELS = [
     saucers: [{ x: DCX, y: 760 }],
   }),
 ];
-// Arena: one table, flippers at both ends, no gravity: the ball flies freely.
-const ACX = AW / 2, ACY = AH / 2, AFX = 82, AFL = 61;
+// Arena: a football pitch, no gravity (the ball flies freely). Each player has a keeper pair in front of their goal
+// and two strikers out in the opponent's half, like table football.
+const ACX = AW / 2, ACY = AH / 2, AFX = 82, AFL = 61, ASX = 135, ASY = 250, ASL = 52;
 // the bottom player's ramp shoots at the top goal; the top player's ramp is its point mirror
 const ARAMP0 = { pts: [[70, 520], [70, 320], [95, 240], [150, 190], [215, 165]], own: 0, col: COL[0] };
 const ARAMP1 = { pts: ARAMP0.pts.map(([x, y]) => [AW - x, AH - y]), own: 1, col: COL[1] };
 function arenaLayout(name, cfg) {
   const L = { kind: 'arena', name, W: AW, H: AH, cx: ACX, walls: [], slings: [], bumpers: cfg.bumpers || [], movers: cfg.movers || [], pegs: cfg.pegs || [], saucers: cfg.saucers || [], sensors: [], rolls: [], drops: [], kaos: null, flippers: [],
     portals: cfg.portals || [], ramps: (cfg.ramps ? [ARAMP0, ARAMP1] : []).map(mkRamp) };
-  L.walls.push(sg(15, -40, 15, AH + 40), sg(AW - 15, -40, AW - 15, AH + 40), sg(15, AH - 260, ACX - AFX, AH - 70), sg(AW - 15, AH - 260, ACX + AFX, AH - 70), sg(15, 260, ACX - AFX, 70), sg(AW - 15, 260, ACX + AFX, 70));
+  L.walls.push(sg(15, -40, 15, AH + 40), sg(AW - 15, -40, AW - 15, AH + 40), sg(15, AH - 260, ACX - AFX + 3, AH - 79), sg(AW - 15, AH - 260, ACX + AFX - 3, AH - 79), sg(15, 260, ACX - AFX + 3, 79), sg(AW - 15, 260, ACX + AFX - 3, 79));
   L.islands = cfg.islands || [];
   for (const w of L.islands) L.walls.push(w);
-  L.flippers = [{ px: ACX - AFX, py: AH - 70, sx: 1, sy: 1, len: AFL, rest: .52, up: -.48 }, { px: ACX + AFX, py: AH - 70, sx: -1, sy: 1, len: AFL, rest: .52, up: -.48 },
-    { px: ACX - AFX, py: 70, sx: 1, sy: -1, len: AFL, rest: .52, up: -.48 }, { px: ACX + AFX, py: 70, sx: -1, sy: -1, len: AFL, rest: .52, up: -.48 }];
+  const fl = (px, py, sx, sy, len, p) => ({ px, py, sx, sy, len, rest: .52, up: -.48, p, side: sx > 0 ? 'l' : 'r' });
+  L.flippers = [fl(ACX - AFX, AH - 70, 1, 1, AFL, 0), fl(ACX + AFX, AH - 70, -1, 1, AFL, 0), fl(ACX - AFX, 70, 1, -1, AFL, 1), fl(ACX + AFX, 70, -1, -1, AFL, 1),
+    fl(ACX - ASX, ASY, 1, 1, ASL, 0), fl(ACX + ASX, ASY, -1, 1, ASL, 0), fl(ACX - ASX, AH - ASY, 1, -1, ASL, 1), fl(ACX + ASX, AH - ASY, -1, -1, ASL, 1)];
   L.shields = [sg(ACX - 50, AH - 18, ACX + 50, AH - 18), sg(ACX - 50, 18, ACX + 50, 18)];
   L.area = cfg.area || [90, 260, AW - 90, AH - 260];
-  L.labels = [{ x: ACX, y: AH - 130, txt: 'FORSVAR HULLET MELLEM DINE FLIPPERE' }];
+  L.labels = [{ x: ACX, y: AH - 130, txt: 'DIN MÅLMAND: FORSVAR MÅLET' }, { x: ACX + ASX, y: ASY, txt: 'DINE ANGRIBERE: SKYD MOD MÅLET' }];
   for (const s of L.saucers) L.labels.push({ x: s.x, y: s.y, txt: 'KAOS-HUL: SKYDER TILFÆLDIGT' });
   for (const m of L.movers) if (m.kind === 'bar') L.labels.push({ x: m.cx, y: m.cy - 40, txt: 'MØLLE: ROTERER HELE TIDEN' });
   if (L.ramps.length) L.labels.push({ x: L.ramps[0].ent.x, y: L.ramps[0].ent.y, txt: 'DIN RAMPE: SKYDER MOD MÅLET' });
@@ -648,7 +650,7 @@ class Table {
       const f = this.fl[i];
       let lm = 1, sm = 1;
       if (this.kind === 'duel') { if (this.eff.big > 0) lm *= 1.3; if (this.eff.small > 0) lm *= .6; }
-      else { const p = i < 2 ? 0 : 1; if (this.bigP[p] > 0) lm *= 1.3; if (this.slowP[p] > 0) sm = .4; if (this.frz[p] > 0) sm = 0; }
+      else { const p = f.p; if (this.bigP[p] > 0) lm *= 1.3; if (this.slowP[p] > 0) sm = .4; if (this.frz[p] > 0) sm = 0; }
       f.len += (f.base * lm - f.len) * Math.min(1, h * 12);
       const o = f.a; f.a = f.on ? Math.max(f.up, f.a - FUP * sm * h) : Math.min(f.rest, f.a + FDN * sm * h); f.w = (f.a - o) / h;
     }
@@ -802,7 +804,7 @@ class Table {
       const rx = q[0] - f.px, ry = q[1] - f.py, k = f.sx * f.sy * f.w;
       const imp = resolve(b, q[0], q[1], 10 - 4 * q[2], .22, -ry * k, rx * k);
       if (imp > 0 && duel && i >= 2 && f.w < -5 && this.fhCd[0] <= 0) { this.fhCd[0] = .6; this.hook('upper', { x: q[0], y: q[1] }); }
-      if (imp > 0 && !duel) { const p = i < 2 ? 0 : 1; this.last = p; this.grav = p === 0 ? -1 : 1; if (this.fhCd[p] <= 0 && Math.abs(f.w) > 5) { this.fhCd[p] = .5; this.hook('fhit', { p }); } }
+      if (imp > 0 && !duel) { const p = f.p; this.last = p; this.grav = p === 0 ? -1 : 1; if (this.fhCd[p] <= 0 && Math.abs(f.w) > 5) { this.fhCd[p] = .5; this.hook('fhit', { p }); } }
     }
   }
   freeSpot() {
@@ -855,6 +857,12 @@ class Table {
         if (sp > 1 && sp < mn) { const k = Math.min(mn / sp, 1 + dt * 3); b.vx *= k; b.vy *= k; }
         else if (sp > mx) { const k = Math.max(mx / sp, 1 - dt * .6); b.vx *= k; b.vy *= k; }
         if (Math.abs(b.vy) < Math.max(150, sp * .4)) b.vy += (b.vy === 0 ? this.grav : Math.sign(b.vy)) * 900 * dt;
+      }
+      if (!b.ramp && b.held <= 0 && !b.lane && !(duel && b.x > this.L.laneX)) {
+        if (b.ax == null || Math.hypot(b.x - b.ax, b.y - b.ay) > 25) { b.ax = b.x; b.ay = b.y; b.at = 0; }
+        else if ((b.at += dt) > 2.5 && !this.fl.some(f => f.on && Math.hypot(b.x - f.px, b.y - f.py) < f.len + 20)) {
+          b.at = 0; b.vx = rnd(-320, 320); b.vy = duel ? -rnd(650, 850) : (b.y > this.L.H / 2 ? -1 : 1) * rnd(550, 700);
+        }
       }
       if (b.x < -30 || b.x > this.L.W + 30) { b.x = this.L.cx; b.y = this.L.H / 2; b.vx = 0; b.vy = 0; }
     }
@@ -965,7 +973,7 @@ class Table {
 
 /* ================= AI ================= */
 class AI {
-  constructor(skill) { this.skill = skill; this.hold = [0, 0, 0, 0]; }
+  constructor(skill) { this.skill = skill; this.hold = []; }
   press(t, fi, dt) {
     if (this.hold[fi] > 0) { this.hold[fi] -= dt; return true; }
     const f = t.fl[fi], c = Math.cos(f.rest), s = Math.sin(f.rest);
@@ -1353,7 +1361,7 @@ function netSend(now) {
     const t = G.tables[0];
     if (Net.role === 'host') P.ar = { b: t.balls.slice(0, MAXBALLS).map(b => [Math.round(b.x), Math.round(b.y), Math.round(b.vx), Math.round(b.vy)]), f: t.fl.map(f => Math.round(f.a * 100) / 100),
       g: t.grav, sc: t.score, tk: tokOut(t), sh: t.shield, fx: G.fxList, l: t.last, li: ARENAS.indexOf(t.L), bp: t.bigP.map(r1), sp: t.slowP.map(r1), tb: r1(t.turbo), ef: [r1(t.eff.giant), r1(t.eff.moon), r1(t.eff.rage)], tt: r1(t.time) };
-    else { P.inp = [t.fl[2].on ? 1 : 0, t.fl[3].on ? 1 : 0]; P.sx = G.supReq; }
+    else { P.inp = ['l', 'r'].map(sd => t.fl.some(f => f.p === 1 && f.side === sd && f.on) ? 1 : 0); P.sx = G.supReq; }
     if (Net.role === 'host') Object.assign(P.ar, { am: G.meter.map(Math.round), an: G.nextAtk.map(k => ABIL_KEYS.indexOf(k)), fz: t.frz.map(r1), fi: r1(t.fire) });
   }
   if (G.over) P.re = G.wantRe ? 1 : 0;
@@ -1411,7 +1419,7 @@ function oppArenaGuest(op) {
     const b = prev[i] || t.ball(0, 0); b.x = (+v[0] || 0) + (+v[2] || 0) * dtx; b.y = (+v[1] || 0) + (+v[3] || 0) * dtx; b.vx = +v[2] || 0; b.vy = +v[3] || 0;
     b.trail.push(b.x, b.y); if (b.trail.length > 24) b.trail.splice(0, 2); return b;
   });
-  if (Array.isArray(a.f)) { t.fl[0].a = clamp(+a.f[0], -1, 1); t.fl[1].a = clamp(+a.f[1], -1, 1); }
+  if (Array.isArray(a.f)) t.fl.forEach((f, i) => { if (f.p === 0 && a.f[i] != null) f.a = clamp(+a.f[i], -1, 1); });
   t.grav = a.g === -1 ? -1 : 1; t.last = a.l | 0;
   if (Array.isArray(a.sc)) t.score = [a.sc[0] | 0, a.sc[1] | 0];
   tokIn(t, a.tk);
@@ -1487,17 +1495,17 @@ function applyInputs(dt) {
   } else {
     const t = G.tables[0]; if (!t) return;
     let a = [false, false, false, false];
-    if (G.demo) a = [0, 1, 2, 3].map(i => G.ai[i < 2 ? 0 : 1].press(t, i, dt));
+    const aiSide = p => { const o = [false, false]; t.fl.forEach((f, i) => { if (f.p === p && G.ai[p].press(t, i, dt)) o[f.side === 'l' ? 0 : 1] = true; }); return o; };
+    if (G.demo) a = [...aiSide(0), ...aiSide(1)];
     else if (G.type === 'guest') { const [l, r] = humanInput(0); a = [false, false, r, l]; }
     else {
       const [l, r] = humanInput(0); a[0] = l; a[1] = r;
-      if (G.type === 'cpu') { a[2] = G.ai[1].press(t, 2, dt); a[3] = G.ai[1].press(t, 3, dt); }
+      if (G.type === 'cpu') [a[2], a[3]] = aiSide(1);
       else if (G.type === 'local') { const [l2, r2] = humanInput(1); a[2] = l2; a[3] = r2; }
       else if (G.type === 'host') { const op = Net.opp && Net.opp.presence; const inp = op && Array.isArray(op.inp) ? op.inp : [0, 0]; a[2] = !!inp[0]; a[3] = !!inp[1]; }
     }
     if (!active) a = [false, false, false, false];
-    if (G.type === 'guest') { t.fl[2].on = a[2]; t.fl[3].on = a[3]; }
-    else t.fl.forEach((f, i) => f.on = a[i]);
+    t.fl.forEach(f => { if (G.type !== 'guest' || f.p === 1) f.on = a[f.p * 2 + (f.side === 'l' ? 0 : 1)]; });
   }
   if (!G.demo) {
     const fl = G.tables.flatMap(t => t.fl);
@@ -1717,7 +1725,29 @@ function drawTable(t, R, pi, opt = {}) {
   ctx.stroke(); ctx.restore();
   if (!duel) {
     const MY = TH / 2;
-    ctx.save(); ctx.setLineDash([8, 10]); ctx.strokeStyle = 'rgba(255,255,255,.18)'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(20, MY); ctx.lineTo(L.W - 20, MY); ctx.stroke(); ctx.restore();
+    // football pitch: mown stripes, white lines, centre circle, boxes and goal nets
+    ctx.save();
+    for (let k = 0; k * 80 < TH; k++) if (k % 2) { ctx.fillStyle = 'rgba(70,255,150,.045)'; ctx.fillRect(15, k * 80, L.W - 30, 80); }
+    ctx.strokeStyle = 'rgba(255,255,255,.26)'; ctx.lineWidth = 2.5; ctx.beginPath();
+    ctx.moveTo(15, MY); ctx.lineTo(L.W - 15, MY);
+    ctx.moveTo(L.cx + 72, MY); ctx.arc(L.cx, MY, 72, 0, TAU);
+    for (const e of [1, -1]) {
+      const gy = e > 0 ? TH - 12 : 12;
+      ctx.rect(L.cx - 150, e > 0 ? gy - 175 : gy, 300, 175);
+      ctx.rect(L.cx - 70, e > 0 ? gy - 70 : gy, 140, 70);
+      ctx.moveTo(L.cx + 55, gy - e * 175); ctx.arc(L.cx, gy - e * 175, 55, e > 0 ? Math.PI : 0, e > 0 ? TAU : Math.PI, e < 0);
+    }
+    ctx.stroke();
+    ctx.fillStyle = 'rgba(255,255,255,.4)'; ctx.beginPath(); ctx.arc(L.cx, MY, 5, 0, TAU); ctx.fill();
+    for (let p = 0; p < 2; p++) {
+      const e = p === 0 ? 1 : -1, gy = e > 0 ? TH - 14 : 0, gw = 104;
+      ctx.fillStyle = `rgba(${COLRGB[p]},.12)`; ctx.fillRect(L.cx - gw / 2, gy, gw, 14);
+      ctx.strokeStyle = `rgba(${COLRGB[p]},.45)`; ctx.lineWidth = 1; ctx.beginPath();
+      for (let x = L.cx - gw / 2; x <= L.cx + gw / 2; x += 8) { ctx.moveTo(x, gy); ctx.lineTo(x, gy + 14); }
+      ctx.moveTo(L.cx - gw / 2, gy + 7); ctx.lineTo(L.cx + gw / 2, gy + 7); ctx.stroke();
+      ctx.fillStyle = '#ffffff'; for (const sx of [-1, 1]) { ctx.beginPath(); ctx.arc(L.cx + sx * gw / 2, e > 0 ? TH - 14 : 14, 4, 0, TAU); ctx.fill(); }
+    }
+    ctx.restore();
     // goal mouths glow in the colour of the player defending them
     for (let p = 0; p < 2; p++) { const gy = p === 0 ? TH : 0, gg = ctx.createRadialGradient(L.cx, gy, 10, L.cx, gy, 150); gg.addColorStop(0, `rgba(${COLRGB[p]},.28)`); gg.addColorStop(1, `rgba(${COLRGB[p]},0)`); ctx.fillStyle = gg; ctx.fillRect(L.cx - 150, gy - 150, 300, 300); }
   }
@@ -1836,8 +1866,8 @@ function drawTable(t, R, pi, opt = {}) {
   // flippers
   for (let i = 0; i < t.fl.length; i++) {
     const f = t.fl[i];
-    let fc = duel ? (t.tilt > 0 ? '#5a5470' : t.eff.mir > 0 ? '#ff7a30' : t.eff.small > 0 ? '#ff4060' : t.eff.big > 0 ? '#ffd84a' : col) : COL[i < 2 ? 0 : 1];
-    if (!duel) { const p = i < 2 ? 0 : 1; if (t.frz[p] > 0) fc = '#d8f8ff'; else if (t.slowP[p] > 0) fc = '#b98cff'; else if (t.bigP[p] > 0) fc = '#ffd84a'; }
+    let fc = duel ? (t.tilt > 0 ? '#5a5470' : t.eff.mir > 0 ? '#ff7a30' : t.eff.small > 0 ? '#ff4060' : t.eff.big > 0 ? '#ffd84a' : col) : COL[f.p];
+    if (!duel) { const p = f.p; if (t.frz[p] > 0) fc = '#d8f8ff'; else if (t.slowP[p] > 0) fc = '#b98cff'; else if (t.bigP[p] > 0) fc = '#ffd84a'; }
     const tx = f.px + f.sx * f.len * Math.cos(f.a), ty = f.py + f.sy * f.len * Math.sin(f.a);
     const ang = Math.atan2(ty - f.py, tx - f.px), nx = -Math.sin(ang), ny = Math.cos(ang), fr = f.len < 56 ? 8 : 10;
     const p = new Path2D();
