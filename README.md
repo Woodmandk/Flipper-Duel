@@ -68,6 +68,10 @@ Tryk på **?** i spillet for at se en forklaring på alt.
 
 ## Sådan spiller I mod hinanden
 
+**Find en modstander online:** tryk **Find en modstander online**, så bliver du sat sammen med en tilfældig spiller, der søger samme spiltype lige nu. Det kører uden egen server (via PeerJS). Er der ingen online, kan du spille mod computeren i stedet.
+
+**Mod en ven:**
+
 1. Åbn spillet, skriv dit navn, vælg spiltype og tryk **Udfordr en ven online**.
 2. Tryk **Kopiér invitation** og send linket til din ven.
 3. Din ven åbner linket (koden er allerede udfyldt) og trykker **Deltag**.

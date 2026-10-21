@@ -158,6 +158,7 @@ button.btn.ghost{background:transparent;font-size:14px;padding:9px;}
       <div class="row"><span class="mysk" id="mySk"></span><button class="btn" type="button" id="bSk">Vælg</button></div>
     </div>
     <div class="btns">
+      <button class="btn pri" type="button" id="bFind">Find en modstander online</button>
       <button class="btn pri" type="button" id="bOnline">Udfordr en ven online</button>
       <button class="btn" type="button" id="bCamp">Kampagne: boss-kampe</button>
       <button class="btn" type="button" id="bCpu">Spil mod computeren</button>
@@ -218,6 +219,7 @@ button.btn.ghost{background:transparent;font-size:14px;padding:9px;}
     <button class="btn" type="button" id="bCopy">Kopiér invitation</button>
     <p class="status" id="lobStatus"><span class="dot"></span>Venter på modstander…</p>
     <button class="btn pri" type="button" id="bStart" disabled>Start kampen</button>
+    <button class="btn" type="button" id="bMmCpu" hidden>Spil mod computeren i stedet</button>
     <button class="btn" type="button" id="bLeave">Annullér</button>
     <p class="hint" id="lobHint">Send koden eller linket til din ven. Din ven skal kunne åbne spillet i Claude, så del det med dem først.</p>
   </div>
@@ -240,6 +242,7 @@ button.btn.ghost{background:transparent;font-size:14px;padding:9px;}
         <li><b>Evner:</b> du vælger selv 2 evner i menuen (fx Homing, Vampyr, Tåge) og i kampagnen (fx Lyn, Sneglefart, Meteor). Du har én energibar, der fyldes, når du rammer ting, og hver evne koster energi. Mærkerne på bjælken viser, hvad dine evner koster. Bruger du den samme evne igen, lægges tiden oven i. Brug dem med <kbd>Q</kbd> og <kbd>E</kbd> (eller <kbd>1</kbd> <kbd>2</kbd>) eller knapperne. Spiller 2 på samme skærm bruger <kbd>I</kbd> og <kbd>O</kbd>.</li>
         <li><b>Kampagnen</b> har 20 baner og en mega-boss på hver 5. Slår du den, låser du nye evner op. Mange baner har en særlig regel, fx stormvind, mørke eller bomberegn, og mega-bosser går i fase 2 med en invasion.</li>
         <li><b>Indstillinger og statistik</b> i menuen: vælg computerens sværhedsgrad, din kugle og dine flippers farve. Nye kugler låses op, når du spiller.</li>
+        <li><b>Find en modstander online</b> sætter dig sammen med en tilfældig spiller, der også søger lige nu (på spillets hjemmeside).</li>
         <li><b>Online</b> kan du sende emojis til modstanderen med tasterne <kbd>6</kbd>–<kbd>0</kbd> eller knapperne øverst til venstre.</li>
       </ul>
     </section>
@@ -1962,10 +1965,10 @@ function loadPeer() {
   return new Promise((res, rej) => { const s = document.createElement('script'); s.src = 'https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js'; s.onload = res; s.onerror = () => rej(new Error('nopeer')); document.head.appendChild(s); });
 }
 // Direct WebRTC link (PeerJS) shaped like the room API subset this game uses: presence, peers, onPeers, leave.
-async function peerRoom(code, role) {
+async function peerRoom(code, role, quiet) {
   await loadPeer();
   return new Promise((res, rej) => {
-    const id = 'flipperduel-' + code.toLowerCase();
+    const id = role === 'probe' ? '' : 'flipperduel-' + code.toLowerCase();
     const me = role === 'host' ? new Peer(id) : new Peer();
     const S = { conn: null, opp: null, hs: [], last: {}, ok: false,
       leave() { try { me.destroy(); } catch (e) {} return Promise.resolve(); },
@@ -1977,12 +1980,23 @@ async function peerRoom(code, role) {
       S.conn = c;
       c.on('open', () => { c.send(S.last); fire(); });
       c.on('data', d => { if (d && typeof d === 'object') { S.opp = { peer: 'opp', sameTab: false, isMe: false, presence: d, updatedAt: Date.now() }; fire(); } });
-      c.on('close', () => { const o = S.opp; S.opp = null; S.conn = null; if (o) fire(o); });
+      c.on('close', () => { const o = S.opp; S.opp = null; S.conn = null; S.dead = true; if (o) fire(o); });
     };
     me.on('open', () => {
+      if (role === 'probe') { // matchmaking: knock on every waiting spot at once and take the first host that answers
+        const cs = code.map(cd => me.connect('flipperduel-' + cd, { reliable: true }));
+        cs.forEach((c, i) => c.on('data', d => {
+          if (S.conn || !d || d.role !== 'host' || !d.mm || d.mode !== G.mode || d.ph !== 'lobby') return;
+          S.conn = c; S.code = code[i]; cs.forEach(o => { if (o !== c) try { o.close(); } catch (e) {} });
+          S.opp = { peer: 'opp', sameTab: false, isMe: false, presence: d, updatedAt: Date.now() };
+          c.on('data', d2 => { if (d2 && typeof d2 === 'object') { S.opp = { peer: 'opp', sameTab: false, isMe: false, presence: d2, updatedAt: Date.now() }; fire(); } });
+          c.on('close', () => { const o = S.opp; S.opp = null; S.conn = null; S.dead = true; if (o) fire(o); });
+          try { c.send(S.last); } catch (e) {} fire();
+        }));
+      }
       if (role === 'guest') {
         const c = me.connect(id, { reliable: true }); wire(c);
-        const t = setTimeout(() => { if (!S.opp && Net.r === S) { netLeave(); toMenu('Fandt ikke et rum med den kode. Tjek koden, og at din ven stadig venter i rummet.'); } }, 10000);
+        const t = setTimeout(() => { if (!S.opp && Net.r === S && !quiet) { netLeave(); toMenu('Fandt ikke et rum med den kode. Tjek koden, og at din ven stadig venter i rummet.'); } }, 10000);
         c.on('open', () => clearTimeout(t));
       }
       S.ok = true; res(S);
@@ -1990,6 +2004,7 @@ async function peerRoom(code, role) {
     if (role === 'host') me.on('connection', c => { if (S.conn && S.conn.open) { c.close(); return; } wire(c); });
     me.on('error', e => {
       if (!S.ok) { rej(new Error(e.type === 'unavailable-id' ? 'taken' : e.type === 'peer-unavailable' ? 'notfound' : 'net')); return; }
+      if (e.type === 'peer-unavailable' && quiet) { S.dead = true; return; }
       if (e.type === 'peer-unavailable' && role === 'guest') { netLeave(); toMenu('Fandt ikke et rum med den kode. Tjek koden og prøv igen.'); }
     });
   });
@@ -2000,15 +2015,18 @@ async function netJoin(code, role) {
     if (!room) throw new Error('noroom');
     Net.r = await room.join('fd-' + code.toLowerCase());
   } else Net.r = await peerRoom(code, role);
+  await netAttach(code, role);
+}
+async function netAttach(code, role) {
   Net.code = code; Net.role = role; Net.opp = null; Net.oppPeer = null;
   Net.unsub.push(Net.r.onPeers(ch => {
     if (Net.oppPeer && ch.left.some(p => p.peer === Net.oppPeer)) oppLeft();
     lobbyRefresh();
   }));
-  await Net.r.presence({ n: myName(), role, mode: G.mode, ph: 'lobby', rid: 0 });
+  await Net.r.presence({ n: myName(), role, mode: G.mode, ph: 'lobby', rid: 0, mm: Net.mm ? 1 : 0 });
 }
 function netLeave() {
-  G.emSeen = 0; G.emoList = [];
+  Net.mm = 0; G.emSeen = 0; G.emoList = [];
   Net.unsub.forEach(u => { try { u(); } catch (e) {} }); Net.unsub = [];
   if (Net.r) { Net.r.leave().catch(() => {}); }
   Net.r = null; Net.role = null; Net.opp = null; Net.oppPeer = null;
@@ -3313,7 +3331,7 @@ $('bOnline').onclick = async () => {
     catch (e) { if (e.message === 'taken') { code = genCode(); continue; } menuErr(IN_CLAUDE ? NOROOM : NONET); return; }
   }
   if (!ok) { menuErr(NONET); return; }
-  hide('menu'); show('lobby');
+  hide('menu'); show('lobby'); $('lobCode').hidden = false; $('bMmCpu').hidden = true;
   $('lobTitle').textContent = G.mode === 'duel' ? 'Dit rum · DUEL' : 'Dit rum · ARENA';
   $('lobCode').textContent = code;
   $('lobLink').textContent = inviteLink(code);
@@ -3321,12 +3339,63 @@ $('bOnline').onclick = async () => {
   $('lobHint').textContent = IN_CLAUDE ? 'Send koden eller linket til din ven. Din ven skal kunne åbne spillet i Claude, så del det med dem først.' : 'Send linket til din ven. Når de åbner det, er koden allerede udfyldt.';
   lobbyRefresh();
 };
+/* ---- FIND A RANDOM OPPONENT: no server of our own. A few fixed PeerJS ids per mode act as waiting spots.
+   A searcher first tries to join a waiting host in each spot; if nobody waits, it waits in the lowest free spot.
+   Anyone waiting in a spot above the first one re-checks the lower spots now and then, so two searchers always meet. */
+const MM_SLOTS = 5, MM_VER = '1', sleep = ms => new Promise(r => setTimeout(r, ms));
+const mmCode = n => 'q' + MM_VER + (G.mode === 'arena' ? 'a' : 'd') + n;
+async function mmProbe(run) {
+  let r; try { r = await peerRoom(Array.from({ length: MM_SLOTS }, (_, i) => mmCode(i + 1)), 'probe', true); } catch (e) { return null; }
+  for (let i = 0; i < 35 && Net.mm === run; i++) { if (r.conn && r.opp) return r; await sleep(100); }
+  r.leave(); return null;
+}
+function mmStatus(txt) { if (!$('lobby').hidden && Net.mm) $('lobStatus').innerHTML = '<span class="dot"></span>' + txt; }
+async function findMatch() {
+  const run = Date.now(); Net.mm = run; const t0 = Date.now();
+  hide('menu'); show('lobby');
+  $('lobTitle').textContent = 'Find modstander · ' + (G.mode === 'duel' ? 'DUEL' : 'ARENA');
+  $('lobCode').hidden = true; $('lobLink').textContent = ''; $('bCopy').hidden = true; $('bStart').hidden = true; $('bMmCpu').hidden = true;
+  $('lobHint').textContent = 'Vi leder efter en anden spiller, der også søger ' + (G.mode === 'duel' ? 'DUEL' : 'ARENA') + ' lige nu.';
+  while (Net.mm === run) {
+    mmStatus('Søger modstander…');
+    // 1) is somebody already waiting?
+    { const r = await mmProbe(run);
+      if (r && Net.mm === run) { Net.r = r; await netAttach(r.code, 'guest'); Net.mm = run; mmStatus('Modstander fundet! Starter…'); lobbyRefresh(); return; }
+      if (r) r.leave(); }
+    if (Net.mm !== run) return;
+    // 2) nobody: wait in the lowest free spot
+    let slot = 0;
+    for (let n = 1; n <= MM_SLOTS && !slot && Net.mm === run; n++) {
+      try { Net.r = await peerRoom(mmCode(n), 'host', true); slot = n; } catch (e) { if (e.message !== 'taken') { await sleep(1500); break; } }
+    }
+    if (Net.mm !== run) { if (slot && Net.r) netLeave(); return; }
+    if (!slot) continue;
+    await netAttach(mmCode(slot), 'host'); Net.mm = run;
+    mmStatus('Venter på en modstander…');
+    // a spot above the first is re-checked against the lower ones every few seconds
+    const until = Date.now() + (slot === 1 ? 20000 : rnd(3500, 5500));
+    while (Net.mm === run && Date.now() < until && !findOpp()) {
+      if (Date.now() - t0 > 40000 && $('bMmCpu').hidden) { $('bMmCpu').hidden = false; $('lobHint').textContent = 'Der er ikke nogen online lige nu. Du kan blive ved med at vente eller spille mod computeren i stedet.'; }
+      await sleep(250);
+    }
+    if (Net.mm !== run) return;
+    if (findOpp()) return; // lobbyRefresh starts the match
+    // nobody came: give up the spot and search again
+    Net.unsub.forEach(u => { try { u(); } catch (e) {} }); Net.unsub = []; if (Net.r) Net.r.leave().catch(() => {}); Net.r = null; Net.role = null;
+  }
+}
+$('bFind').onclick = () => {
+  SFX.init(); menuErr();
+  if (IN_CLAUDE) { menuErr('Find modstander virker på spillets hjemmeside: https://woodmandk.github.io/Flipper-Duel/. Her i Claude kan du udfordre en ven med en kode.'); return; }
+  findMatch().catch(() => { if (Net.mm) toMenu(NONET); });
+};
+$('bMmCpu').onclick = () => { netLeave(); hide('lobby'); $('lobCode').hidden = false; SFX.init(); startGame(G.mode, 'cpu', [myName(), 'CPU']); layout(); };
 async function joinWith(code) {
   code = String(code).replace(/[^0-9]/g, '');
   if (code.length !== 4) { menuErr('Koden er 4 tal, fx 4821.'); return; }
   SFX.init(); menuErr();
   try { await netJoin(code, 'guest'); } catch (e) { menuErr(!IN_CLAUDE && e.message === 'notfound' ? 'Fandt ikke et rum med den kode. Tjek koden, og at din ven stadig venter i rummet.' : IN_CLAUDE ? NOROOM : NONET); return; }
-  hide('menu'); show('lobby');
+  hide('menu'); show('lobby'); $('lobCode').hidden = false; $('bMmCpu').hidden = true;
   $('lobTitle').textContent = 'Rum'; $('lobCode').textContent = code; $('lobLink').textContent = '';
   $('bStart').hidden = true; $('bCopy').hidden = true;
   $('lobHint').textContent = 'Værten vælger spiltype og starter kampen.';
@@ -3354,7 +3423,8 @@ function lobbyRefresh() {
   const op = findOpp(); Net.opp = op;
   const st = $('lobStatus');
   if (Net.role === 'host') {
-    if (op) { st.textContent = clean(op.presence.n) + ' er klar!'; $('bStart').disabled = false; }
+    if (op) { st.textContent = Net.mm ? 'Modstander fundet: ' + clean(op.presence.n) + '!' : clean(op.presence.n) + ' er klar!'; $('bStart').disabled = false;
+      if (Net.mm && !Net.mmGo) { Net.mmGo = 1; setTimeout(() => { Net.mmGo = 0; if (Net.mm && Net.role === 'host' && !$('lobby').hidden && findOpp()) $('bStart').onclick(); }, 1200); } }
     else { st.innerHTML = '<span class="dot"></span>Venter på modstander…'; $('bStart').disabled = true; }
   } else {
     if (op) { const m = op.presence.mode === 'arena' ? 'ARENA' : 'DUEL'; st.textContent = `${clean(op.presence.n)} · ${m} · venter på start`; }
