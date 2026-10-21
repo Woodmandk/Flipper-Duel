@@ -95,6 +95,20 @@ button.btn.ghost{background:transparent;font-size:14px;padding:9px;}
 .sw button:disabled i{filter:grayscale(1) brightness(.5);}
 .stats{display:grid;grid-template-columns:1fr auto;gap:5px 14px;margin:0;font-size:14px;}
 .stats dt{color:var(--muted);} .stats dd{margin:0;text-align:right;font-family:var(--display);color:var(--gold);}
+.skills{position:fixed;z-index:6;display:flex;gap:6px;}
+.skills.col{flex-direction:column;}
+.skills button{cursor:pointer;touch-action:manipulation;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;min-width:82px;padding:5px 8px;border-radius:12px;border:1.5px solid var(--c);background:rgba(10,8,26,.82);color:var(--fg);font-family:var(--display);font-size:11px;letter-spacing:.03em;opacity:.45;}
+.skills button b{font-family:var(--body);font-size:18px;line-height:1.1;color:var(--c);}
+.skills button small{font-family:var(--body);font-weight:700;font-size:10px;color:var(--muted);}
+.skills button.on{opacity:1;box-shadow:0 0 16px var(--c);}
+.mysk{flex:1;min-width:0;align-self:center;font-weight:700;font-size:14px;line-height:1.35;}
+.skl{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px;}
+.skl button{cursor:pointer;display:grid;grid-template-columns:30px 1fr;column-gap:8px;align-items:center;text-align:left;font-family:var(--body);color:var(--fg);background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:10px;padding:8px;min-width:0;}
+.skl button i{grid-row:span 2;font-style:normal;font-size:17px;color:var(--c);border:1.5px solid var(--c);border-radius:8px;height:30px;display:flex;align-items:center;justify-content:center;}
+.skl button b{font-family:var(--display);font-weight:400;font-size:13px;letter-spacing:.03em;}
+.skl button span{font-size:12px;color:var(--muted);line-height:1.25;}
+.skl button:disabled{cursor:not-allowed;opacity:.45;}
+.skl button[aria-pressed=true]{border-color:var(--gold);box-shadow:inset 0 0 0 1px var(--gold);background:rgba(255,216,74,.1);}
 .emo{position:fixed;z-index:6;display:flex;gap:6px;top:calc(env(safe-area-inset-top,0px) + 10px);left:max(10px,env(safe-area-inset-left,0px));}
 .emo button{cursor:pointer;width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:rgba(10,8,26,.7);font-size:19px;padding:0;touch-action:manipulation;}
 .hud button{cursor:pointer;width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:rgba(10,8,26,.7);color:var(--fg);font-size:16px;font-family:var(--body);font-weight:700;}
@@ -113,6 +127,8 @@ button.btn.ghost{background:transparent;font-size:14px;padding:9px;}
   <button id="bExit" type="button" aria-label="Tilbage til menuen">✕</button>
 </div>
 <div class="emo" id="emo" hidden aria-label="Send en reaktion"></div>
+<div class="skills" id="skills" hidden></div>
+<div class="skills" id="skills2" hidden></div>
 <button class="sup" id="bSuper0" type="button" hidden>SUPER</button>
 <button class="sup" id="bSuper1" type="button" hidden>SUPER</button>
 
@@ -130,6 +146,10 @@ button.btn.ghost{background:transparent;font-size:14px;padding:9px;}
         <button class="mode" type="button" id="mDuel" aria-pressed="true"><b>DUEL</b><span>Hvert sit bord. Gode skud skader modstanderen og sender angreb over. Bedst af 3.</span></button>
         <button class="mode" type="button" id="mArena" aria-pressed="false"><b>ARENA</b><span>Flipper-fodbold på én bane. Skyd kuglen i modstanderens mål. Først til 5.</span></button>
       </div>
+    </div>
+    <div class="field">
+      <span class="lbl">Dine evner</span>
+      <div class="row"><span class="mysk" id="mySk"></span><button class="btn" type="button" id="bSk">Vælg</button></div>
     </div>
     <div class="btns">
       <button class="btn pri" type="button" id="bOnline">Udfordr en ven online</button>
@@ -163,10 +183,21 @@ button.btn.ghost{background:transparent;font-size:14px;padding:9px;}
   </div>
 </div>
 
+<div class="ov" id="pick" hidden>
+  <div class="card">
+    <h2 id="pickTitle">Dine evner</h2>
+    <p class="sub">Vælg 3 evner. Din energi lader op, når du rammer ting, og du bruger evnerne, når du vil. Flere evner låses op, når du slår mega-bosserne i kampagnen.</p>
+    <div class="skl" id="pickList"></div>
+    <p class="hint" id="pickHint"></p>
+    <button class="btn pri" type="button" id="bPickDone">Færdig</button>
+  </div>
+</div>
+
 <div class="ov" id="camp" hidden>
   <div class="card">
     <h2>Kampagne</h2>
-    <p class="sub">Dig alene mod hver banes boss. Slå den for at låse den næste op. Du har 300 liv og 5 minutter (finalen 8), og SUPER rammer bossen for 3. Jo flere liv du har tilbage, jo flere stjerner.</p>
+    <p class="sub">Dig alene mod hver banes boss. Slå den for at låse den næste op. Hver 5. bane er en mega-boss, der låser nye evner op. Du har 300 liv og 5–7 minutter. Vælg 3 evner: din energi lader op, når du rammer ting, og du bruger evnerne, når du vil. Jo flere liv du har tilbage, jo flere stjerner.</p>
+    <div class="field"><span class="lbl">Dine evner · vælg 3</span><div class="skl" id="skl"></div><p class="hint" id="sklHint"></p></div>
     <ul class="lvls" id="lvls"></ul>
     <p class="hint" id="campSum"></p>
     <button class="btn" type="button" id="bCampBack">Tilbage</button>
@@ -193,14 +224,16 @@ button.btn.ghost{background:transparent;font-size:14px;padding:9px;}
       <h3>Kort fortalt</h3>
       <ul class="quick">
         <li><b>Flippere:</b> <kbd>A</kbd> <kbd>D</kbd> eller <kbd>←</kbd> <kbd>→</kbd>. På mobil trykker du i venstre eller højre side.</li>
-        <li><b>Ram ting</b> for at skade modstanderen og lade din gule SUPER-måler op.</li>
-        <li><b>Fuld måler?</b> Tryk <kbd>W</kbd>, <kbd>↑</kbd>, <kbd>Mellemrum</kbd> eller SUPER-knappen, når det passer dig.</li>
+        <li><b>Ram ting</b> for at skade modstanderen og lade din gule energi op.</li>
+        <li><b>Nok energi?</b> Brug dine 3 evner med <kbd>Q</kbd> <kbd>W</kbd> <kbd>E</kbd> (eller <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd>) eller knapperne ved bordet. Stregerne på energibaren viser, hvad hver evne koster.</li>
         <li><b>Sekskanter</b> er power-ups. Dem med regnbue-ring er KAOS.</li>
         <li><b>Mist ikke kuglen</b>. Det koster dig selv liv.</li>
         <li><b>Hver bane har sin egen form og sit eget tema:</b> Neon Klassik, Ruminvasion (Space Invaders), Kaosfabrikken, Dybhavet og Spøgelseshuset. Kameraet følger kuglen.</li>
         <li><b>Ryst bordet</b> med <kbd>S</kbd> eller <kbd>↓</kbd> for at redde en kugle. Ryster du for meget, kommer der TILT.</li>
+        <li><b>Evner:</b> du vælger selv 3 evner i menuen (fx Homing, Super-skade, Tåge) og i kampagnen (fx Lyn, Frys bossen, Meteor). Din energi lader op, når du rammer ting, og du bruger evnerne med <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd>, <kbd>Q</kbd> <kbd>W</kbd> <kbd>E</kbd> eller knapperne. Spiller 2 på samme skærm bruger <kbd>8</kbd> <kbd>9</kbd> <kbd>0</kbd> eller <kbd>I</kbd> <kbd>O</kbd> <kbd>P</kbd>.</li>
+        <li><b>Kampagnen</b> har en mega-boss på hver 5. bane. Slår du den, låser du nye evner op.</li>
         <li><b>Indstillinger og statistik</b> i menuen: vælg computerens sværhedsgrad, din kugle og dine flippers farve. Nye kugler låses op, når du spiller.</li>
-        <li><b>Online</b> kan du sende emojis til modstanderen med tasterne <kbd>1</kbd>–<kbd>5</kbd> eller knapperne øverst til venstre.</li>
+        <li><b>Online</b> kan du sende emojis til modstanderen med tasterne <kbd>6</kbd>–<kbd>0</kbd> eller knapperne øverst til venstre.</li>
       </ul>
     </section>
     <section>
@@ -209,26 +242,26 @@ button.btn.ghost{background:transparent;font-size:14px;padding:9px;}
         <li><i style="--c:#7dffea">⤴</i><b>Ramper</b><span>Skyd hårdt op i indgangen, så kører kuglen på skinner. −8, flere i træk giver mere</span></li>
         <li><i style="--c:#ff9a3c">◎</i><b>Portaler</b><span>Orange og blå hænger sammen. Kuglen teleporteres, −2</span></li>
         <li><i style="--c:#ff4060">☠</i><b>BOSS</b><span>Hver bane har sin egen boss, der kæmper imod og skader dig (−15) indtil den er død. Ved halv energi bliver den RASENDE. Besejr den: modstanderen mister 100 liv</span></li>
-        <li><i style="--c:#7dff9a">!</i><b>Missioner</b><span>Små opgaver med tidsfrist. Klarer du den: −30 liv til modstanderen og +35% SUPER</span></li>
+        <li><i style="--c:#7dff9a">!</i><b>Missioner</b><span>Små opgaver med tidsfrist. Klarer du den: −30 liv til modstanderen og +35% energi</span></li>
         <li><i style="--c:var(--gold)">↗</i><b>Ekstra flipper</b><span>Nogle baner har en flipper midt på bordet. Den følger din venstre eller højre knap</span></li>
         <li><i style="--c:#ff4060">T</i><b>TILT</b><span>For mange rystelser lammer dine flippere i 3 sek.</span></li>
       </ul>
     </section>
     <section>
       <h3><span class="a">DUEL</span> · hvert sit bord, bedst af 3</h3>
-      <p>I starter med 1200 liv, og hver runde spilles på en ny tilfældig bane. En SUPER koster modstanderen 40 liv og sender et angreb over. Angreb står i kø, så de ikke lander oven i hinanden, og efter et kaos-power-up får bordet en pause. Efter 2½ minut kommer OVERDRIVE, hvor al skade tæller dobbelt.</p>
+      <p>I starter med 1200 liv, og hver runde spilles på en ny tilfældig bane. Dine angrebs-evner (fx Tåge, Bombe, Sort hul) koster modstanderen 15 liv og sendes over på deres bord. Angreb står i kø, så de ikke lander oven i hinanden, og efter et kaos-power-up får bordet en pause. Efter 2½ minut kommer OVERDRIVE, hvor al skade tæller dobbelt.</p>
       <ul class="legend">
         <li><i style="--c:var(--p1)">◎</i><b>Bumper</b><span>−2 liv</span></li>
         <li><i style="--c:var(--gold)">Z</i><b>ZAP-baner</b><span>−3, alle 3 tændt = −10</span></li>
         <li><i style="--c:#7dff9a">▮</i><b>Grønne targets</b><span>−4, alle 3 = −12</span></li>
-        <li><i style="--c:var(--gold)">▮</i><b>Angreb-target</b><span>Fylder SUPER-måleren ekstra</span></li>
+        <li><i style="--c:var(--gold)">▮</i><b>Angreb-target</b><span>Giver ekstra energi</span></li>
         <li><i style="--c:var(--gold)">◢</i><b>Slynge</b><span>−1</span></li>
         <li><i style="--c:#ff6060">↓</i><b>Tabt kugle</b><span>Du mister selv 50 liv</span></li>
         <li><i style="--c:#ff3fd2">◌</i><b>Kaos-hul</b><span>Fanger kuglen og skyder den i en tilfældig retning, −3</span></li>
         <li><i style="--c:#7dffea">»</i><b>Orbit-loop</b><span>Skyd hele vejen rundt i toppen, −6</span></li>
         <li><i style="--c:var(--gold)">×5</i><b>Combo</b><span>5 hurtige træf i træk giver +25% skade</span></li>
       </ul>
-      <h4>SUPER-angreb du kan sende og få</h4>
+      <h4>Angreb du kan sende og få</h4>
       <ul class="legend">
         <li><i style="--c:#ff7a30">⇄</i><b>Spejlvendt</b><span>Flipperne byttes om</span></li>
         <li><i style="--c:#b98cff">≋</i><b>Tåge</b><span>Bunden af bordet skjules</span></li>
@@ -241,7 +274,7 @@ button.btn.ghost{background:transparent;font-size:14px;padding:9px;}
     <section>
       <h3><span class="b">ARENA</span> · flipper-fodbold, først til 5</h3>
       <p>Banen er en fodboldbane. Du har en målmand (to flippere foran dit mål) og to angribere ude på modstanderens halvdel, ligesom i bordfodbold. Dine knapper styrer dem alle på én gang. Der er ingen tyngdekraft, så kuglen flyver frit. Banen skifter for hver 2 mål: Stadion, Ishallen, Retro-arkaden eller Vulkanen. På Stadion har hver spiller sin egen rampe, der skyder kuglen mod modstanderens mål.</p>
-      <p>Din SUPER-måler lader op, når du rammer kuglen, rammer bumpere og når du får mål imod dig. Fyr den af, når det passer dig:</p>
+      <p>Din energi lader op, når du rammer kuglen, rammer bumpere og når du får mål imod dig. Du vælger selv 3 evner, fx:</p>
       <ul class="legend">
         <li><i style="--c:#ff7a30">🔥</i><b>Ildkugle</b><span>Alle kugler brager mod modstanderens mål</span></li>
         <li><i style="--c:#7de8ff">❄</i><b>Frys</b><span>Modstanderens flippere fryser fast i 2 sek.</span></li>
@@ -734,7 +767,8 @@ const POW = {
 const DUEL_POW = ['multi', 'shield', 'x2', 'heal', 'big', 'zap', 'net'], DUEL_KAOS = ['mega', 'giant', 'moon', 'rage', 'storm', 'cannon', 'inv', 'flip'];
 const ARENA_POW = ['multi', 'shield', 'big', 'slow', 'turbo', 'dbl'], ARENA_KAOS = ['mega', 'giant', 'rage', 'cannon', 'inv'];
 const pick = a => a[Math.floor(Math.random() * a.length)];
-const pickPow = (duel, kaosOk = true) => kaosOk && Math.random() < .45 ? pick(duel ? DUEL_KAOS : ARENA_KAOS) : pick(duel ? DUEL_POW : ARENA_POW);
+const SOLO_POW = ['multi', 'shield', 'heal', 'big', 'net'], SOLO_KAOS = ['mega', 'moon', 'cannon', 'flip'];
+const pickPow = (duel, kaosOk = true, solo) => solo ? (kaosOk && Math.random() < .3 ? pick(SOLO_KAOS) : pick(SOLO_POW)) : kaosOk && Math.random() < .45 ? pick(duel ? DUEL_KAOS : ARENA_KAOS) : pick(duel ? DUEL_POW : ARENA_POW);
 const ABIL = {
   fire: { n: 'ILDKUGLE', d: 'Alle kugler brager mod modstanderens mål', c: '#ff7a30' },
   frz: { n: 'FRYS', d: 'Modstanderens flippere fryser fast i 2 sek.', c: '#7de8ff' },
@@ -781,13 +815,13 @@ class Table {
     this.drops = [false, false, false]; this.dropReset = 0; this.kaosCd = 0; this.kaosF = 0;
     this.eff = { mir: 0, fog: 0, bh: 0, small: 0, quake: 0, x2: 0, big: 0, giant: 0, moon: 0, rage: 0, flip: 0 };
     this.inv = null; this.dbl = [0, 0];
-    this.quakeT = 0; this.dshield = 0; this.storm = 0; this.stormT = 0; this.bolts = [];
+    this.quakeT = 0; this.dshield = 0; this.storm = 0; this.stormT = 0; this.bolts = []; this.zapB = 0; this.zapBT = 0;
     this.laneRest = 0; this.save = 0; this.time = 0;
     this.grav = 1; this.last = -1; this.shield = [0, 0]; this.bigP = [0, 0]; this.slowP = [0, 0]; this.turbo = 0;
     this.tokens = []; this.tokenT = this.kind === 'duel' ? 6 : 5; this.serveT = 0; this.serveDir = 1; this.score = [0, 0]; this.goals = 0; this.queueL = -1;
     this.calm = 0; this.lastKaos = -10; this.atkQ = []; this.atkCalm = 0; this.frz = [0, 0]; this.fire = 0; this.fhCd = [0, 0];
     this.cam = { y: 0, h: this.camMin() }; this.cam.y = this.kind === 'duel' ? L.H - this.cam.h : 0;
-    this.boss = null; this.solo = false; this.rush = null; this.forceBoss = null; this.bossMul = 1; this.bossT = rnd(40, 50); this.mis = null; this.misT = rnd(12, 16); this.misDone = 0;
+    this.boss = null; this.solo = false; this.mega = false; this.rush = null; this.forceBoss = null; this.bossMul = 1; this.bossT = rnd(40, 50); this.mis = null; this.misT = rnd(12, 16); this.misDone = 0;
     this.rampN = 0; this.rampT = 0; this.tilt = 0; this.tiltW = 0;
     this.combo = 0; this.comboT = 0; this.flash = 0; this.flashCol = '#fff'; this.punch = 0; this.labelT = 6;
     this.parts.length = 0; this.texts.length = 0; this.rings.length = 0; this.banner = null;
@@ -943,14 +977,12 @@ class Table {
       }
     }
     if (this.boss) {
-      const bo = this.boss, BI = BOSS[bo.k], imp = bo.inv > 0 ? 0 : resolve(b, bo.x, bo.y, BI.r, .7, bo.vx, bo.vy || 0);
-      if (imp > 1 && bo.cd <= 0 && bo.sh > 0) { bo.cd = .25; b.vx += LNX * 500; b.vy += LNY * 500; this.hook('bossBlock', { x: bo.x + LNX * BI.r, y: bo.y + LNY * BI.r }); }
+      const bo = this.boss, BI = BOSS[bo.k], R = bo.R || BI.r, imp = bo.inv > 0 ? 0 : resolve(b, bo.x, bo.y, R, .7, bo.vx, bo.vy || 0);
+      if (imp > 1 && bo.cd <= 0 && bo.sh > 0) { bo.cd = .25; b.vx += LNX * 500; b.vy += LNY * 500; this.hook('bossBlock', { x: bo.x + LNX * R, y: bo.y + LNY * R }); }
       else if (imp > 1 && bo.cd <= 0) {
-        bo.cd = .12; b.vx += LNX * 420; b.vy += LNY * 420; bo.hp--; bo.f = 1;
-        if (!bo.rage && bo.hp <= bo.max / 2) { bo.rage = 1; bo.vx *= 1.5; bo.atk = Math.min(bo.atk, 1.5); this.hook('bossRage', { x: bo.x, y: bo.y }); }
-        this.hook('bossHit', { x: bo.x + LNX * BI.r, y: bo.y + LNY * BI.r });
-        if (bo.hp <= 0) { this.hook('bossDown', { x: bo.x, y: bo.y, k: bo.k }); this.boss = null; this.bossT = this.solo ? 3.5 : rnd(55, 70); this.calm = Math.max(this.calm, 8); if (this.rush) this.rush.shift(); }
-        else if (bo.k === 'crab') bo.vx *= 1.08;
+        bo.cd = .12; b.vx += LNX * 420; b.vy += LNY * 420;
+        this.hook('bossHit', { x: bo.x + LNX * R, y: bo.y + LNY * R });
+        if (!this.hurtBoss(this.eff.pow2 > 0 ? 2 : 1) && bo.k === 'crab') bo.vx *= 1.08;
       }
     }
     if (this.inv && !b.bomb) {
@@ -1013,6 +1045,14 @@ class Table {
       if (imp > 0 && !duel) { const p = f.p; this.last = p; this.grav = p === 0 ? -1 : 1; if (this.fhCd[p] <= 0 && Math.abs(f.w) > 5) { this.fhCd[p] = .5; this.hook('fhit', { p }); } }
     }
   }
+  hurtBoss(n) {
+    const bo = this.boss; if (!bo) return false;
+    bo.hp = Math.max(0, bo.hp - n); bo.f = 1;
+    if (!bo.rage && bo.hp > 0 && bo.hp <= bo.max / 2) { bo.rage = 1; bo.vx *= 1.5; bo.atk = Math.min(bo.atk, 1.5); this.hook('bossRage', { x: bo.x, y: bo.y }); }
+    if (bo.hp > 0) return false;
+    this.hook('bossDown', { x: bo.x, y: bo.y, k: bo.k }); this.boss = null; this.bossT = this.solo ? 3.5 : rnd(55, 70); this.calm = Math.max(this.calm, 8); if (this.rush) this.rush.shift();
+    return true;
+  }
   freeSpot() {
     const [x0, y0, x1, y1] = this.L.area;
     for (let k = 0; k < 40; k++) {
@@ -1064,10 +1104,20 @@ class Table {
         else if (sp > mx) { const k = Math.max(mx / sp, 1 - dt * .6); b.vx *= k; b.vy *= k; }
         if (Math.abs(b.vy) < Math.max(150, sp * .4)) b.vy += (b.vy === 0 ? this.grav : Math.sign(b.vy)) * 900 * dt;
       }
+      if ((duel ? this.eff.home : this.eff.ahome) > 0 && !b.ramp && !b.lane && b.held <= 0 && (!duel || b.y < this.L.H - 230)) {
+        let tx, ty;
+        if (!duel) { tx = this.L.cx; ty = this.homeP === 0 ? 0 : this.L.H; }
+        else if (this.boss) { tx = this.boss.x; ty = this.boss.y; }
+        else { let best = null, bd = 1e9; for (const u of this.L.bumpers) { const d = Math.hypot(u.x - b.x, u.y - b.y); if (d > u.r + 30 && d < bd) { bd = d; best = u; } } if (best) { tx = best.x; ty = best.y; } }
+        if (tx != null) { const dx = tx - b.x, dy = ty - b.y, d = Math.hypot(dx, dy) || 1, f = duel ? 1500 : 1700; b.vx += dx / d * f * dt; b.vy += dy / d * f * dt; }
+      }
+      if (this.eff.mag > 0 && this.boss && !b.ramp && !b.lane && b.held <= 0) { const bo = this.boss, dx = bo.x - b.x, dy = bo.y - b.y, d = Math.hypot(dx, dy) || 1; b.vx += dx / d * 1900 * dt; b.vy += dy / d * 1900 * dt; }
       if (!b.ramp && b.held <= 0 && !b.lane && !(duel && b.x > this.L.laneX)) {
         if (b.ax == null || Math.hypot(b.x - b.ax, b.y - b.ay) > 25) { b.ax = b.x; b.ay = b.y; b.at = 0; }
-        else if ((b.at += dt) > 2.5 && !this.fl.some(f => f.on && Math.hypot(b.x - f.px, b.y - f.py) < f.len + 20)) {
+        else if ((b.at += dt) > (this.eff.giant > 0 || b.kt > this.time - 8 ? 1.2 : 2.5) && !this.fl.some(f => f.on && Math.hypot(b.x - f.px, b.y - f.py) < f.len + 20)) {
           b.at = 0; b.vx = rnd(-320, 320); b.vy = duel ? -rnd(650, 850) : (b.y > this.L.H / 2 ? -1 : 1) * rnd(550, 700);
+          if (b.kt > this.time - 8 || this.eff.giant > 0) { const sp = this.freeSpot(); if (sp) { this.hook('fade', { x: b.x, y: b.y }); b.x = sp[0]; b.y = sp[1]; b.trail.length = 0; b.ax = b.x; b.ay = b.y; } }
+          b.kt = this.time;
         }
       }
       if (b.x < -30 || b.x > this.L.W + 30) { b.x = this.L.cx; b.y = this.L.H / 2; b.vx = 0; b.vy = 0; }
@@ -1086,7 +1136,7 @@ class Table {
     if (this.tokenT <= 0 && this.tokens.length < 2 && this.calm <= 0) {
       this.tokenT = duel ? rnd(8, 12) : rnd(6, 9);
       const s = this.freeSpot();
-      if (s) this.tokens.push({ x: s[0], y: s[1], type: pickPow(duel, this.time - this.lastKaos > 25), t: 0 });
+      if (s) this.tokens.push({ x: s[0], y: s[1], type: pickPow(duel, this.time - this.lastKaos > 25, this.solo), t: 0 });
     }
     this.calm = Math.max(0, this.calm - dt);
     this.tilt = Math.max(0, this.tilt - dt); this.tiltW = Math.max(0, this.tiltW - dt * .6);
@@ -1098,6 +1148,10 @@ class Table {
     for (let p = 0; p < 2; p++) { this.frz[p] = Math.max(0, this.frz[p] - dt); this.fhCd[p] -= dt; }
     this.fire = Math.max(0, this.fire - dt);
     for (const t of this.tokens) t.t += dt;
+    if (this.zapB > 0) {
+      this.zapBT -= dt;
+      if (this.zapBT <= 0) { this.zapBT = .3; this.zapB--; const bo = this.boss; if (bo) { this.bolts.push({ x: bo.x, y: bo.y, life: .3, seed: Math.random() * 1000 }); this.hook('bossZap', { x: bo.x, y: bo.y }); this.hurtBoss(1); } }
+    }
     if (this.storm > 0) {
       this.stormT -= dt;
       if (this.stormT <= 0) {
@@ -1128,7 +1182,8 @@ class Table {
   directors(dt) {
     const L = this.L, bo = this.boss;
     // boss: arrives during a calm stretch, stays ~35 s, then a long break
-    if (bo) {
+    if (bo && this.eff.frzB > 0) { bo.cd -= dt; bo.f = Math.max(0, bo.f - dt * 4); bo.vy = 0; bo.laser = null; bo.sh = 0; bo.inv = 0; }
+    else if (bo) {
       const BI = BOSS[bo.k]; bo.t += dt; bo.f = Math.max(0, bo.f - dt * 4); bo.cd -= dt; bo.sh -= dt; bo.inv -= dt;
       if (bo.dash > 0) { bo.dash -= dt; if (bo.dash <= 0) bo.vx /= 2.6; }
       if (bo.k === 'ghost') { bo.tp -= dt; if (bo.tp <= 0) { bo.tp = bo.rage ? 1.7 : 2.6; bo.x = rnd(L.boss.x0, L.boss.x1); bo.y = L.boss.y + rnd(-50, 230); this.hook('bossBlink', { x: bo.x, y: bo.y }); } }
@@ -1142,13 +1197,14 @@ class Table {
       // its special attack
       bo.atk -= dt;
       if (bo.atk <= 0) {
-        bo.atk = (bo.rage ? .6 : 1) * rnd(5, 6.5);
-        if (bo.k === 'eye') { this.spawnBomb(bo.x, bo.y + BI.r + 12); if (bo.rage) this.spawnBomb(bo.x + 30, bo.y + BI.r + 12); this.hook('bossShot', { x: bo.x, y: bo.y + BI.r }); }
-        else if (bo.k === 'crab') { bo.vx *= 2.6; bo.dash = 1.1; this.hook('bossAtk', { x: bo.x, y: bo.y, txt: 'KRABBEN STORMER!' }); }
-        else if (bo.k === 'ghost') { bo.inv = 1.6; this.spawnBomb(bo.x, bo.y + 20); this.hook('bossAtk', { x: bo.x, y: bo.y, txt: 'USYNLIG!' }); }
-        else if (bo.k === 'ufo') { bo.laser = { x: bo.x, t: 0 }; this.hook('bossAtk', { x: bo.x, y: bo.y, txt: 'LASER!' }); }
-        else if (bo.k === 'robot') { bo.sh = 1.8; this.spawnBomb(bo.x, bo.y + BI.r + 12); this.hook('bossAtk', { x: bo.x, y: bo.y, txt: 'SKJOLD OP!' }); }
-        else if (bo.k === 'kraken') { this.eff.fog = Math.max(this.eff.fog, 3.5); this.shake = 12; for (const b of this.balls) if (!b.lane && !b.ramp) { b.vx += rnd(-650, 650); b.vy += rnd(-200, 350); } this.hook('bossAtk', { x: bo.x, y: bo.y, txt: 'BLÆK OG ARME!' }); }
+        bo.atk = (bo.rage ? .6 : 1) * (bo.mega ? .75 : 1) * rnd(5, 6.5);
+        const kk = bo.mega ? pick(['eye', 'crab', 'ufo', 'robot', 'kraken']) : bo.k;
+        if (kk === 'eye') { this.spawnBomb(bo.x, bo.y + (bo.R || BI.r) + 12); if (bo.rage || bo.mega) this.spawnBomb(bo.x + 30, bo.y + (bo.R || BI.r) + 12); this.hook('bossShot', { x: bo.x, y: bo.y + (bo.R || BI.r) }); }
+        else if (kk === 'crab') { bo.vx *= 2.6; bo.dash = 1.1; this.hook('bossAtk', { x: bo.x, y: bo.y, txt: 'KRABBEN STORMER!' }); }
+        else if (kk === 'ghost') { bo.inv = 1.6; this.spawnBomb(bo.x, bo.y + 20); this.hook('bossAtk', { x: bo.x, y: bo.y, txt: 'USYNLIG!' }); }
+        else if (kk === 'ufo') { bo.laser = { x: bo.x, t: 0 }; this.hook('bossAtk', { x: bo.x, y: bo.y, txt: 'LASER!' }); }
+        else if (kk === 'robot') { bo.sh = 1.8; this.spawnBomb(bo.x, bo.y + (bo.R || BI.r) + 12); this.hook('bossAtk', { x: bo.x, y: bo.y, txt: 'SKJOLD OP!' }); }
+        else if (kk === 'kraken') { this.eff.fog = Math.max(this.eff.fog, 3.5); this.shake = 12; for (const b of this.balls) if (!b.lane && !b.ramp) { b.vx += rnd(-650, 650); b.vy += rnd(-200, 350); } this.hook('bossAtk', { x: bo.x, y: bo.y, txt: 'BLÆK OG ARME!' }); }
       }
       // UFO laser: aims for 1 s, then fires for .7 s and slams every ball under it downwards
       if (bo.laser) {
@@ -1158,13 +1214,13 @@ class Table {
       }
       // a boss left alone hurts you
       bo.hurt -= dt;
-      if (bo.hurt <= 0) { bo.hurt = bo.rage ? 6 : 9; this.hook('bossHurt', { x: bo.x, y: bo.y + BI.r + 20 }); }
+      if (bo.hurt <= 0) { bo.hurt = (bo.rage ? 6 : 9) * (bo.mega ? .8 : 1); this.hook('bossHurt', { x: bo.x, y: bo.y + (bo.R || BI.r) + 20 }); }
       if (bo.t > 45 && !this.solo) { this.boss = null; this.bossT = rnd(50, 65); this.calm = Math.max(this.calm, 6); this.hook('bossGone', { x: bo.x, y: bo.y }); }
     } else {
       this.bossT -= dt;
       if (this.bossT <= 0 && (this.solo ? !this.rush || this.rush.length : this.calm <= 0 && this.atkCalm <= 2 && !this.mis)) {
         const k = this.rush ? this.rush[0] : this.forceBoss || pick(THEME_BOSS[L.theme] || BOSS_KEYS), BI = BOSS[k], hp = Math.round(BI.hp * this.bossMul);
-        this.boss = { k, x: (L.boss.x0 + L.boss.x1) / 2, y: L.boss.y, vy: 0, vx: BI.sp * (Math.random() < .5 ? -1 : 1), hp, max: hp, f: 0, t: 0, cd: 0, tp: 2.6, atk: 4, hurt: 9, sw: 4, yy: L.boss.y, sh: 0, inv: 0, dash: 0, rage: 0, laser: null };
+        this.boss = { k, mega: this.mega ? 1 : 0, R: BI.r * (this.mega ? 1.45 : 1), x: (L.boss.x0 + L.boss.x1) / 2, y: L.boss.y, vy: 0, vx: BI.sp * (this.mega ? 1.2 : 1) * (Math.random() < .5 ? -1 : 1), hp, max: hp, f: 0, t: 0, cd: 0, tp: 2.6, atk: 4, hurt: 9, sw: 4, yy: L.boss.y, sh: 0, inv: 0, dash: 0, rage: 0, laser: null };
         this.calm = Math.max(this.calm, 6); this.tokens = this.tokens.filter(t => !POW[t.type].k);
         this.hook('bossIn', { k, x: this.boss.x, y: this.boss.y });
       }
@@ -1236,7 +1292,7 @@ const G = {
   rid: 0, li: 0, camp: -1, atkSeq: 0, atkList: [], oppAtkSeen: 0, ai: [null, null], winner: -1, slow: 0, slowCd: 0,
   over: false, fxId: 0, fxList: [], fxSeen: 0, overdrive: false, me: 0, flash: 0,
   nextAtk: [null, null], aiFire: [0, 0], supReq: 0, supSeen: 0,
-  big: 0, unlocks: [], emSeq: 0, emIdx: 0, emSeen: 0, emCd: 0, emoList: [],
+  big: 0, skCd: [0, 0], lo: [null, null], aiSk: [null, null], skReqK: 0, unlocks: [], emSeq: 0, emIdx: 0, emSeen: 0, emCd: 0, emoList: [],
 };
 const DMG = { alien: 5, alienAll: 20, bumper: 2, sling: 1, roll: 3, rollAll: 10, drop: 4, dropAll: 12, kaos: 3, strike: 2, saucer: 3, orbit: 6, spin: 1, ramp: 8, portal: 2, bossHit: 4 };
 const BOSS_DMG = 100, BOSS_HURT = 15, MIS_DMG = 30;
@@ -1244,11 +1300,55 @@ const ROUND_TIME = 240, OVERDRIVE_AT = 150, ARENA_GOALS = 5, DRAIN = 50;
 let MAXHP = 1200;
 // campaign: you alone against each table's boss (with lots of HP); the finale is a boss rush on Neon Klassik
 const CAMP = [
-  { li: 0, boss: 'eye', mul: 2.5 }, { li: 1, boss: 'ufo', mul: 2.5 }, { li: 2, boss: 'robot', mul: 2.5 },
-  { li: 3, boss: 'kraken', mul: 2.5 }, { li: 4, boss: 'ghost', mul: 3 },
-  { li: 0, rush: ['crab', 'ufo', 'robot', 'kraken', 'ghost'], mul: 1.5, fin: 1, time: 480 },
+  { li: 0, boss: 'eye', mul: 3 }, { li: 1, boss: 'ufo', mul: 3 }, { li: 0, boss: 'crab', mul: 3.2 }, { li: 3, boss: 'kraken', mul: 3.4 },
+  { li: 0, boss: 'eye', mul: 6, mega: 1, time: 360 },
+  { li: 2, boss: 'robot', mul: 3.5 }, { li: 4, boss: 'ghost', mul: 4 }, { li: 1, boss: 'ufo', mul: 4.2 }, { li: 2, boss: 'crab', mul: 4.4 },
+  { li: 1, boss: 'ufo', mul: 7, mega: 1, time: 360 },
+  { li: 3, boss: 'kraken', mul: 4.8 }, { li: 2, boss: 'robot', mul: 5 }, { li: 4, boss: 'ghost', mul: 5.5 },
+  { li: 0, rush: ['eye', 'crab', 'ufo', 'kraken'], mul: 2.4, time: 420 },
+  { li: 3, boss: 'kraken', mul: 8, mega: 1, time: 420 },
 ];
-const SOLO_HP = 300, SOLO_HURT = 8;
+const MEGA_LV = CAMP.map((C, i) => C.mega ? i : -1).filter(i => i >= 0);
+// how many mega bosses you have beaten decides which skills are unlocked
+const megaWins = () => { const st = campStars(); return MEGA_LV.filter(i => (st[i] | 0) > 0).length; };
+const SOLO_HP = 300, SOLO_HURT = 10;
+// campaign skills: you pick 3 before the fight, the energy bar fills as you hit things, and you spend it when you like
+const SKILLS = {
+  // campaign (m: b)
+  zap: { n: 'LYN', d: '3 lyn rammer bossen for 1 hver', c: '#fff36b', i: '⚡', cost: 35, boss: 1, m: 'b', u: 0 },
+  frz: { n: 'FRYS BOSSEN', d: 'Bossen står stille og angriber ikke i 5 sek.', c: '#7de8ff', i: '❄', cost: 40, boss: 1, m: 'b', u: 1 },
+  mag: { n: 'MAGNET', d: 'Kuglerne trækkes mod bossen i 4 sek.', c: '#ff5cf0', i: 'M', cost: 45, boss: 1, m: 'b', u: 2 },
+  pow2: { n: 'KRAFTSLAG', d: 'Hvert træf på bossen tæller dobbelt i 8 sek.', c: '#ff5c8a', i: '×2', cost: 50, boss: 1, m: 'b', u: 2 },
+  meteor: { n: 'METEOR', d: 'Kæmpe slag: bossen mister 4 liv', c: '#ff7a30', i: '☄', cost: 100, boss: 1, m: 'b', u: 3 },
+  // Duel (m: d)
+  home: { n: 'HOMING', d: 'Kuglerne styrer selv mod bumpere og bossen i 8 sek.', c: '#7dffea', i: '➶', cost: 40, m: 'd', u: 0 },
+  x2: { n: 'SUPER-SKADE', d: 'Al din skade ×2 i 10 sek.', c: '#ff5c8a', i: '×2', cost: 45, m: 'd', u: 0 },
+  mega: { n: 'MEGA-SLAG', d: 'Modstanderen mister 60 liv med det samme', c: '#ff7a30', i: '☄', cost: 100, m: 'd', u: 3 },
+  fog: { n: 'TÅGE', d: 'Send tåge over modstanderens bord (−15)', c: '#b98cff', i: '≋', cost: 45, m: 'd', u: 0, atk: 1 },
+  bomb: { n: 'BOMBE', d: 'Send en bombe til modstanderen (−15)', c: '#ff4060', i: '✸', cost: 40, m: 'd', u: 0, atk: 1 },
+  quake: { n: 'JORDSKÆLV', d: 'Ryst modstanderens kugler rundt (−15)', c: '#ff9a3c', i: '≈', cost: 35, m: 'd', u: 0, atk: 1 },
+  mir: { n: 'SPEJLVENDT', d: 'Byt modstanderens flippere om (−15)', c: '#ff7a30', i: '⇄', cost: 50, m: 'd', u: 1, atk: 1 },
+  small: { n: 'MINI-FLIPPERE', d: 'Krymp modstanderens flippere (−15)', c: '#ff4060', i: '↘', cost: 50, m: 'd', u: 1, atk: 1 },
+  bh: { n: 'SORT HUL', d: 'Modstanderens kugle suges mod midten (−15)', c: '#c070ff', i: '●', cost: 50, m: 'd', u: 2, atk: 1 },
+  rain: { n: 'BOMBEREGN', d: 'Send 3 bomber til modstanderen (−15)', c: '#ff4060', i: '✸', cost: 75, m: 'd', u: 2, atk: 1 },
+  // shared by several modes
+  multi: { n: 'MULTIBALL', d: 'Ekstra kugler i 10 sek.', c: '#ff9a3c', i: '3', cost: 35, m: 'bda', u: 0 },
+  big: { n: 'KÆMPE-FLIPPERE', d: 'Længere flippere i 10–12 sek.', c: '#ffd84a', i: 'B', cost: 25, m: 'bda', u: 0 },
+  shield: { n: 'SKJOLD', d: 'Næste tabte kugle teleporteres op igen', c: '#5cf2ff', i: 'S', cost: 25, m: 'bd', u: 0 },
+  heal: { n: 'HELBRED', d: '+60 liv', c: '#7dff9a', i: '+', cost: 50, m: 'bd', u: 1 },
+  // Arena (m: a)
+  afire: { n: 'ILDKUGLE', d: 'Alle kugler brager mod modstanderens mål', c: '#ff7a30', i: '🔥', cost: 60, m: 'a', u: 0 },
+  afrz: { n: 'FRYS', d: 'Modstanderens flippere fryser i 2 sek.', c: '#7de8ff', i: '❄', cost: 50, m: 'a', u: 0 },
+  wall: { n: 'MUR', d: 'Et skjold foran dit mål teleporterer ét skud væk', c: '#5cf2ff', i: '▬', cost: 40, m: 'a', u: 0 },
+  ahome: { n: 'HOMING', d: 'Kuglen styrer mod modstanderens mål i 4 sek.', c: '#7dffea', i: '➶', cost: 45, m: 'a', u: 0 },
+  slow: { n: 'SLØV MODSTANDER', d: 'Modstanderens flippere går langsomt i 6 sek.', c: '#b98cff', i: 'Z', cost: 45, m: 'a', u: 2 },
+  dbl: { n: 'DOBBELT MÅL', d: 'Dit næste mål tæller 2', c: '#ffd84a', i: '2', cost: 55, m: 'a', u: 3 },
+};
+const SKILL_KEYS = Object.keys(SKILLS), SK_ATK_DMG = 15;
+const LO_KEY = { b: 'skills', d: 'dsk', a: 'ask' }, LO_DEF = { b: ['zap', 'multi', 'big'], d: ['home', 'x2', 'fog'], a: ['afire', 'afrz', 'ahome'] };
+const skPool = m => SKILL_KEYS.filter(k => SKILLS[k].m.includes(m));
+const skOpen = k => !!SKILLS[k] && SKILLS[k].u <= megaWins();
+const MEGA_NAMES = ['første', 'anden', 'tredje'];
 // settings, lifetime stats and unlockable balls (all kept on this device)
 const CPU_LV = [{ n: 'Let', s: .6, f: [4, 8] }, { n: 'Normal', s: .9, f: [1.5, 5] }, { n: 'Svær', s: .95, f: [.8, 2.5] }, { n: 'Umulig', s: 1, f: [.2, .6] }];
 const BALLS = [
@@ -1262,6 +1362,7 @@ const BALLS = [
 const FLIPS = [{ n: 'Din farve', c: null }, { n: 'Guld', c: '#ffd84a' }, { n: 'Grøn', c: '#7dff9a' }, { n: 'Orange', c: '#ff9a3c' }, { n: 'Lilla', c: '#b98cff' }, { n: 'Hvid', c: '#ffffff' }];
 const loadJ = (k, d) => { try { const v = JSON.parse(store.get(k, '{}')); return Object.assign(d, v && typeof v === 'object' ? v : {}); } catch (e) { return d; } };
 const SET = loadJ('fd-set', { cpu: 1, ball: 0, flip: 0 });
+for (const m in LO_KEY) { const a = SET[LO_KEY[m]]; if (!Array.isArray(a) || a.length !== 3 || !a.every(k => SKILLS[k] && SKILLS[k].m.includes(m))) SET[LO_KEY[m]] = LO_DEF[m].slice(); }
 const STATS = loadJ('fd-stats', { played: 0, won: 0, duelW: 0, arenaW: 0, online: 0, onlineW: 0, boss: 0, combo: 0, goals: 0, supers: 0, dmg: 0, camp: 0, fastBoss: 0 });
 const cpuLv = () => CPU_LV[SET.cpu] || CPU_LV[1];
 const ballOpen = i => !!BALLS[i] && (!BALLS[i].need || BALLS[i].need());
@@ -1276,6 +1377,61 @@ function stat(k, v, how) {
     G.unlocks.push(b.n); SFX.jackpot();
     const t = G.tables[0]; if (t) t.ban('NY KUGLE: ' + b.n.toUpperCase() + '!', '#ffd84a', 2.2, 'Vælg den under Indstillinger');
   });
+}
+const skMode = () => G.type === 'boss' ? 'b' : G.mode === 'arena' ? 'a' : 'd';
+// the loadout each player brings: humans use their own picks, the CPU gets a random one
+function loadout(p) { return G.lo[p] || SET[LO_KEY[skMode()]].map(k => skOpen(k) ? k : LO_DEF[skMode()][0]); }
+const skKeys = lp => COARSE ? 'TRYK PÅ EVNERNE' : G.type === 'local' ? (lp === 0 ? 'EVNER: 1 2 3 ELLER Q W E' : 'EVNER: 8 9 0 ELLER I O P') : 'EVNER: 1 2 3 ELLER Q W E';
+// a human presses skill i (lp is the local player: 0, or 1 on a shared screen)
+function useSkill(lp, i) {
+  if (G.phase !== 'play' || G.demo || G.ai[lp]) return;
+  const k = loadout(lp)[i], S = SKILLS[k]; if (!S) return;
+  if (G.mode === 'arena' && G.type === 'guest') { // the host runs the Arena, so ask it
+    if (G.meter[1] >= S.cost && G.skCd[0] <= 0) { G.skCd[0] = .4; G.supReq++; G.skReqK = SKILL_KEYS.indexOf(k); stat('supers', 1); }
+    return;
+  }
+  if (trySkill(lp, k) && lp === 0) stat('supers', 1);
+}
+function trySkill(p, k) {
+  const S = SKILLS[k], t = tableOf(p);
+  if (!S || !t || G.phase !== 'play' || G.skCd[p] > 0 || G.meter[p] < S.cost) return false;
+  if (S.boss && !t.boss) { if (isHuman(p)) t.ban('INGEN BOSS LIGE NU', '#ff6080', .9, 'Gem din energi til bossen kommer'); return false; }
+  G.meter[p] -= S.cost; G.skCd[p] = .35;
+  doSkill(p, k, t);
+  return true;
+}
+function skillFx(t, p, k) {
+  const S = SKILLS[k], arena = t.kind === 'arena', cx = t.L.cx, cy = arena ? (p === 0 ? t.L.H - 160 : 160) : t.cam.y + t.cam.h * .45;
+  SFX.send(); t.ban(S.n + '!', S.c, 1.2, S.d); t.burst(cx, cy, S.c, 24, 400, .5);
+  if (!online() || p === 0) vibrate(40);
+}
+function doSkill(p, k, t) {
+  const S = SKILLS[k], cx = t.L.cx;
+  if (t.kind === 'arena') {
+    if (k === 'afire' || k === 'afrz' || k === 'wall') { useAbility(p, { afire: 'fire', afrz: 'frz', wall: 'wall' }[k]); return; }
+    if (k === 'ahome') { t.eff.ahome = 4; t.homeP = p; t.last = p; t.grav = p === 0 ? -1 : 1; }
+    else if (k === 'multi') t.spawnMulti(2, cx, t.L.H / 2, p === 0 ? 1 : -1, 10);
+    else if (k === 'big') t.bigP[p] = 10;
+    else if (k === 'slow') t.slowP[1 - p] = 6;
+    else if (k === 'dbl') t.dbl[p] = 15;
+    skillFx(t, p, k); pushFx('K', 200, 360, p, SKILL_KEYS.indexOf(k));
+    return;
+  }
+  if (S.atk) { G.dealt[p] += SK_ATK_DMG; sendAttack(p, k); return; }
+  const bo = t.boss, cy = t.cam.y + t.cam.h * .45;
+  skillFx(t, p, k);
+  if (k === 'zap') { t.zapB = 3; t.zapBT = .1; }
+  else if (k === 'frz') { t.eff.frzB = 5; SFX.zap(); t.ring(bo.x, bo.y, 80, '#7de8ff', .5, 5); }
+  else if (k === 'mag') { t.eff.mag = 4; t.ring(bo.x, bo.y, 120, '#ff5cf0', .6, 4); }
+  else if (k === 'pow2') t.eff.pow2 = 8;
+  else if (k === 'meteor') { SFX.boom(); t.bolts.push({ x: bo.x, y: bo.y, life: .4, seed: Math.random() * 1000 }); t.boom(bo.x, bo.y, '#ff7a30', true); t.shake = 16; t.hurtBoss(4); }
+  else if (k === 'multi') t.spawnMulti(3, cx, t.L.H - 380, 1, 10);
+  else if (k === 'big') t.eff.big = G.type === 'boss' ? 12 : 10;
+  else if (k === 'shield') t.dshield = 1;
+  else if (k === 'heal') { G.drain[p] = Math.max(-G.dealt[1 - p], G.drain[p] - 60); t.text(cx, cy, '+60', '#7dff9a', 34); }
+  else if (k === 'home') t.eff.home = 8;
+  else if (k === 'x2') t.eff.x2 = 10;
+  else if (k === 'mega') { const dm = 60; G.dealt[p] += dm; SFX.boom(); t.boom(cx, t.cam.y + 40, '#ff7a30', true); t.text(cx, t.cam.y + 100, '-' + dm, COL[1 - p], 44); t.shake = 14; }
 }
 // big moments (boss down, goal, round won) play out in slow motion
 function bigMoment(d) {
@@ -1311,6 +1467,7 @@ function startGame(mode, type, names) {
   if (mode === 'duel') G.tables = online() || type === 'boss' ? [new Table('duel')] : [new Table('duel'), new Table('duel')];
   else G.tables = [new Table('arena')];
   G.ai = [null, type === 'cpu' ? new AI(cpuLv().s) : null];
+  { const m = type === 'boss' ? 'b' : mode === 'arena' ? 'a' : 'd', pool = skPool(m).sort(() => Math.random() - .5); G.lo = [null, type === 'cpu' ? pool.slice(0, 3) : null]; G.aiSk = [null, null]; G.skCd = [0, 0]; G.skReqK = 0; }
   G.tables.forEach((t, i) => t.hook = (ty, d) => onEvent(i, ty, d));
   hide('menu'); hide('lobby'); hide('over'); hide('help'); show('hud');
   startMatch();
@@ -1328,7 +1485,7 @@ function startRound() {
   G.rid++; let li; do { li = Math.floor(Math.random() * DUELS.length); } while (li === G.li && DUELS.length > 1); G.li = li;
   const C = CAMP[G.camp]; if (C) G.li = C.li;
   resetRoundState(); G.countT = 3.2;
-  if (C) { const t = G.tables[0]; t.solo = true; t.rush = C.rush ? C.rush.slice() : null; t.forceBoss = C.boss || null; t.bossMul = C.mul; t.bossT = 1.5; t.misT = 1e9; }
+  if (C) { const t = G.tables[0]; t.solo = true; t.rush = C.rush ? C.rush.slice() : null; t.forceBoss = C.boss || null; t.bossMul = C.mul; t.mega = !!C.mega; t.bossT = 1.5; t.misT = 1e9; }
 }
 function goPlay() { G.phase = 'play'; SFX.beep(true); for (const t of G.tables) t.ban('KØR!', '#ffd84a', .8); }
 function endRound(w) {
@@ -1348,7 +1505,7 @@ function featureFx(t, type, d, c) {
     case 'rampIn': SFX.ramp(); t.ring(d.x, d.y, 34, '#7dffea', .35, 3); return true;
     case 'rampOut': SFX.rampOut(); t.burst(d.x, d.y, '#7dffea', 16, 300, .4); return true;
     case 'portal': SFX.portal(); t.ring(d.x, d.y, 40, '#ff9a3c', .4, 4); t.ring(d.x2, d.y2, 40, '#5cc8ff', .4, 4); t.burst(d.x2, d.y2, '#5cc8ff', 14, 260, .35); return true;
-    case 'bossIn': { const BI = BOSS[d.k]; SFX.bossIn(); t.ban('BOSS: ' + BI.n, BI.col, 2.2, BI.d); t.boom(d.x, d.y, BI.col, true); t.shake = 14; return true; }
+    case 'bossIn': { const BI = BOSS[d.k]; SFX.bossIn(); t.ban((t.mega ? 'MEGA-BOSS: MEGA-' : 'BOSS: ') + BI.n, BI.col, 2.2, t.mega ? 'Større, stærkere og med alle bossernes angreb' : BI.d); t.boom(d.x, d.y, BI.col, true); t.shake = 14; return true; }
     case 'bossShot': t.text(d.x, d.y + 30, 'BOSS-BOMBE!', '#ff6060', 16); t.ring(d.x, d.y, 30, '#ff4060', .3, 3); return true;
     case 'bossAtk': SFX.kaos(); t.text(d.x, d.y + 60, d.txt, BOSS[t.boss ? t.boss.k : 'eye'].col, 20); t.ring(d.x, d.y, 70, '#ffffff', .4, 3); return true;
     case 'bossBlock': SFX.sling(); t.ring(d.x, d.y, 30, '#ffb020', .3, 4); t.text(d.x, d.y - 20, 'BLOKERET!', '#ffb020', 16); return true;
@@ -1382,7 +1539,7 @@ function applyPower(t, p, d) {
     if (ty === 'multi') t.spawnMulti(3, d.x, d.y, 1, 10);
     else if (ty === 'shield') t.dshield = 1;
     else if (ty === 'x2') t.eff.x2 = 10;
-    else if (ty === 'heal') { if (!G.demo) G.drain[p] -= 50; }
+    else if (ty === 'heal') { if (!G.demo) G.drain[p] = Math.max(-G.dealt[1 - p], G.drain[p] - 50); }
     else if (ty === 'big') t.eff.big = 10;
     else if (ty === 'storm') { t.storm = 12; t.stormT = .2; }
     else if (ty === 'cannon') for (const b of t.balls) { if (!b.lane) { b.vx = rnd(-500, 500); b.vy = -rnd(1500, 1900); } }
@@ -1431,6 +1588,7 @@ function onEvent(i, type, d) {
       G.dealt[p] += MIS_DMG; chargeMeter(p, 35);
     }
   }
+  if (type === 'bossZap') { SFX.zap(); t.boom(d.x, d.y, '#fff36b', false); t.flash = .25; t.flashCol = '#fff36b'; t.text(d.x, d.y - 40, 'LYN −1', '#fff36b', 22); return; }
   if (type === 'bossHurt') {
     t.burst(d.x, d.y, '#ff4060', 16, 260, .4);
     if (playing) { const h = G.type === 'boss' ? SOLO_HURT : BOSS_HURT; G.drain[p] += h; t.text(d.x, d.y, 'BOSS-ANGREB −' + h, '#ff4060', 20); }
@@ -1492,7 +1650,7 @@ function onEvent(i, type, d) {
     case 'shield': SFX.portal(); t.boom(d.x, d.y, '#5cf2ff', false); t.ring(d.x2, d.y2, 50, '#5cf2ff', .5, 4); t.burst(d.x2, d.y2, '#5cf2ff', 20, 300, .45); t.text(d.x2, d.y2 - 40, 'SKJOLD: TELEPORT!', '#5cf2ff', 18); break;
     case 'power':
       powerFx(t, d);
-      if (d.type === 'heal' && playing) { G.drain[p] -= 50; t.text(d.x, d.y - 20, '+50', '#7dff9a', 30); }
+      if (d.type === 'heal' && playing) { G.drain[p] = Math.max(-G.dealt[1 - p], G.drain[p] - 50); t.text(d.x, d.y - 20, '+50', '#7dff9a', 30); }
       else if (d.type !== 'heal') applyPower(t, p, d);
       if (mine) vibrate(60);
       break;
@@ -1535,14 +1693,9 @@ const isHuman = p => !G.ai[p] && (p === 0 || G.type === 'local');
 const fireKeys = p => COARSE ? 'TRYK SUPER-KNAPPEN' : G.type === 'local' ? (p === 0 ? 'TRYK W' : 'TRYK ↑') : 'TRYK W / ↑ / MELLEMRUM';
 function chargeMeter(p, amt) {
   if (G.phase !== 'play' || G.demo || G.meter[p] >= 100) return;
-  G.meter[p] = Math.min(100, G.meter[p] + amt);
-  if (G.meter[p] < 100) return;
-  const arena = G.mode === 'arena';
-  G.nextAtk[p] = pick(arena ? ABIL_KEYS : Object.keys(ATK));
-  if (G.ai[p]) G.aiFire[p] = rnd(...cpuLv().f);
-  const t = tableOf(p), info = arena ? ABIL[G.nextAtk[p]] : ATK[G.nextAtk[p]];
-  if (t && isHuman(p) && !(arena && G.type === 'local')) { SFX.beep(true); t.ban('SUPER KLAR!', '#ffd84a', 1.3, info.n.replace('!', '') + ' · ' + fireKeys(p)); }
-  else if (isHuman(p)) SFX.beep(true);
+  const before = G.meter[p];
+  G.meter[p] = Math.min(100, G.meter[p] + amt * (G.type === 'boss' ? 1.1 : 1));
+  if (isHuman(p) && !(G.mode === 'arena' && G.type === 'local') && loadout(p).some(k => SKILLS[k] && before < SKILLS[k].cost && G.meter[p] >= SKILLS[k].cost)) SFX.beep(false);
 }
 function humanNudge(p) {
   if (G.mode !== 'duel' || G.phase !== 'play' || G.demo || G.ai[p]) return;
@@ -1550,6 +1703,7 @@ function humanNudge(p) {
 }
 function humanFire(p) {
   if (G.phase !== 'play' || G.demo || G.ai[p]) return;
+  if (G.type === 'boss') return;
   if (p === 0 && G.meter[G.mode === 'arena' && G.type === 'guest' ? 1 : 0] >= 100) stat('supers', 1);
   if (G.mode === 'arena' && G.type === 'guest') { if (G.meter[1] >= 100) G.supReq++; return; }
   fireSuper(p);
@@ -1580,8 +1734,8 @@ function abilityFx(t, p, type) {
 }
 function sendAttack(p, type) {
   const t = G.tables[p];
-  SFX.send(); SFX.wave(); t.ban('SUPER SENDT!', '#ffd84a', 1.2, ATK[type].n.replace('!', '') + ' på vej · −' + SUPER_DMG + ' liv');
-  t.boom(t.L.cx, t.cam.y + 30, '#ffd84a', true); t.text(t.L.cx, t.cam.y + 90, '-' + SUPER_DMG, COL[1 - p], 34);
+  SFX.send(); SFX.wave(); t.ban(ATK[type].n.replace('!', '') + ' SENDT!', '#ffd84a', 1.2, 'På vej til modstanderen · −' + SK_ATK_DMG + ' liv');
+  t.boom(t.L.cx, t.cam.y + 30, '#ffd84a', true); t.text(t.L.cx, t.cam.y + 90, '-' + SK_ATK_DMG, COL[1 - p], 34);
   if (online()) { G.atkSeq++; G.atkList.push([G.atkSeq, type]); if (G.atkList.length > 4) G.atkList.shift(); }
   else applyAttack(1 - p, type);
 }
@@ -1698,8 +1852,8 @@ function netSend(now) {
   if (G.mode === 'arena' && G.tables[0]) {
     const t = G.tables[0];
     if (Net.role === 'host') P.ar = { b: t.balls.slice(0, MAXBALLS).map(b => [Math.round(b.x), Math.round(b.y), Math.round(b.vx), Math.round(b.vy)]), f: t.fl.map(f => Math.round(f.a * 100) / 100),
-      g: t.grav, sc: t.score, tk: tokOut(t), sh: t.shield, fx: G.fxList, l: t.last, li: ARENAS.indexOf(t.L), bp: t.bigP.map(r1), sp: t.slowP.map(r1), tb: r1(t.turbo), ef: [r1(t.eff.giant), r1(t.eff.moon), r1(t.eff.rage)], tt: r1(t.time), iv: invOut(t.inv), db: t.dbl.map(r1) };
-    else { P.inp = ['l', 'r'].map(sd => t.fl.some(f => f.p === 1 && f.side === sd && f.on) ? 1 : 0); P.sx = G.supReq; }
+      g: t.grav, sc: t.score, tk: tokOut(t), sh: t.shield, fx: G.fxList, l: t.last, li: ARENAS.indexOf(t.L), bp: t.bigP.map(r1), sp: t.slowP.map(r1), tb: r1(t.turbo), ef: [r1(t.eff.giant), r1(t.eff.moon), r1(t.eff.rage), r1(t.eff.ahome || 0)], tt: r1(t.time), iv: invOut(t.inv), db: t.dbl.map(r1) };
+    else { P.inp = ['l', 'r'].map(sd => t.fl.some(f => f.p === 1 && f.side === sd && f.on) ? 1 : 0); P.sx = G.supReq; P.sk = G.skReqK; }
     if (Net.role === 'host') Object.assign(P.ar, { am: G.meter.map(Math.round), an: G.nextAtk.map(k => ABIL_KEYS.indexOf(k)), fz: t.frz.map(r1), fi: r1(t.fire) });
   }
   if (G.over) P.re = G.wantRe ? 1 : 0;
@@ -1772,7 +1926,7 @@ function oppArenaGuest(op) {
   if (Array.isArray(a.fz)) t.frz = [+a.fz[0] || 0, +a.fz[1] || 0];
   t.fire = +a.fi || 0;
   t.inv = invIn(a.iv); if (Array.isArray(a.db)) t.dbl = [+a.db[0] || 0, +a.db[1] || 0];
-  if (Array.isArray(a.ef)) { t.eff.giant = +a.ef[0] || 0; t.eff.moon = +a.ef[1] || 0; t.eff.rage = +a.ef[2] || 0; }
+  if (Array.isArray(a.ef)) { t.eff.giant = +a.ef[0] || 0; t.eff.moon = +a.ef[1] || 0; t.eff.rage = +a.ef[2] || 0; t.eff.ahome = +a.ef[3] || 0; }
   for (const b of t.balls) b.r = t.eff.giant > 0 ? BR_BIG : BR;
   if (typeof a.tt === 'number') t.time = a.tt + dtx;
   if (Array.isArray(a.fx)) for (const f of a.fx) {
@@ -1788,6 +1942,7 @@ function oppArenaGuest(op) {
     else if (ty === 'A') featureFx(t, 'alienAll', { x, y });
     else if (ty === 'P') featureFx(t, 'portal', { x, y, x2: Math.floor(ex / 2000), y2: ex % 2000 });
     else if (ty === 'S') { if (ABIL_KEYS[ex]) abilityFx(t, p, ABIL_KEYS[ex]); }
+    else if (ty === 'K') { if (SKILL_KEYS[ex]) skillFx(t, p, SKILL_KEYS[ex]); }
     else if (ty === 'L') { SFX.wave(); t.ban('NY BANE!', '#ffd84a', 1.8, (ARENAS[ex] || t.L).name); t.flash = .8; t.flashCol = '#ffd84a'; }
   }
 }
@@ -1799,9 +1954,13 @@ const SUP0 = ['KeyW', 'Space'], SUP1 = ['ArrowUp', 'Enter', 'NumpadEnter', 'KeyI
 addEventListener('keydown', e => {
   if (e.target && e.target.tagName === 'INPUT') return;
   keys.add(e.code); if (e.code.startsWith('Arrow') || e.code === 'Space') e.preventDefault(); SFX.init();
-  if (!e.repeat && [...SUP0, ...SUP1].includes(e.code)) humanFire(G.type === 'local' && SUP1.includes(e.code) ? 1 : 0);
   if (!e.repeat && [...NUD0, ...NUD1].includes(e.code)) humanNudge(G.type === 'local' && NUD1.includes(e.code) ? 1 : 0);
-  if (!e.repeat && /^Digit[1-5]$/.test(e.code)) sendEmo(+e.code.slice(5) - 1);
+  if (!e.repeat && online()) { const em = { Digit6: 0, Digit7: 1, Digit8: 2, Digit9: 3, Digit0: 4 }[e.code]; if (em != null) sendEmo(em); }
+  if (!e.repeat) {
+    const k0 = { Digit1: 0, Digit2: 1, Digit3: 2, KeyQ: 0, KeyW: 1, KeyE: 2, Space: 0 }[e.code], k1 = { Digit8: 0, Digit9: 1, Digit0: 2, KeyI: 0, KeyO: 1, KeyP: 2, ArrowUp: 0, Enter: 0, NumpadEnter: 0 }[e.code];
+    if (k0 != null) useSkill(0, k0);
+    else if (k1 != null && !(online() && /^Digit/.test(e.code))) useSkill(G.type === 'local' ? 1 : 0, k1);
+  }
 });
 addEventListener('keyup', e => keys.delete(e.code));
 addEventListener('blur', () => { keys.clear(); ptrs.clear(); });
@@ -1905,10 +2064,14 @@ function update(dt, now) {
     const t = G.tables[0]; t.stepFlippers(dt); t.tokens.forEach(k => k.t += dt);
   }
   if (G.phase === 'play' && !G.demo) {
-    G.t += authority ? dt : 0;
-    for (let p = 0; p < 2; p++) if (G.ai[p] && G.meter[p] >= 100) { G.aiFire[p] -= dt; if (G.aiFire[p] <= 0) fireSuper(p); }
+    G.t += authority ? dt : 0; G.skCd[0] -= dt; G.skCd[1] -= dt;
+    for (let p = 0; p < 2; p++) if (G.ai[p] && G.type !== 'boss') {
+      const lo = loadout(p); if (G.aiSk[p] == null) { G.aiSk[p] = Math.floor(Math.random() * 3); G.aiFire[p] = rnd(...cpuLv().f); }
+      const S = SKILLS[lo[G.aiSk[p]]];
+      if (!S) G.aiSk[p] = null; else if (G.meter[p] >= S.cost && (G.aiFire[p] -= dt) <= 0) { trySkill(p, lo[G.aiSk[p]]); G.aiSk[p] = null; }
+    }
     if (G.mode === 'arena' && authority) { chargeMeter(0, dt * 1.8); chargeMeter(1, dt * 1.8); }
-    if (G.mode === 'arena' && G.type === 'host') { const op = Net.opp && Net.opp.presence, sx = op ? op.sx | 0 : 0; if (sx > G.supSeen) { G.supSeen = sx; fireSuper(1); } }
+    if (G.mode === 'arena' && G.type === 'host') { const op = Net.opp && Net.opp.presence, sx = op ? op.sx | 0 : 0; if (sx > G.supSeen) { G.supSeen = sx; trySkill(1, SKILL_KEYS[op.sk | 0]); } }
     if (G.mode === 'duel') {
       if (!G.overdrive && G.t >= OVERDRIVE_AT && G.type !== 'boss') { G.overdrive = true; SFX.music(true, 140); for (const t of G.tables) { t.ban('OVERDRIVE ×2', '#ff7a30', 1.8, 'Al skade tæller dobbelt'); t.flash = .6; t.flashCol = '#ff7a30'; } }
       if (G.type === 'boss') { if (rawHp(0) <= 0 || G.t >= soloTime()) endRound(1); }
@@ -2099,7 +2262,7 @@ function pill(x, y, txt, col, size = 11) {
 }
 
 function drawBoss(t, now) {
-  const bo = t.boss, BI = BOSS[bo.k], by = bo.y != null ? bo.y : t.L.boss.y, r = BI.r * (1 + bo.f * .18);
+  const bo = t.boss, BI = BOSS[bo.k], by = bo.y != null ? bo.y : t.L.boss.y, r = (bo.R || BI.r) * (1 + bo.f * .18);
   ctx.save(); ctx.translate(bo.x, by);
   // UFO laser: thin aiming line, then a fat beam
   if (bo.laser) {
@@ -2328,7 +2491,12 @@ function drawTable(t, R, pi, opt = {}) {
     neon(p, f > .1 ? '#ffffff' : col, u.r > 12 ? 3 : 2);
     if (u.r > 12) { ctx.strokeStyle = 'rgba(255,255,255,.35)'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(u.x, u.y, r * .55, 0, TAU); ctx.stroke(); }
   }
-  if (duel && t.boss) drawBoss(t, now);
+  if (duel && t.boss) {
+    drawBoss(t, now);
+    if (t.boss.mega) { const bo = t.boss, r = bo.R + 14 + 4 * Math.sin(now * 5); ctx.save(); ctx.globalAlpha = .7; neon(new Path2D(`M${bo.x - r} ${bo.y}a${r} ${r} 0 1 0 ${2 * r} 0a${r} ${r} 0 1 0 ${-2 * r} 0`), '#ff3050', 3); ctx.globalAlpha = 1; ctx.font = '13px Bungee, sans-serif'; ctx.textAlign = 'center'; ctx.fillStyle = '#ffd84a'; ctx.fillText('♛ MEGA', bo.x, bo.y - r - 8); ctx.restore(); }
+    if (t.eff.frzB > 0) { const bo = t.boss, r = (bo.R || BOSS[bo.k].r) + 10; ctx.save(); ctx.globalAlpha = .35 + .15 * Math.sin(now * 6); ctx.fillStyle = '#bff4ff'; ctx.beginPath(); ctx.arc(bo.x, bo.y, r, 0, TAU); ctx.fill(); ctx.globalAlpha = 1; neon(new Path2D(`M${bo.x - r} ${bo.y}a${r} ${r} 0 1 0 ${2 * r} 0a${r} ${r} 0 1 0 ${-2 * r} 0`), '#7de8ff', 2.5); ctx.restore(); }
+    if (t.eff.mag > 0) { const bo = t.boss; ctx.save(); ctx.strokeStyle = '#ff5cf0'; ctx.globalAlpha = .5; ctx.lineWidth = 2; for (let k = 0; k < 3; k++) { const rr2 = 40 + ((now * 120 + k * 40) % 120); ctx.beginPath(); ctx.arc(bo.x, bo.y, rr2, 0, TAU); ctx.stroke(); } ctx.restore(); }
+  }
   if (t.inv) { const v = t.inv; for (let i = 0; i < v.n; i++) if (v.alive[i]) { const ax = L.cx + (i - (v.n - 1) / 2) * v.gap + v.x; ctx.fillStyle = 'rgba(125,255,107,.18)'; ctx.beginPath(); ctx.arc(ax, v.y, 20, 0, TAU); ctx.fill(); invader(ax, v.y, 3.1, i % 2 ? '#7dff6b' : '#ffffff', Math.floor(now * 3)); } }
   // ramps: raised rails over the playfield
   for (const RM of L.ramps) {
@@ -2377,6 +2545,7 @@ function drawTable(t, R, pi, opt = {}) {
     ctx.fillStyle = `rgba(${tc},.25)`; ctx.beginPath(); ctx.arc(b.x, b.y, r + 6, 0, TAU); ctx.fill();
     if (b.extra && b.life < 1.5 && Math.sin(now * 24) < 0) ctx.globalAlpha = .35;
     if (!duel && t.fire > 0) { ctx.fillStyle = 'rgba(255,122,48,.55)'; ctx.beginPath(); ctx.arc(b.x, b.y, r + 8 + 4 * Math.sin(now * 30), 0, TAU); ctx.fill(); if (t.parts.length < 900) t.parts.push({ x: b.x + rnd(-4, 4), y: b.y + rnd(-4, 4), vx: rnd(-60, 60), vy: rnd(-60, 60), life: .35, max: .35, col: Math.random() < .5 ? '#ff7a30' : '#ffd84a', size: 3 }); }
+    if ((duel ? t.eff.home : t.eff.ahome) > 0) { ctx.strokeStyle = '#7dffea'; ctx.lineWidth = 2; ctx.globalAlpha = .5 + .4 * Math.sin(now * 14); ctx.beginPath(); ctx.arc(b.x, b.y, r + 7, 0, TAU); ctx.stroke(); ctx.globalAlpha = 1; }
     if (b.held > 0) { ctx.fillStyle = 'rgba(255,63,210,.5)'; ctx.beginPath(); ctx.arc(b.x, b.y, r + 10 + 4 * Math.sin(now * 20), 0, TAU); ctx.fill(); }
     ctx.fillStyle = bg; ctx.beginPath(); ctx.arc(b.x, b.y, r, 0, TAU); ctx.fill(); ctx.globalAlpha = 1;
     if (b.bomb && Math.random() < .5 && t.parts.length < 900) t.parts.push({ x: b.x + rnd(-3, 3), y: b.y - 9, vx: rnd(-40, 40), vy: rnd(-90, -30), life: .3, max: .3, col: '#ffb040', size: 2 });
@@ -2469,7 +2638,7 @@ function drawTable(t, R, pi, opt = {}) {
       const bo = t.boss, BI = BOSS[bo.k], bw = 230, bx = W / 2 - bw / 2;
       rr(bx, 6, bw, 22, 11); ctx.fillStyle = 'rgba(6,4,18,.88)'; ctx.fill(); ctx.strokeStyle = BI.col; ctx.lineWidth = 1.5; ctx.stroke();
       rr(bx + 3, 9, Math.max(6, (bw - 6) * bo.hp / Math.max(1, bo.max)), 16, 8); ctx.fillStyle = BI.col + 'aa'; ctx.fill();
-      ctx.font = '11px Bungee, sans-serif'; ctx.fillStyle = '#fff'; ctx.fillText((bo.rage ? 'RASENDE ' : 'BOSS: ') + BI.n + ' ' + bo.hp + '/' + bo.max + (G.type === 'boss' ? '' : ' · ' + Math.max(0, Math.ceil(45 - (bo.t || 0))) + 's'), bx + bw / 2, 18);
+      ctx.font = '11px Bungee, sans-serif'; ctx.fillStyle = '#fff'; ctx.fillText((bo.rage ? 'RASENDE ' : 'BOSS: ') + (bo.mega ? 'MEGA-' : '') + BI.n + ' ' + bo.hp + '/' + bo.max + (G.type === 'boss' ? '' : ' · ' + Math.max(0, Math.ceil(45 - (bo.t || 0))) + 's'), bx + bw / 2, 18);
     }
     if (duel && t.mis && (pi === 0 || G.type === 'local' || G.demo)) {
       const m = t.mis, txt = 'MISSION: ' + m.txt.toUpperCase() + (m.need > 1 ? ' ' + m.n + '/' + m.need : '') + ' · ' + Math.ceil(m.t);
@@ -2522,7 +2691,10 @@ function drawHud(p, R, compact) {
     if (ready) { rr(-2, 60, W + 4, 15, 7); ctx.strokeStyle = `rgba(255,255,255,${pulse})`; ctx.lineWidth = 1.5; ctx.stroke(); }
     ctx.font = '10px Bungee, sans-serif'; ctx.textAlign = 'left'; ctx.fillStyle = ready ? '#ffffff' : 'rgba(255,216,74,.85)';
     const nx = G.nextAtk[p] && ATK[G.nextAtk[p]];
-    ctx.fillText(!ready ? 'SUPER ' + Math.floor(m * 100) + '%  ·  LAD OP VED AT RAMME TING' : isHuman(p) && nx ? 'SUPER KLAR: ' + nx.n.replace('!', '') + '  ·  ' + fireKeys(p) : 'SUPER KLAR · KAN KOMME NÅR SOM HELST!', 0, 88);
+    if (true) {
+      loadout(p).forEach(k => { const S = SKILLS[k]; if (!S) return; const x = W * S.cost / 100; ctx.fillStyle = m * 100 >= S.cost ? S.c : 'rgba(255,255,255,.5)'; ctx.fillRect(Math.min(W - 3, x - 1.5), 58, 3, 19); });
+      ctx.fillStyle = 'rgba(255,216,74,.9)'; ctx.fillText('ENERGI ' + Math.floor(m * 100) + '%' + (isHuman(p) ? '  ·  ' + skKeys(p) : '  ·  ' + loadout(p).map(k => SKILLS[k] ? SKILLS[k].n : '').join(' · ')), 0, 88);
+    } else ctx.fillText(!ready ? 'SUPER ' + Math.floor(m * 100) + '%  ·  LAD OP VED AT RAMME TING' : isHuman(p) && nx ? 'SUPER KLAR: ' + nx.n.replace('!', '') + '  ·  ' + fireKeys(p) : 'SUPER KLAR · KAN KOMME NÅR SOM HELST!', 0, 88);
   }
   ctx.restore();
 }
@@ -2541,7 +2713,10 @@ function drawArenaHud(R) {
     if (m > 0) { rr(0, by, Math.max(10, W * m), 10, 5); ctx.fillStyle = ready ? `rgba(255,216,74,${pulse})` : 'rgba(255,216,74,.75)'; ctx.fill(); }
     const lp = p === G.me ? 0 : 1, nx = G.nextAtk[p] && ABIL[G.nextAtk[p]];
     ctx.font = '8px Bungee, sans-serif'; ctx.textAlign = 'center'; ctx.fillStyle = ready ? '#160c00' : 'rgba(255,255,255,.75)';
-    ctx.fillText(!ready ? 'SUPER ' + Math.floor(m * 100) + '%' : nx && (isHuman(lp) || G.type === 'guest' && lp === 0) ? 'SUPER KLAR: ' + nx.n + ' · ' + fireKeys(lp) : 'SUPER KLAR!', W / 2, by + 5.5);
+    const mine = isHuman(lp) || G.type === 'guest' && lp === 0;
+    for (const k of (lp === 0 || G.type === 'local' ? loadout(lp) : [])) { const S = SKILLS[k]; if (S) { ctx.fillStyle = m * 100 >= S.cost ? S.c : 'rgba(255,255,255,.45)'; ctx.fillRect(Math.min(W - 3, W * S.cost / 100 - 1.5), by - 2, 3, 14); } }
+    ctx.fillStyle = ready ? '#160c00' : 'rgba(255,255,255,.75)';
+    ctx.fillText('ENERGI ' + Math.floor(m * 100) + '%' + (mine && !COARSE ? ' · ' + skKeys(lp).replace('EVNER: ', '') : ''), W / 2, by + 5.5);
   }
   ctx.restore();
 }
@@ -2563,7 +2738,7 @@ function drawCenter() {
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     ctx.fillStyle = 'rgba(5,3,15,.7)'; ctx.fillRect(-260, -170, 520, 70);
     ctx.font = '22px Bungee, sans-serif'; ctx.fillStyle = '#ffd84a';
-    ctx.fillText(G.mode === 'arena' ? `FØRST TIL ${goalsNeeded()} MÅL` : G.type === 'boss' ? (CAMP[G.camp] && CAMP[G.camp].fin ? 'FINALE: BOSS-RUSH' : 'BOSS-KAMP ' + (G.camp + 1)) : `RUNDE ${G.round}`, 0, -150);
+    ctx.fillText(G.mode === 'arena' ? `FØRST TIL ${goalsNeeded()} MÅL` : G.type === 'boss' ? (CAMP[G.camp] && CAMP[G.camp].rush ? 'BOSS-RUSH' : CAMP[G.camp] && CAMP[G.camp].mega ? 'MEGA-BOSS!' : 'BOSS-KAMP ' + (G.camp + 1)) : `RUNDE ${G.round}`, 0, -150);
     ctx.font = '16px Bungee, sans-serif'; ctx.fillStyle = '#ece9ff';
     ctx.fillText('BANE: ' + (G.mode === 'arena' ? G.tables[0].L.name : duelL().name), 0, -120);
     ctx.scale(1 + k * .5, 1 + k * .5); ctx.font = '110px Bungee, sans-serif';
@@ -2636,7 +2811,43 @@ function render(now) {
 // on-screen SUPER buttons for touch (keyboard players use W / ↑ / Space)
 const supEls = [document.getElementById('bSuper0'), document.getElementById('bSuper1')], supKey = ['', ''];
 supEls.forEach((el, lp) => el.addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); SFX.init(); humanFire(lp); }));
+const SKELS = [document.getElementById('skills'), document.getElementById('skills2')], skKey = ['', ''];
+function placeBar(lp, n) {
+  const R = LAY.rects, arena = G.mode === 'arena', r = arena ? R[0] : R[lp]; if (!r) return null;
+  const tw = W * r.s, th = H * r.s, cw = innerWidth, ch = innerHeight;
+  if (lp === 0 ? r.x >= 104 : cw - (r.x + tw) >= 104) return { col: 1, x: lp === 0 ? r.x - 12 : r.x + tw + 12, y: arena ? r.y + th * (lp === 0 ? .7 : .3) : r.y + th * .55, tf: lp === 0 ? 'translate(-100%,-50%)' : 'translate(0,-50%)' };
+  if (arena && lp === 1) return { x: r.x + tw / 2, y: Math.max(4, r.y - 40 * r.s - 62), tf: 'translate(-50%,0) rotate(180deg)' };
+  const below = r.y + th + (arena ? 40 * r.s : 6);
+  if (below + 60 < ch) return { x: r.x + tw / 2, y: below, tf: 'translate(-50%,0)' };
+  return { x: r.x + tw / 2, y: r.y + 96 * r.s, tf: 'translate(-50%,0)' };
+}
+function skillButtons() {
+  for (let lp = 0; lp < 2; lp++) {
+    const el = SKELS[lp], human = lp === 0 ? !G.ai[0] : G.type === 'local';
+    const on = human && !G.demo && (G.phase === 'play' || G.phase === 'count') && G.phase !== 'menu';
+    const pos = on ? placeBar(lp) : null;
+    if (!pos) { if (!el.hidden) { el.hidden = true; skKey[lp] = ''; } continue; }
+    const lo = loadout(lp), key = lo.join() + '|' + Math.round(pos.x) + ',' + Math.round(pos.y) + pos.tf;
+    if (key !== skKey[lp]) {
+      skKey[lp] = key; el.textContent = ''; el.style.left = Math.round(pos.x) + 'px'; el.style.top = Math.round(pos.y) + 'px'; el.style.transform = pos.tf; el.classList.toggle('col', !!pos.col);
+      lo.forEach((k, i) => {
+        const S = SKILLS[k], b = document.createElement('button'); b.type = 'button'; b.style.setProperty('--c', S.c);
+        b.title = S.n + ': ' + S.d;
+        const ic = document.createElement('b'), nm = document.createElement('span'), co = document.createElement('small');
+        ic.textContent = S.i; nm.textContent = S.n; co.textContent = (COARSE ? '' : (lp === 0 ? 'QWE' : 'IOP')[i] + ' · ') + S.cost + '%';
+        b.append(ic, nm, co);
+        b.addEventListener('pointerdown', ev => { ev.preventDefault(); ev.stopPropagation(); SFX.init(); useSkill(lp, i); });
+        el.append(b);
+      });
+      el.hidden = false;
+    }
+    const wp = G.mode === 'arena' && G.type === 'guest' ? 1 : lp, t = tableOf(wp);
+    lo.forEach((k, i) => { const S = SKILLS[k], b = el.children[i]; if (b) b.classList.toggle('on', G.meter[wp] >= S.cost && (!S.boss || !!(t && t.boss))); });
+  }
+}
 function superButtons() {
+  skillButtons();
+  supEls.forEach(el => { el.hidden = true; }); return;
   const R = LAY.rects, arena = G.mode === 'arena';
   for (let lp = 0; lp < 2; lp++) {
     const el = supEls[lp];
@@ -2672,6 +2883,7 @@ $('name').addEventListener('input', () => store.set('fd-name', $('name').value))
 function setMode(m) {
   G.mode = m; $('mDuel').setAttribute('aria-pressed', m === 'duel'); $('mArena').setAttribute('aria-pressed', m === 'arena');
   store.set('fd-mode', m); if (G.demo) { startDemo(); layout(); }
+  if ($('mySk')) menuSkills();
 }
 $('mDuel').onclick = () => setMode('duel'); $('mArena').onclick = () => setMode('arena');
 function menuErr(msg) { const e = $('menuErr'); e.textContent = msg || ''; e.hidden = !msg; }
@@ -2688,7 +2900,7 @@ $('bMute').onclick = () => { SFX.init(); $('bMute').textContent = SFX.toggle() ?
 $('bMute').textContent = SFX.muted ? '×' : '♪';
 $('bMenu').onclick = () => toMenu();
 const EMO = $('emo');
-EMOJI.forEach((e, i) => { const b = document.createElement('button'); b.type = 'button'; b.textContent = e; b.title = 'Send ' + e + ' (tast ' + (i + 1) + ')'; b.addEventListener('pointerdown', ev => { ev.preventDefault(); ev.stopPropagation(); SFX.init(); sendEmo(i); }); EMO.append(b); });
+EMOJI.forEach((e, i) => { const b = document.createElement('button'); b.type = 'button'; b.textContent = e; b.title = 'Send ' + e + ' (tast ' + ((i + 6) % 10) + ')'; b.addEventListener('pointerdown', ev => { ev.preventDefault(); ev.stopPropagation(); SFX.init(); sendEmo(i); }); EMO.append(b); });
 function fmtTime(s) { return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); }
 function showProf() {
   const mk = (box, items, cur, pick, swatch, lock) => {
@@ -2713,21 +2925,50 @@ function showProf() {
   hide('menu'); show('prof');
 }
 $('bProf').onclick = () => { SFX.init(); showProf(); };
+$('bSk').onclick = () => { SFX.init(); showPick(); };
+$('bPickDone').onclick = () => { hide('pick'); show('menu'); menuSkills(); };
 $('bProfBack').onclick = () => { hide('prof'); show('menu'); };
 function startCamp(i) {
   const C = CAMP[i]; if (!C) return;
   SFX.init(); menuErr(); hide('camp');
   G.camp = i; startGame('duel', 'boss', [myName(), 'BOSS']); G.camp = i; startMatch(); layout();
 }
+function drawLoadout(m, box, hint) {
+  m = m || 'b'; box = box || $('skl'); hint = hint || $('sklHint');
+  const key = LO_KEY[m]; box.textContent = '';
+  skPool(m).forEach(k => {
+    const S = SKILLS[k], b = document.createElement('button'), open = skOpen(k); b.type = 'button'; b.style.setProperty('--c', S.c);
+    const on = SET[key].includes(k); b.setAttribute('aria-pressed', on); b.disabled = !open;
+    const ic = document.createElement('i'), nm = document.createElement('b'), ds = document.createElement('span');
+    ic.textContent = open ? S.i : '🔒'; nm.textContent = (on ? (SET[key].indexOf(k) + 1) + '. ' : '') + S.n + ' · ' + S.cost + '%';
+    ds.textContent = open ? S.d : 'Slå den ' + MEGA_NAMES[S.u - 1] + ' mega-boss i kampagnen';
+    b.append(ic, nm, ds);
+    b.onclick = () => { if (on || !open) return; SET[key] = [...SET[key].slice(1), k]; saveSet(); drawLoadout(m, box, hint); if (m !== 'b') menuSkills(); };
+    box.append(b);
+  });
+  hint.textContent = 'Valgt: ' + SET[key].map(k => SKILLS[k].n).join(', ') + '. Tryk på en ny for at skifte den ældste ud.';
+}
+function menuSkills() {
+  const m = G.mode === 'arena' ? 'a' : 'd';
+  $('mySk').textContent = SET[LO_KEY[m]].map(k => SKILLS[k].i + ' ' + SKILLS[k].n).join('  ·  ');
+}
+function showPick() {
+  const m = G.mode === 'arena' ? 'a' : 'd';
+  $('pickTitle').textContent = 'Dine evner · ' + (m === 'a' ? 'ARENA' : 'DUEL');
+  drawLoadout(m, $('pickList'), $('pickHint'));
+  hide('menu'); show('pick');
+}
 function showCamp() {
+  drawLoadout('b');
   const st = campStars(), ul = $('lvls'); ul.textContent = '';
   CAMP.forEach((C, i) => {
     const L = DUELS[C.li], open = i === 0 || (st[i - 1] | 0) > 0;
     const li = document.createElement('li'), b = document.createElement('button');
-    b.type = 'button'; b.className = 'lvl' + (C.fin ? ' fin' : ''); b.disabled = !open;
+    b.type = 'button'; b.className = 'lvl' + (C.mega || C.rush ? ' fin' : ''); b.disabled = !open;
     const n = document.createElement('span'); n.className = 'n'; n.textContent = open ? String(i + 1) : '🔒';
     const mid = document.createElement('span'), nb = document.createElement('b'), sm = document.createElement('small');
-    nb.textContent = C.fin ? 'FINALE: BOSS-RUSH' : BOSS[C.boss].n; sm.textContent = C.fin ? 'Alle 5 bosser i træk på ' + L.name : L.name + ' · ' + Math.round(BOSS[C.boss].hp * C.mul) + ' træf';
+    nb.textContent = C.rush ? 'BOSS-RUSH' : C.mega ? 'MEGA-BOSS: MEGA-' + BOSS[C.boss].n : BOSS[C.boss].n;
+    sm.textContent = C.rush ? C.rush.length + ' bosser i træk på ' + L.name : L.name + ' · ' + Math.round(BOSS[C.boss].hp * C.mul) + ' træf' + (C.mega ? ' · låser nye evner op' : '');
     mid.append(nb, sm);
     const s2 = document.createElement('span'); s2.className = 'st'; s2.textContent = st[i] ? '★'.repeat(st[i]) + '☆'.repeat(3 - st[i]) : '';
     b.append(n, mid, s2); b.onclick = () => startCamp(i);
@@ -2815,19 +3056,20 @@ setInterval(() => {
   } else lobbyRefresh();
 }, 200);
 function campResult() {
-  const i = G.camp, won = G.winner === 0;
+  const i = G.camp, won = G.winner === 0, mw0 = megaWins();
   let st = 0;
   if (won) {
     if (G.mode === 'duel') { const k = hpOf(0) / MAXHP; st = k > .6 ? 3 : k > .3 ? 2 : 1; }
     else { const t = G.tables[0], d = t.score[0] - t.score[1]; st = t.score[1] === 0 ? 3 : d >= 2 ? 2 : 1; }
     const a = campStars(); a[i] = Math.max(a[i] | 0, st); store.set('fd-camp', JSON.stringify(a));
     stat('camp', 1); stat('fastBoss', Math.round(G.t), 'min');
+    if (megaWins() > mw0) { const nu = SKILL_KEYS.filter(k => SKILLS[k].u === megaWins()).map(k => SKILLS[k].n); G.unlocks.push(...[...new Set(nu)].map(n => 'evnen ' + n)); }
   }
   return { won, st };
 }
 function unlockNote() {
   if (!G.unlocks.length) return;
-  $('overStatus').textContent = ($('overStatus').textContent + ' Ny kugle låst op: ' + G.unlocks.join(', ') + '!').trim(); G.unlocks = [];
+  $('overStatus').textContent = ($('overStatus').textContent + ' Låst op: ' + G.unlocks.map(u => u.startsWith('evnen') ? u : 'kuglen ' + u).join(', ') + '!').trim(); G.unlocks = [];
 }
 function showOver() {
   SFX.music(false);
@@ -2838,7 +3080,7 @@ function showOver() {
     $('overTitle').textContent = r.won ? (last ? 'KAMPAGNEN KLARET!' : 'BOSSEN ER BESEJRET!') : 'BOSSEN VANDT';
     $('overTitle').style.color = r.won ? 'var(--gold)' : 'var(--p2)';
     $('overScore').textContent = r.won ? '★'.repeat(r.st) + '☆'.repeat(3 - r.st) : (G.t >= soloTime() ? 'Tiden løb ud' : 'Du løb tør for liv') + '. Prøv igen!';
-    $('overStatus').textContent = (G.camp + 1) + ' / ' + CAMP.length + ' · ' + (CAMP[G.camp].fin ? 'Boss-rush' : BOSS[CAMP[G.camp].boss].n);
+    $('overStatus').textContent = (G.camp + 1) + ' / ' + CAMP.length + ' · ' + (CAMP[G.camp].rush ? 'Boss-rush' : (CAMP[G.camp].mega ? 'MEGA-' : '') + BOSS[CAMP[G.camp].boss].n);
     $('bNext').hidden = !r.won || last; $('bRe').disabled = false;
     if (r.won) { const t = G.tables[0], cy = t.cam.y + t.cam.h * .4; t.burst(t.L.cx, cy, '#ffd84a', 80, 600, 1.4, 5, 200); }
     unlockNote(); show('over'); return;

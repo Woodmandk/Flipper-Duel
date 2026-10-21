@@ -7,7 +7,7 @@ Et neon-flipperspil for to spillere, der kører direkte i browseren. Ingen insta
 ## Spiltyper
 
 - **Duel** – I har hvert jeres bord og 1200 liv hver. Alt du rammer, skader modstanderens liv. Bedst af 3 runder, og hver runde spilles på en tilfældig bane (Neon Klassik, Ruminvasion, Kaosfabrikken, Dybhavet eller Spøgelseshuset). Efter 2½ minut går runden i OVERDRIVE, hvor al skade tæller dobbelt. 5 hurtige træf i træk giver combo med +25% skade.
-- **Kampagne** – dig alene mod hver banes boss i 6 boss-kampe. Du har 300 liv og 5 minutter, og bossen tærer på dine liv. Vind for at låse næste bane op, og få 1–3 stjerner efter hvor mange liv du har tilbage. Finalen er en boss-rush mod alle 5 bosser i træk.
+- **Kampagne** – dig alene mod bosserne i 15 boss-kampe. Hver 5. bane er en **mega-boss**, der er større, har alle bossernes angreb og låser nye evner op, når du slår den. Du har 300 liv og 5–7 minutter, og bossen tærer på dine liv. Vind for at låse næste bane op, og få 1–3 stjerner efter hvor mange liv du har tilbage. Power-ups i kampagnen er kun dem, der hjælper mod bossen.
 - **Arena** – Flipper-fodbold: banen er en fodboldbane uden tyngdekraft. Hver spiller har en målmand (to flippere foran målet) og to angribere ude på modstanderens halvdel, ligesom i bordfodbold. Først til 5 mål, og banen skifter for hver 2 mål. Hver spiller har sin egen rampe, der skyder mod modstanderens mål.
 
 ## Brede baner
@@ -27,14 +27,17 @@ Banerne er brede og zoomet godt ud. I Duel følger kameraet kuglen og viser hele
 - **Slowmotion** – boss-drab, mål og den afgørende sejr spilles i slowmotion med filmstriber.
 - **Indstillinger og statistik** (i menuen) – vælg computerens sværhedsgrad (Let, Normal, Svær, Umulig), din kugle og din flipperfarve. Statistikken viser sejre, bosser, bedste combo, mål, skade og kampagne-stjerner.
 - **Kugler at låse op** – Guld (vind 3 kampe), Ild (besejr 5 bosser), Slim (combo på 20), Galakse (25 mål i Arena) og Regnbue (12 kampagne-stjerner).
-- **Emojis online** – send 😂 😮 🔥 😈 👏 til modstanderen med tasterne 1–5 eller knapperne øverst til venstre.
+- **Emojis online** – send 😂 😮 🔥 😈 👏 til modstanderen med tasterne 6–0 eller knapperne øverst til venstre.
 
-## SUPER-angreb
+## Evner (du vælger selv)
 
-Alt du rammer, lader din gule SUPER-måler op. Når den er fuld, kan du se hvilket angreb du har klar, og **du bestemmer selv hvornår du fyrer det af**.
+Alt du rammer, lader din gule energi op. Du vælger selv **3 evner** (under "Dine evner" i menuen og i kampagnen), og du bruger dem, når du vil, med `Q` `W` `E` / `1` `2` `3` eller knapperne ved bordet. Hver evne har sin pris, vist som streger på energibaren. Computeren vælger også sine egne evner.
 
-- **Duel:** SUPER koster modstanderen 40 liv og sender et angreb over: spejlvendte flippere, tåge, sort hul, bombe, bomberegn, mini-flippere eller jordskælv. Angreb står i kø, så de aldrig lander oven i hinanden.
-- **Arena:** Ildkugle (alle kugler brager mod modstanderens mål), Frys (modstanderens flippere fryser i 2 sek.) eller Mur (et skjold foran dit mål, der teleporterer ét skud væk).
+- **Duel:** Homing (kuglerne styrer mod bumpere og bossen), Super-skade (×2), Multiball, Kæmpe-flippere, Skjold, Helbred, Mega-slag og angreb du sender over (Tåge, Bombe, Jordskælv, Spejlvendt, Mini-flippere, Sort hul, Bomberegn). Angreb koster modstanderen 15 liv og står i kø, så de aldrig lander oven i hinanden.
+- **Arena:** Ildkugle, Frys, Mur, Homing (kuglen styrer mod modstanderens mål), Multiball, Kæmpe-flippere, Sløv modstander og Dobbelt mål.
+- **Kampagne:** Lyn, Frys bossen, Magnet, Kraftslag, Meteor, Multiball, Kæmpe-flippere, Skjold og Helbred.
+
+Nogle evner er låst, indtil du slår mega-bosserne i kampagnen.
 
 Efter et kaos-power-up får bordet en pause, før det næste dukker op: kaos, så ro, så kaos igen.
 
