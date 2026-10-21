@@ -1601,8 +1601,8 @@ function doSkill(p, k, t) {
 }
 // big moments (boss down, goal, round won) play out in slow motion
 function bigMoment(d) {
-  if (REDUCED || G.demo) return;
-  G.slow = Math.max(G.slow, d); G.slowCd = d + 1.5; G.big = d; SFX.slowmo();
+  if (G.demo) return;
+  G.slow = Math.max(G.slow, d); G.slowMax = G.slow; G.slowCd = d + 1.5; G.big = Math.max(G.big, d); G.bigMax = G.big; SFX.slowmo();
 }
 // online emoji reactions
 const EMOJI = ['😂', '😮', '🔥', '😈', '👏'];
@@ -1659,7 +1659,7 @@ function endRound(w) {
   if (G.phase !== 'play') return;
   G.winner = w; if (w >= 0) G.wins[w]++;
   G.phase = 'roundover'; G.overT = 3.2;
-  if (w >= 0) bigMoment(1.4);
+  if (w >= 0) bigMoment(2.6);
   if (G.mode === 'duel' && G.type !== 'boss') stat('dmg', Math.round(G.dealt[0]));
   SFX.music(false);
   if (w >= 0) { SFX.win(); const t = tableOf(w); if (t) { t.ban('VINDER!', COL[w], 3); t.boom(t.L.cx, t.cam.y + t.cam.h * .4, COL[w], true); } }
@@ -1769,7 +1769,7 @@ function onEvent(i, type, d) {
     if (playing) { const h = G.type === 'boss' ? SOLO_HURT : BOSS_HURT; G.drain[p] += h; t.text(d.x, d.y, 'BOSS-ANGREB −' + h, '#ff4060', 20); }
     return;
   }
-  if (type === 'bossDown' && playing) { bigMoment(1.1); if (p === 0) stat('boss', 1); }
+  if (type === 'bossDown' && playing) { bigMoment(2.2); if (p === 0) stat('boss', 1); }
   if (type === 'bossDown' && G.type === 'boss') {
     if (playing) {
       const left = t.rush ? t.rush.length - 1 : 0;
@@ -1848,7 +1848,7 @@ function onArenaEvent(t, type, d) {
     case 'goal':
       SFX.goal(); t.boom(d.x, d.y, COL[1 - d.p], true);
       if (!playing) break;
-      bigMoment(.9); if (d.p === G.me) stat('goals', 1);
+      bigMoment(1.8); if (d.p === G.me) stat('goals', 1);
       { const two = t.dbl[d.p] > 0; t.score[d.p] = Math.min(goalsNeeded(), t.score[d.p] + (two ? 2 : 1)); t.dbl[d.p] = 0; t.goals++; t.ban(two ? 'DOBBELT MÅL!' : 'MÅL!', COL[d.p], 1.3, clean(G.names[d.p === G.me ? 0 : 1]).toUpperCase() + ' SCORER'); } pushFx('g', d.x, d.y, d.p); vibrate(150);
       chargeMeter(1 - d.p, 20);
       if (t.score[d.p] >= goalsNeeded()) endRound(d.p);
@@ -2132,7 +2132,7 @@ function oppArenaGuest(op) {
     if (!Array.isArray(f) || f[0] <= G.fxSeen) continue; G.fxSeen = f[0];
     const [, ty, x, y, p, ex] = f;
     if (ty === 'b') { SFX.bumper(); t.burst(x, y, COL[Math.max(0, t.last)], 12, 300, .4); t.ring(x, y, 44, COL[Math.max(0, t.last)], .3, 3); }
-    else if (ty === 'g') { SFX.goal(); t.boom(x, y, COL[1 - p], true); t.ban('MÅL!', COL[p], 1.3, clean(G.names[p === G.me ? 0 : 1]).toUpperCase() + ' SCORER'); }
+    else if (ty === 'g') { if (G.phase === 'play') { G.big = G.bigMax = 1.8; SFX.slowmo(); } SFX.goal(); t.boom(x, y, COL[1 - p], true); t.ban('MÅL!', COL[p], 1.3, clean(G.names[p === G.me ? 0 : 1]).toUpperCase() + ' SCORER'); }
     else if (ty === 'p') { const k = POW_KEYS[ex]; if (k) powerFx(t, { x, y, type: k }); }
     else if (ty === 's') { SFX.boom(); t.boom(x, y, COL[p], false); }
     else if (ty === 'r') { SFX.ramp(); t.ring(x, y, 34, '#7dffea', .35, 3); }
@@ -2249,7 +2249,7 @@ function update(dt, now) {
   const sim = G.demo || G.phase === 'play' || G.phase === 'roundover';
   if (sim && !(G.mode === 'arena' && G.type === 'guest')) {
     let ts = 1;
-    if (G.slow > 0) { G.slow -= dt; ts = .3; }
+    if (G.slow > 0) { G.slow -= dt; const m = G.slowMax || 1, e = Math.min(m - G.slow, G.slow); ts = e < .25 ? .2 + .8 * (1 - e / .25) : .2; }
     G.slowCd -= dt;
     acc += dt * ts;
     while (acc >= 1 / 120) { for (const t of G.tables) t.step(1 / 120); acc -= 1 / 120; }
@@ -2258,8 +2258,8 @@ function update(dt, now) {
         if (t.balls.length > 2) break;
         const dn = t.kind === 'duel' || b.vy > 0;
         const TH = t.L.H;
-        if (dn && b.y > TH - 70 && b.y < TH - 40 && b.vy > 150 && Math.abs(b.x - t.L.cx) < 35 && !b.bomb) { G.slow = .45; G.slowCd = 2.5; }
-        if (t.kind === 'arena' && b.y < 65 && b.y > 35 && b.vy < -150 && Math.abs(b.x - t.L.cx) < 35) { G.slow = .45; G.slowCd = 2.5; }
+        if (dn && b.y > TH - 70 && b.y < TH - 40 && b.vy > 150 && Math.abs(b.x - t.L.cx) < 35 && !b.bomb) { G.slow = G.slowMax = .7; G.slowCd = 2.5; }
+        if (t.kind === 'arena' && b.y < 65 && b.y > 35 && b.vy < -150 && Math.abs(b.x - t.L.cx) < 35) { G.slow = G.slowMax = .7; G.slowCd = 2.5; }
       }
     }
   } else if (G.mode === 'arena' && G.type === 'guest') {
@@ -3058,10 +3058,19 @@ function drawCenter() {
 function drawMoments(now) {
   const cw = LAY.cw, ch = LAY.ch;
   if (G.big > 0 && !G.demo) { // cinematic bars while a big moment plays in slow motion
-    const k = clamp(Math.min(G.big, 1.6 - G.big) * 4, 0, 1), bh = ch * .07 * k;
-    ctx.fillStyle = 'rgba(0,0,0,.85)'; ctx.fillRect(0, 0, cw, bh); ctx.fillRect(0, ch - bh, cw, bh);
-    const v = ctx.createRadialGradient(cw / 2, ch / 2, Math.min(cw, ch) * .3, cw / 2, ch / 2, Math.max(cw, ch) * .75);
-    v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, `rgba(0,0,0,${.5 * k})`); ctx.fillStyle = v; ctx.fillRect(0, 0, cw, ch);
+    const k = clamp(Math.min(G.big, (G.bigMax || 1.6) - G.big) * 4, 0, 1), bh = ch * .11 * k;
+    const v = ctx.createRadialGradient(cw / 2, ch / 2, Math.min(cw, ch) * .25, cw / 2, ch / 2, Math.max(cw, ch) * .7);
+    v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, `rgba(0,0,0,${.65 * k})`); ctx.fillStyle = v; ctx.fillRect(0, 0, cw, ch);
+    ctx.globalAlpha = .1 * k; ctx.fillStyle = '#9fd8ff'; ctx.fillRect(0, 0, cw, ch); ctx.globalAlpha = 1;
+    ctx.fillStyle = 'rgba(0,0,0,.92)'; ctx.fillRect(0, 0, cw, bh); ctx.fillRect(0, ch - bh, cw, bh);
+    // a big SLOWMOTION title in the bottom bar, with a pulsing record dot
+    if (k > .3) {
+      const fs = Math.max(14, Math.min(bh * .42, 34)), y = ch - bh / 2;
+      ctx.save(); ctx.globalAlpha = k; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.font = fs + 'px Bungee, sans-serif';
+      ctx.fillStyle = '#ffffff'; ctx.fillText('SLOWMOTION', cw / 2, y);
+      const tw = ctx.measureText('SLOWMOTION').width; ctx.fillStyle = Math.sin(now / 120) > 0 ? '#ff3050' : 'rgba(255,48,80,.3)'; ctx.beginPath(); ctx.arc(cw / 2 - tw / 2 - fs * .7, y, fs * .25, 0, TAU); ctx.fill();
+      ctx.restore();
+    }
   }
   for (const e of G.emoList) { // emoji reactions float up; the opponent's are big, yours small
     const a = clamp(e.t * 2, 0, 1), rise = (2.4 - e.t) * 40;
