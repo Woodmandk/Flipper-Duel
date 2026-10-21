@@ -168,7 +168,7 @@ button.btn.ghost{background:transparent;font-size:14px;padding:9px;}
     <div class="field">
       <label class="lbl" for="joinCode">Har du fået en kode?</label>
       <div class="row">
-        <input type="text" id="joinCode" maxlength="4" placeholder="KODE" autocomplete="off">
+        <input type="text" id="joinCode" maxlength="4" placeholder="1234" inputmode="numeric" pattern="[0-9]*" autocomplete="off">
         <button class="btn" type="button" id="bJoin">Deltag</button>
       </div>
     </div>
@@ -1947,7 +1947,7 @@ function doAttack(p, type) {
 
 /* ================= NETWORK ================= */
 const Net = { room: null, r: null, code: '', role: null, opp: null, lastSend: 0, unsub: [], oppPeer: null };
-function genCode() { const a = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789'; let s = ''; for (let i = 0; i < 4; i++) s += a[Math.floor(Math.random() * a.length)]; return s; }
+function genCode() { const a = '0123456789'; let s = ''; for (let i = 0; i < 4; i++) s += a[Math.floor(Math.random() * a.length)]; return s; }
 async function getRoom() {
   if (Net.room) return Net.room;
   if (!window.claude || !window.claude.use) return null;
@@ -3311,8 +3311,8 @@ $('bOnline').onclick = async () => {
   lobbyRefresh();
 };
 async function joinWith(code) {
-  code = code.toUpperCase().replace(/[^A-Z0-9]/g, '');
-  if (code.length !== 4) { menuErr('Koden har 4 tegn, fx KX7P.'); return; }
+  code = String(code).replace(/[^0-9]/g, '');
+  if (code.length !== 4) { menuErr('Koden er 4 tal, fx 4821.'); return; }
   SFX.init(); menuErr();
   try { await netJoin(code, 'guest'); } catch (e) { menuErr(!IN_CLAUDE && e.message === 'notfound' ? 'Fandt ikke et rum med den kode. Tjek koden, og at din ven stadig venter i rummet.' : IN_CLAUDE ? NOROOM : NONET); return; }
   hide('menu'); show('lobby');
@@ -3321,6 +3321,7 @@ async function joinWith(code) {
   $('lobHint').textContent = 'Værten vælger spiltype og starter kampen.';
   lobbyRefresh();
 }
+$('joinCode').addEventListener('input', e => { const v = e.target.value.replace(/[^0-9]/g, ''); if (v !== e.target.value) e.target.value = v; });
 $('bJoin').onclick = () => joinWith($('joinCode').value);
 $('joinCode').addEventListener('keydown', e => { if (e.key === 'Enter') joinWith($('joinCode').value); });
 $('bLeave').onclick = () => toMenu();
@@ -3414,7 +3415,7 @@ G.mode = store.get('fd-mode', 'duel') === 'arena' ? 'arena' : 'duel';
 setMode(G.mode);
 startDemo(); layout();
 const hc = (location.hash || '').replace('#', '');
-if (/^[a-z0-9]{4}$/i.test(hc)) { $('joinCode').value = hc.toUpperCase(); $('menuInfo').hidden = false; }
+if (/^[0-9]{4}$/.test(hc)) { $('joinCode').value = hc; $('menuInfo').hidden = false; }
 if (document.fonts && document.fonts.load) document.fonts.load('20px Bungee').catch(() => {});
 requestAnimationFrame(frame);
 </script>
