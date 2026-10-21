@@ -192,7 +192,7 @@ button.btn.ghost{background:transparent;font-size:14px;padding:9px;}
 <div class="ov" id="pick" hidden>
   <div class="card">
     <h2 id="pickTitle">Dine evner</h2>
-    <p class="sub">Vælg 2 evner. Hver evne lader op for sig selv, når du rammer ting, og dyre evner tager længere tid. Du bruger dem, når de er klar. Flere evner låses op, når du slår mega-bosserne i kampagnen.</p>
+    <p class="sub">Vælg 2 evner. Du har én energibar, der fyldes, når du rammer ting. Hver evne koster energi, og dyre evner koster mere, så du vælger selv, hvad du bruger den på. Flere evner låses op, når du slår mega-bosserne i kampagnen.</p>
     <div class="skl" id="pickList"></div>
     <p class="hint" id="pickHint"></p>
     <button class="btn pri" type="button" id="bPickDone">Færdig</button>
@@ -202,7 +202,7 @@ button.btn.ghost{background:transparent;font-size:14px;padding:9px;}
 <div class="ov" id="camp" hidden>
   <div class="card">
     <h2>Kampagne</h2>
-    <p class="sub">Dig alene mod hver banes boss. Slå den for at låse den næste op. Hver 5. bane er en mega-boss, der låser nye evner op. Du har 300 liv og 5–7 minutter. Vælg 2 evner: hver lader op for sig selv, når du rammer ting, og du bruger dem, når de er klar. Jo flere liv du har tilbage, jo flere stjerner.</p>
+    <p class="sub">Dig alene mod hver banes boss. Slå den for at låse den næste op. Hver 5. bane er en mega-boss, der låser nye evner op. Du har 300 liv og 5–7 minutter. Vælg 2 evner: din energibar fyldes, når du rammer ting, og hver evne koster en del af den. Jo flere liv du har tilbage, jo flere stjerner.</p>
     <div class="field"><span class="lbl">Dine evner · vælg 2</span><div class="skl" id="skl"></div><p class="hint" id="sklHint"></p></div>
     <ul class="lvls" id="lvls"></ul>
     <p class="hint" id="campSum"></p>
@@ -231,13 +231,13 @@ button.btn.ghost{background:transparent;font-size:14px;padding:9px;}
       <ul class="quick">
         <li><b>Flippere:</b> <kbd>A</kbd> <kbd>D</kbd> eller <kbd>←</kbd> <kbd>→</kbd>. På mobil trykker du i venstre eller højre side.</li>
         <li><b>Ram ting</b> for at skade modstanderen og lade din gule energi op.</li>
-        <li><b>Evne klar?</b> Når en af dine 2 bjælker er fuld, står der KLAR! Brug den med <kbd>Q</kbd> eller <kbd>E</kbd> eller knappen ved bordet.</li>
+        <li><b>Evne klar?</b> Når din energibar når mærket for en evne, står der KLAR! Brug den med <kbd>Q</kbd> eller <kbd>E</kbd> eller knappen ved bordet.</li>
         <li><b>Sekskanter</b> er power-ups. Dem med regnbue-ring er KAOS.</li>
         <li><b>Mist ikke kuglen</b>. Det koster dig selv liv.</li>
         <li><b>Hver bane har sin egen særlige mekanik</b>, som står på skærmen før runden. Neon Klassik: tænd alle bumpere for en lys-jackpot. Ruminvasion: skyd UFO'en ned. Kaosfabrikken: transportbånd. Dybhavet: lav tyngde og boblesøjler. Spøgelseshuset: lyset går ud. Kameraet følger kuglen.</li>
         <li><b>Kæmpebaner</b> dukker op en gang imellem: KÆMPEHALLEN i Duel og MEGASTADION i Arena er meget større end de andre baner.</li>
         <li><b>Ryst bordet</b> med <kbd>S</kbd> eller <kbd>↓</kbd> for at redde en kugle. Ryster du for meget, kommer der TILT.</li>
-        <li><b>Evner:</b> du vælger selv 2 evner i menuen (fx Homing, Vampyr, Tåge) og i kampagnen (fx Lyn, Sneglefart, Meteor). Hver evne lader op for sig selv, når du rammer ting, og dyre evner tager længere tid. Brug dem med <kbd>Q</kbd> og <kbd>E</kbd> (eller <kbd>1</kbd> <kbd>2</kbd>) eller knapperne. Spiller 2 på samme skærm bruger <kbd>I</kbd> og <kbd>O</kbd>.</li>
+        <li><b>Evner:</b> du vælger selv 2 evner i menuen (fx Homing, Vampyr, Tåge) og i kampagnen (fx Lyn, Sneglefart, Meteor). Du har én energibar, der fyldes, når du rammer ting, og hver evne koster energi. Mærkerne på bjælken viser, hvad dine evner koster. Brug dem med <kbd>Q</kbd> og <kbd>E</kbd> (eller <kbd>1</kbd> <kbd>2</kbd>) eller knapperne. Spiller 2 på samme skærm bruger <kbd>I</kbd> og <kbd>O</kbd>.</li>
         <li><b>Kampagnen</b> har 20 baner og en mega-boss på hver 5. Slår du den, låser du nye evner op. Mange baner har en særlig regel, fx stormvind, mørke eller bomberegn, og mega-bosser går i fase 2 med en invasion.</li>
         <li><b>Indstillinger og statistik</b> i menuen: vælg computerens sværhedsgrad, din kugle og dine flippers farve. Nye kugler låses op, når du spiller.</li>
         <li><b>Online</b> kan du sende emojis til modstanderen med tasterne <kbd>6</kbd>–<kbd>0</kbd> eller knapperne øverst til venstre.</li>
@@ -806,7 +806,7 @@ const ATK = {
   small: { n: 'MINI-FLIPPERE!', d: 'Dine flippere er krympet' },
   quake: { n: 'JORDSKÆLV!', d: 'Bordet ryster kuglerne rundt' },
   ice: { n: 'FROSNE FLIPPERE!', d: 'Dine flippere er frosset fast' },
-  steal: { n: 'ENERGITYV!', d: 'Din opladning er stjålet' },
+  steal: { n: 'ENERGITYV!', d: 'Din energi er stjålet' },
 };
 const POW = {
   multi: { n: 'MULTIBALL', d: 'Ekstra kugler i 10 sek.', c: '#ff9a3c', i: '3' },
@@ -1419,7 +1419,7 @@ const G = {
   rid: 0, li: 0, camp: -1, atkSeq: 0, atkList: [], oppAtkSeen: 0, ai: [null, null], winner: -1, slow: 0, slowCd: 0,
   over: false, fxId: 0, fxList: [], fxSeen: 0, overdrive: false, me: 0, flash: 0,
   nextAtk: [null, null], aiFire: [0, 0], supReq: 0, supSeen: 0,
-  big: 0, sk: [[0, 0], [0, 0]], skCd: [0, 0], lo: [null, null], aiSk: [null, null], skReqK: 0, unlocks: [], emSeq: 0, emIdx: 0, emSeen: 0, emCd: 0, emoList: [],
+  big: 0, sk: [[0, 0], [0, 0]], en: [0, 0], skCd: [0, 0], lo: [null, null], aiSk: [null, null], skReqK: 0, unlocks: [], emSeq: 0, emIdx: 0, emSeen: 0, emCd: 0, emoList: [],
 };
 const DMG = { lightsAll: 15, ufo: 12, alien: 5, alienAll: 20, bumper: 2, sling: 1, roll: 3, rollAll: 10, drop: 4, dropAll: 12, kaos: 3, strike: 2, saucer: 3, orbit: 6, spin: 1, ramp: 8, portal: 2, bossHit: 4 };
 const BOSS_DMG = 100, BOSS_HURT = 15, MIS_DMG = 30;
@@ -1461,7 +1461,7 @@ const SKILLS = {
   mag: { n: 'MAGNET', d: 'Kuglerne trækkes mod bossen i 4 sek.', c: '#ff5cf0', i: 'M', cost: 70, boss: 1, m: 'b', u: 2 },
   pow2: { n: 'KRAFTSLAG', d: 'Hvert træf på bossen tæller dobbelt i 8 sek.', c: '#ff5c8a', i: '×2', cost: 85, boss: 1, m: 'b', u: 2 },
   meteor: { n: 'METEOR', d: 'Kæmpe slag: bossen mister 4 liv', c: '#ff7a30', i: '☄', cost: 160, boss: 1, m: 'b', u: 3 },
-  nova: { n: 'SUPERNOVA', d: 'Bossen mister 6 liv, og alle kugler skydes op', c: '#ffffff', i: '✺', cost: 210, boss: 1, m: 'b', u: 4 },
+  nova: { n: 'SUPERNOVA', d: 'Bossen mister 6 liv, og alle kugler skydes op', c: '#ffffff', i: '✺', cost: 200, boss: 1, m: 'b', u: 4 },
   // Duel (m: d)
   home: { n: 'HOMING', d: 'Kuglerne styrer selv mod bumpere og bossen i 8 sek.', c: '#7dffea', i: '➶', cost: 55, m: 'd', u: 0 },
   x2: { n: 'SUPER-SKADE', d: 'Al din skade ×2 i 10 sek.', c: '#ff5c8a', i: '×2', cost: 60, m: 'd', u: 0 },
@@ -1475,7 +1475,7 @@ const SKILLS = {
   small: { n: 'MINI-FLIPPERE', d: 'Krymp modstanderens flippere (−15)', c: '#ff4060', i: '↘', cost: 65, m: 'd', u: 1, atk: 1 },
   ice: { n: 'FRYS MODSTANDER', d: 'Modstanderens flippere fryser i 2½ sek. (−15)', c: '#7de8ff', i: '❄', cost: 75, m: 'd', u: 1, atk: 1 },
   bh: { n: 'SORT HUL', d: 'Modstanderens kugle suges mod midten (−15)', c: '#c070ff', i: '●', cost: 65, m: 'd', u: 2, atk: 1 },
-  steal: { n: 'ENERGITYV', d: 'Modstanderen mister al sin opladning (−15)', c: '#ffd84a', i: '⚡', cost: 70, m: 'd', u: 2, atk: 1 },
+  steal: { n: 'ENERGITYV', d: 'Modstanderen mister al sin energi (−15)', c: '#ffd84a', i: '⚡', cost: 70, m: 'd', u: 2, atk: 1 },
   rain: { n: 'BOMBEREGN', d: 'Send 3 bomber til modstanderen (−15)', c: '#ff4060', i: '✸', cost: 100, m: 'd', u: 2, atk: 1 },
   // shared by several modes
   multi: { n: 'MULTIBALL', d: 'Ekstra kugler i 10 sek.', c: '#ff9a3c', i: '3', cost: 50, m: 'bda', u: 0 },
@@ -1549,7 +1549,7 @@ function trySkill(p, i) {
   const k = loadout(p)[i], S = SKILLS[k], t = tableOf(p);
   if (!S || !t || G.phase !== 'play' || G.skCd[p] > 0 || G.sk[p][i] < 100) return false;
   if (S.boss && !t.boss) { if (isHuman(p)) t.ban('INGEN BOSS LIGE NU', '#ff6080', .9, 'Gem din evne til bossen kommer'); return false; }
-  G.sk[p][i] = 0; G.skCd[p] = .35;
+  G.en[p] = Math.max(0, G.en[p] - S.cost); skSync(p); G.skCd[p] = .35;
   doSkill(p, k, t);
   return true;
 }
@@ -1637,7 +1637,7 @@ function startGame(mode, type, names) {
 }
 function startMatch() { G.wins = [0, 0]; G.round = 1; G.over = false; hide('over'); startRound(); }
 function resetRoundState() {
-  G.t = 0; G.dealt = [0, 0]; G.drain = [0, 0]; G.meter = [0, 0]; G.sk = [[0, 0], [0, 0]]; G.hpShow = [MAXHP, MAXHP]; G.hpLag = [MAXHP, MAXHP];
+  G.t = 0; G.dealt = [0, 0]; G.drain = [0, 0]; G.meter = [0, 0]; G.sk = [[0, 0], [0, 0]]; G.en = [0, 0]; G.hpShow = [MAXHP, MAXHP]; G.hpLag = [MAXHP, MAXHP];
   G.atkList = []; G.winner = -1; G.overdrive = false; G.oppAtkSeen = 0; G.nextAtk = [null, null]; G.aiFire = [0, 0];
   for (const t of G.tables) { if (t.kind === 'duel') t.L = duelL(); else t.L = ARENAS[0]; t.reset(); }
   G.ghost.L = duelL(); G.ghost.reset(); G.ghost.balls = [];
@@ -1869,18 +1869,24 @@ function onArenaEvent(t, type, d) {
 const COARSE = matchMedia('(pointer: coarse)').matches;
 const isHuman = p => !G.ai[p] && (p === 0 || G.type === 'local');
 const fireKeys = p => COARSE ? 'TRYK SUPER-KNAPPEN' : G.type === 'local' ? (p === 0 ? 'TRYK W' : 'TRYK ↑') : 'TRYK W / ↑ / MELLEMRUM';
+// one energy bar per player; each skill costs some of it, so you choose what to spend it on
+const ENMAX = 200;
+function skSync(p) {
+  const lo = loadout(p);
+  G.sk[p] = [0, 1].map(i => SKILLS[lo[i]] ? Math.min(100, G.en[p] * 100 / SKILLS[lo[i]].cost) : 0);
+  G.meter[p] = G.en[p] * 100 / ENMAX;
+}
 function chargeMeter(p, amt) {
   if (G.phase !== 'play' || G.demo) return;
-  const lo = loadout(p), mul = G.type === 'boss' ? 1.1 : 1;
+  const lo = loadout(p), mul = G.type === 'boss' ? 1.1 : 1, was = G.sk[p].slice();
+  G.en[p] = Math.min(ENMAX, G.en[p] + amt * mul); skSync(p);
   for (let i = 0; i < NSK; i++) {
-    const S = SKILLS[lo[i]]; if (!S || G.sk[p][i] >= 100) continue;
-    G.sk[p][i] = Math.min(100, G.sk[p][i] + amt * mul * 100 / S.cost);
+    const S = SKILLS[lo[i]]; if (!S || was[i] >= 100) continue;
     if (G.sk[p][i] >= 100 && isHuman(p)) { // tell the player it is ready
       SFX.beep(true); const t = tableOf(p);
       if (t && !(G.mode === 'arena' && G.type === 'local')) t.text(t.L.cx, t.kind === 'arena' ? (p === 0 ? t.L.H - 230 : 230) : t.cam.y + 150, S.n + ' KLAR!', S.c, 22);
     }
   }
-  G.meter[p] = Math.max(...G.sk[p]);
 }
 function humanNudge(p) {
   if (G.mode !== 'duel' || G.phase !== 'play' || G.demo || G.ai[p]) return;
@@ -1932,7 +1938,7 @@ function doAttack(p, type) {
   const t = G.tables[p]; if (!t || G.phase !== 'play') return;
   if (type === 'bomb') t.spawnBomb();
   else if (type === 'rain') { t.spawnBomb(); t.spawnBomb(); t.spawnBomb(); }
-  else if (type === 'steal') G.sk[p] = [0, 0];
+  else if (type === 'steal') { G.en[p] = 0; skSync(p); }
   else t.eff[type] = type === 'fog' ? 7 : type === 'ice' ? 2.5 : 6;
   t.ban(ATK[type].n, '#ff4060', 1.8, ATK[type].d); t.flash = .6; t.flashCol = '#ff2050'; t.shake = 12; t.punch = 1; SFX.alarm();
   if (p === 0 || !online()) vibrate([60, 40, 60]);
@@ -2040,7 +2046,7 @@ function netSend(now) {
     if (Net.role === 'host') P.ar = { b: t.balls.slice(0, MAXBALLS).map(b => [Math.round(b.x), Math.round(b.y), Math.round(b.vx), Math.round(b.vy)]), f: t.fl.map(f => Math.round(f.a * 100) / 100),
       g: t.grav, sc: t.score, tk: tokOut(t), sh: t.shield, fx: G.fxList, l: t.last, li: ARENAS.indexOf(t.L), bp: t.bigP.map(r1), sp: t.slowP.map(r1), tb: r1(t.turbo), ef: [r1(t.eff.giant), r1(t.eff.moon), r1(t.eff.rage), r1(t.eff.ahome || 0)], tt: r1(t.time), iv: invOut(t.inv), db: t.dbl.map(r1), bk: t.bricks.reduce((m, v, i) => m | ((v > 0 ? 1 : 0) << i), 0) };
     else { P.inp = ['l', 'r'].map(sd => t.fl.some(f => f.p === 1 && f.side === sd && f.on) ? 1 : 0); P.sx = G.supReq; P.sk = G.skReqK; P.lo = loadout(0).map(k => SKILL_KEYS.indexOf(k)); }
-    if (Net.role === 'host') Object.assign(P.ar, { ak: G.sk.map(a => a.map(Math.round)), am: G.meter.map(Math.round), an: G.nextAtk.map(k => ABIL_KEYS.indexOf(k)), fz: t.frz.map(r1), fi: r1(t.fire) });
+    if (Net.role === 'host') Object.assign(P.ar, { ak: G.sk.map(a => a.map(Math.round)), ae: G.en.map(Math.round), am: G.meter.map(Math.round), an: G.nextAtk.map(k => ABIL_KEYS.indexOf(k)), fz: t.frz.map(r1), fi: r1(t.fire) });
   }
   if (G.over) P.re = G.wantRe ? 1 : 0;
   if (G.emSeq) P.em = [G.emSeq, G.emIdx];
@@ -2109,6 +2115,7 @@ function oppArenaGuest(op) {
   if (Array.isArray(a.sp)) t.slowP = [+a.sp[0] || 0, +a.sp[1] || 0];
   t.turbo = +a.tb || 0;
   if (Array.isArray(a.am)) G.meter = [+a.am[0] || 0, +a.am[1] || 0];
+  if (Array.isArray(a.ae)) G.en = [+a.ae[0] || 0, +a.ae[1] || 0];
   if (Array.isArray(a.ak)) G.sk = [0, 1].map(q => [0, 1].map(i => +(a.ak[q] || [])[i] || 0));
   if (Array.isArray(a.an)) G.nextAtk = [ABIL_KEYS[a.an[0]] || null, ABIL_KEYS[a.an[1]] || null];
   if (Array.isArray(a.fz)) t.frz = [+a.fz[0] || 0, +a.fz[1] || 0];
@@ -2966,16 +2973,26 @@ function drawHud(p, R, compact) {
 }
 // charge bars for a player's skills (wp: world player for charges, lp: local player for keys/loadout)
 function drawSkBars(wp, lp, x0, y, w, h, ty, mine, small) {
-  const lo = loadout(lp), gap = 8, bw = (w - gap * (NSK - 1)) / NSK, now = performance.now(), keys = mine ? skKeys(lp) : '';
-  for (let i = 0; i < NSK; i++) {
-    const S = SKILLS[lo[i]], c = clamp((G.sk[wp] || [])[i] / 100 || 0, 0, 1), x = x0 + i * (bw + gap), ready = c >= 1;
-    const col = S ? S.c : '#ffd84a', pulse = .65 + .35 * Math.sin(now / 80);
-    rr(x, y, bw, h, h / 2); ctx.fillStyle = hexA(col, .14); ctx.fill();
-    if (c > 0) { rr(x, y, Math.max(h, bw * c), h, h / 2); ctx.fillStyle = ready ? hexA(col, pulse) : hexA(col, .75); ctx.fill(); }
-    if (ready) { rr(x - 2, y - 2, bw + 4, h + 4, h / 2 + 2); ctx.strokeStyle = `rgba(255,255,255,${pulse})`; ctx.lineWidth = 1.5; ctx.stroke(); }
-    if (!S || ty == null) continue;
-    ctx.font = (small ? 8 : 10) + 'px Bungee, sans-serif'; ctx.textAlign = 'left'; ctx.fillStyle = small ? (ready ? '#160c00' : '#ffffff') : ready ? '#ffffff' : hexA(col, .9);
-    ctx.fillText((keys ? keys[i] + ' · ' : '') + S.n + (ready ? ' · KLAR!' : ' ' + Math.floor(c * 100) + '%'), x + (small ? 8 : 2), ty);
+  const lo = loadout(lp), now = performance.now(), keys = mine ? skKeys(lp) : '', en = clamp((G.en || [])[wp] || 0, 0, ENMAX), pulse = .65 + .35 * Math.sin(now / 80);
+  const sx = v => x0 + w * clamp(v / ENMAX, 0, 1), anyReady = lo.some(k => SKILLS[k] && en >= SKILLS[k].cost);
+  rr(x0, y, w, h, h / 2); ctx.fillStyle = 'rgba(255,216,74,.12)'; ctx.fill();
+  if (en > 0) { rr(x0, y, Math.max(h, sx(en) - x0), h, h / 2); const g = ctx.createLinearGradient(x0, 0, x0 + w, 0); g.addColorStop(0, '#ff9a3c'); g.addColorStop(1, '#ffd84a'); ctx.fillStyle = g; ctx.globalAlpha = anyReady ? pulse : .8; ctx.fill(); ctx.globalAlpha = 1; }
+  // a notch for each skill at its price; it lights up when you can afford it
+  lo.slice(0, NSK).forEach((k, i) => {
+    const S = SKILLS[k]; if (!S) return;
+    const x = sx(S.cost), ok = en >= S.cost;
+    ctx.fillStyle = ok ? '#ffffff' : hexA(S.c, .9); ctx.fillRect(x - 1.5, y - 3, 3, h + 6);
+    if (!small) { ctx.beginPath(); ctx.arc(x, y - 6, 4.5, 0, TAU); ctx.fillStyle = ok ? S.c : 'rgba(10,6,24,.9)'; ctx.fill(); ctx.strokeStyle = S.c; ctx.lineWidth = 1.5; ctx.stroke(); }
+  });
+  if (ty == null) return;
+  ctx.font = (small ? 8 : 10) + 'px Bungee, sans-serif'; ctx.textBaseline = 'middle';
+  ctx.textAlign = 'left'; ctx.fillStyle = small ? '#ffffff' : '#ffd84a'; ctx.fillText('ENERGI ' + Math.floor(en), x0 + (small ? 8 : 2), ty);
+  let xr = x0 + w - (small ? 8 : 2);
+  ctx.textAlign = 'right';
+  for (let i = NSK - 1; i >= 0; i--) {
+    const S = SKILLS[lo[i]]; if (!S) continue;
+    const ok = en >= S.cost, txt = (keys ? keys[i] + ' · ' : '') + S.n + ' ' + S.cost + (ok ? ' ✓' : '');
+    ctx.fillStyle = ok ? '#ffffff' : hexA(S.c, .9); ctx.fillText(txt, xr, ty); xr -= ctx.measureText(txt).width + 14;
   }
 }
 
@@ -3114,7 +3131,7 @@ function skillButtons() {
         const S = SKILLS[k], b = document.createElement('button'); b.type = 'button'; b.style.setProperty('--c', S.c); b.style.setProperty('--cf', hexA(S.c, .38));
         b.title = S.n + ': ' + S.d;
         const ic = document.createElement('b'), nm = document.createElement('span'), co = document.createElement('small');
-        ic.textContent = S.i; nm.textContent = S.n; co.textContent = '0%';
+        ic.textContent = S.i; nm.textContent = S.n; co.textContent = '0/' + S.cost;
         b.append(ic, nm, co);
         b.addEventListener('pointerdown', ev => { ev.preventDefault(); ev.stopPropagation(); SFX.init(); useSkill(lp, i); });
         el.append(b);
@@ -3125,7 +3142,7 @@ function skillButtons() {
     lo.slice(0, NSK).forEach((k, i) => {
       const S = SKILLS[k], b = el.children[i]; if (!b) return;
       const c = Math.floor(clamp(G.sk[wp][i], 0, 100)), ready = c >= 100, ok = ready && (!S.boss || !!(t && t.boss)), kk = skKeys(lp);
-      const txt = (kk ? kk[i] + ' · ' : '') + (ready ? 'KLAR!' : c + '%');
+      const txt = (kk ? kk[i] + ' · ' : '') + (ready ? 'KLAR!' : Math.floor(G.en[wp] || 0) + '/' + S.cost);
       if (b.dataset.c !== String(c)) { b.dataset.c = c; b.style.setProperty('--p', c + '%'); }
       if (b.lastChild.textContent !== txt) b.lastChild.textContent = txt;
       b.classList.toggle('on', ok);
@@ -3227,7 +3244,7 @@ function drawLoadout(m, box, hint) {
     const S = SKILLS[k], b = document.createElement('button'), open = skOpen(k); b.type = 'button'; b.style.setProperty('--c', S.c);
     const on = SET[key].includes(k); b.setAttribute('aria-pressed', on); b.disabled = !open;
     const ic = document.createElement('i'), nm = document.createElement('b'), ds = document.createElement('span');
-    ic.textContent = open ? S.i : '🔒'; nm.textContent = (on ? (SET[key].indexOf(k) + 1) + '. ' : '') + S.n + ' · ' + (S.cost <= 50 ? 'hurtig' : S.cost <= 75 ? 'middel' : 'langsom');
+    ic.textContent = open ? S.i : '🔒'; nm.textContent = (on ? (SET[key].indexOf(k) + 1) + '. ' : '') + S.n + ' · koster ' + S.cost;
     ds.textContent = open ? S.d : 'Slå den ' + MEGA_NAMES[S.u - 1] + ' mega-boss i kampagnen';
     b.append(ic, nm, ds);
     b.onclick = () => { if (on || !open) return; SET[key] = [...SET[key].slice(1 - NSK), k].slice(-NSK); saveSet(); drawLoadout(m, box, hint); if (m !== 'b') menuSkills(); };

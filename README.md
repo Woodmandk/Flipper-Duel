@@ -47,7 +47,7 @@ På bordene finder du:
 
 ## Evner (du vælger selv)
 
-Du vælger selv **2 evner** (under "Dine evner" i menuen og i kampagnen). Hver evne har sin egen bjælke, der lader op, når du rammer ting. Billige evner er hurtigt klar, og dyre tager længere tid. Når en bjælke er fuld, står der KLAR!, og du bruger evnen med `Q` / `E` (eller `1` / `2`) eller knappen ved bordet. Computeren vælger også sine egne evner.
+Du vælger selv **2 evner** (under "Dine evner" i menuen og i kampagnen). Du har én energibar, der fyldes, når du rammer ting, og hver evne koster en del af den (mærkerne på bjælken viser prisen). Du vælger selv, om du bruger energien på en billig evne nu eller sparer op til en dyr. Når du har råd, står der KLAR!, og du bruger evnen med `Q` / `E` (eller `1` / `2`) eller knappen ved bordet. Computeren vælger også sine egne evner.
 
 - **Duel:** Homing, Super-skade, Lynstorm, Vampyr (skade bliver til liv), Redningsnet, Multiball, Kæmpe-flippere, Skjold, Helbred, Mega-slag, Dobbeltangreb og angreb du sender over (Tåge, Bombe, Jordskælv, Spejlvendt, Mini-flippere, Frys modstander, Sort hul, Energityv, Bomberegn).
 - **Arena:** Ildkugle, Frys, Mur, Homing, Kæmpekugler, Kanon, Sløv modstander, Kugleregn, Dobbelt mål, Tredobbelt skud, Multiball og Kæmpe-flippere.
