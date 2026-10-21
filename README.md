@@ -38,11 +38,11 @@ Hexagons pop up on the table. Hit them with the ball. Regular ones include Multi
 
 Press **?** in the game for an explanation of everything.
 
-## Daily challenge, shop and Chaos Friday
+## Daily challenge, shop and chaos mode
 
 - **Daily challenge:** a new boss fight every day. The table, boss and rule come from the date, so everyone gets the same one. The game keeps today's record and your streak of days in a row.
-- **Shop:** you earn coins in every match (most for wins and the daily challenge) and buy new balls, flippers, backgrounds (Sunset, Deep Sea, Matrix, Galaxy) and victory dances (Confetti, Fireworks, Lightning Show, Disco).
-- **Chaos Friday:** every Friday all chaos power-ups are on, they show up much more often, and you get 50% more coins. Add `#kaos` to the address to try it on another day.
+- **Shop:** you earn coins in every match (most for wins and the daily challenge, +25% in chaos mode) and buy new balls, flippers, backgrounds (Sunset, Deep Sea, Matrix, Galaxy) and victory dances (Confetti, Fireworks, Lightning Show, Disco).
+- **Chaos mode:** turn it on in the menu any time. All chaos power-ups are on, they show up much more often, and you get 25% more coins.
 
 Coins, purchases, records and stats are stored only on your device.
 
