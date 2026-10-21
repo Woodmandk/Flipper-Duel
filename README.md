@@ -66,6 +66,14 @@ Sekskanter dukker op på bordet. Ram dem med kuglen. I Arena går de til den, de
 
 Tryk på **?** i spillet for at se en forklaring på alt.
 
+## Dagens udfordring, butik og Kaos-fredag
+
+- **Dagens udfordring:** en ny boss-kamp hver dag. Bane, boss og regel bestemmes af datoen, så alle får den samme. Spillet gemmer dagens rekord og din stime af dage i træk.
+- **Butik:** du tjener mønter i alle kampe (mest for sejre og dagens udfordring) og køber nye kugler, flippere, baggrunde (Solnedgang, Dybhav, Matrix, Galakse) og sejrsdanse (Konfetti, Fyrværkeri, Lynshow, Disco).
+- **Kaos-fredag:** hver fredag er alle kaos-power-ups tændt, de kommer meget oftere, og du får 50% flere mønter. Tilføj `#kaos` til adressen for at prøve det en anden dag.
+
+Mønter, køb og rekorder gemmes kun på din enhed.
+
 ## Sådan spiller I mod hinanden
 
 **Find en modstander online:** tryk **Find en modstander online**, så bliver du sat sammen med en tilfældig spiller, der søger samme spiltype lige nu. Det kører uden egen server (via PeerJS). Er der ingen online, kan du spille mod computeren i stedet.

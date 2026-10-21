@@ -93,6 +93,13 @@ button.btn.ghost{background:transparent;font-size:14px;padding:9px;}
 .sw i{width:26px;height:26px;border-radius:50%;display:block;background:var(--c);box-shadow:0 0 10px rgba(255,255,255,.25);}
 .sw button:disabled{cursor:not-allowed;}
 .sw button:disabled i{filter:grayscale(1) brightness(.5);}
+.sw button.dn i{background:none;box-shadow:none;font-size:22px;font-style:normal;line-height:26px;text-align:center;}
+.coins{font-family:var(--display);color:var(--gold);text-align:center;font-size:20px;margin:-6px 0 0;}
+.kaosfri{margin:0;text-align:center;font-family:var(--display);font-size:15px;letter-spacing:.04em;color:#ff7a30;border:1px solid rgba(255,122,48,.6);border-radius:10px;padding:8px 10px;background:rgba(255,122,48,.1);line-height:1.35;}
+.kaosfri small{display:block;font-family:var(--body);font-weight:600;font-size:13px;color:var(--fg);letter-spacing:0;}
+.dinfo{margin:0;display:grid;grid-template-columns:auto 1fr;gap:5px 14px;font-size:14px;}
+.dinfo dt{color:var(--muted);}
+.dinfo dd{margin:0;font-weight:700;text-align:right;}
 .stats{display:grid;grid-template-columns:1fr auto;gap:5px 14px;margin:0;font-size:14px;}
 .stats dt{color:var(--muted);} .stats dd{margin:0;text-align:right;font-family:var(--display);color:var(--gold);}
 .skills{position:fixed;z-index:6;display:flex;gap:6px;}
@@ -142,6 +149,7 @@ button.btn.ghost{background:transparent;font-size:14px;padding:9px;}
   <div class="card">
     <h1><span class="a">FLIPPER</span><br><span class="b">DUEL</span></h1>
     <p class="sub">To spillere. Én vinder. Masser af neon.</p>
+    <p class="kaosfri" id="kaosFri" hidden>KAOS-FREDAG!<small>Alle kaos-power-ups er tændt, de kommer meget oftere, og du får 50% flere mønter.</small></p>
     <div class="field">
       <label class="lbl" for="name">Dit navn</label>
       <input type="text" id="name" maxlength="12" placeholder="Fx Daniel" autocomplete="off">
@@ -160,9 +168,11 @@ button.btn.ghost{background:transparent;font-size:14px;padding:9px;}
     <div class="btns">
       <button class="btn pri" type="button" id="bFind">Find en modstander online</button>
       <button class="btn pri" type="button" id="bOnline">Udfordr en ven online</button>
+      <button class="btn" type="button" id="bDaily">Dagens udfordring</button>
       <button class="btn" type="button" id="bCamp">Kampagne: boss-kampe</button>
       <button class="btn" type="button" id="bCpu">Spil mod computeren</button>
       <button class="btn" type="button" id="bLocal">2 spillere på samme skærm</button>
+      <button class="btn" type="button" id="bShop">Butik</button>
       <button class="btn ghost" type="button" id="bProf">Indstillinger og statistik</button>
       <button class="btn ghost" type="button" id="bHelp2">Sådan spiller du</button>
     </div>
@@ -187,6 +197,32 @@ button.btn.ghost{background:transparent;font-size:14px;padding:9px;}
     <div class="field"><span class="lbl">Dine flippere</span><div class="sw" id="setFlip"></div></div>
     <div class="field"><span class="lbl">Statistik</span><dl class="stats" id="stats"></dl></div>
     <button class="btn" type="button" id="bProfBack">Tilbage</button>
+  </div>
+</div>
+
+<div class="ov" id="shop" hidden>
+  <div class="card">
+    <h2>Butik</h2>
+    <p class="coins" id="shopCoins"></p>
+    <div class="field"><span class="lbl">Kugler</span><div class="sw" id="shBall"></div></div>
+    <div class="field"><span class="lbl">Flippere</span><div class="sw" id="shFlip"></div></div>
+    <div class="field"><span class="lbl">Baggrunde</span><div class="sw" id="shBg"></div></div>
+    <div class="field"><span class="lbl">Sejrsdanse</span><div class="sw" id="shDance"></div></div>
+    <p class="hint">Du tjener mønter i alle kampe. Sejre giver mest, dagens udfordring giver en stor bonus, og på Kaos-fredag får du 50% ekstra. Tryk på noget, du ejer, for at bruge det.</p>
+    <button class="btn" type="button" id="bShopBack">Tilbage</button>
+  </div>
+</div>
+
+<div class="ov" id="daily" hidden>
+  <div class="card">
+    <h2>Dagens udfordring</h2>
+    <p class="sub" id="dSub"></p>
+    <dl class="dinfo" id="dInfo"></dl>
+    <div class="field"><span class="lbl">Dine evner · vælg 2</span><div class="skl" id="dSkl"></div><p class="hint" id="dSklHint"></p></div>
+    <div class="btns">
+      <button class="btn pri" type="button" id="bDailyGo">Start dagens udfordring</button>
+      <button class="btn" type="button" id="bDailyBack">Tilbage</button>
+    </div>
   </div>
 </div>
 
@@ -242,6 +278,9 @@ button.btn.ghost{background:transparent;font-size:14px;padding:9px;}
         <li><b>Evner:</b> du vælger selv 2 evner i menuen (fx Homing, Vampyr, Tåge) og i kampagnen (fx Lyn, Sneglefart, Meteor). Du har én energibar, der fyldes, når du rammer ting, og hver evne koster energi. Mærkerne på bjælken viser, hvad dine evner koster. Bruger du den samme evne igen, lægges tiden oven i. Brug dem med <kbd>Q</kbd> og <kbd>E</kbd> (eller <kbd>1</kbd> <kbd>2</kbd>) eller knapperne. Spiller 2 på samme skærm bruger <kbd>I</kbd> og <kbd>O</kbd>.</li>
         <li><b>Kampagnen</b> har 20 baner og en mega-boss på hver 5. Slår du den, låser du nye evner op. Mange baner har en særlig regel, fx stormvind, mørke eller bomberegn, og mega-bosser går i fase 2 med en invasion.</li>
         <li><b>Indstillinger og statistik</b> i menuen: vælg computerens sværhedsgrad, din kugle og dine flippers farve. Nye kugler låses op, når du spiller.</li>
+        <li><b>Dagens udfordring</b> er en ny boss-kamp hver dag med bane, boss og regel, der er ens for alle. Slå den for en stor møntbonus, og hold din stime i gang ved at klare den hver dag.</li>
+        <li><b>Butik:</b> du tjener mønter i alle kampe og kan købe nye kugler, flippere, baggrunde og sejrsdanse, der spiller, når du vinder.</li>
+        <li><b>Kaos-fredag:</b> hver fredag er alle kaos-power-ups tændt, de kommer meget oftere, og du får 50% flere mønter.</li>
         <li><b>Find en modstander online</b> sætter dig sammen med en tilfældig spiller, der også søger lige nu (på spillets hjemmeside).</li>
         <li><b>Online</b> kan du sende emojis til modstanderen med tasterne <kbd>6</kbd>–<kbd>0</kbd> eller knapperne øverst til venstre.</li>
       </ul>
@@ -835,7 +874,9 @@ const DUEL_POW = ['multi', 'shield', 'x2', 'heal', 'big', 'zap', 'net'], DUEL_KA
 const ARENA_POW = ['multi', 'shield', 'big', 'slow', 'turbo', 'dbl'], ARENA_KAOS = ['mega', 'giant', 'rage', 'cannon', 'inv'];
 const pick = a => a[Math.floor(Math.random() * a.length)];
 const SOLO_POW = ['multi', 'shield', 'heal', 'big', 'net'], SOLO_KAOS = ['mega', 'moon', 'cannon', 'flip'];
-const pickPow = (duel, kaosOk = true, solo) => solo ? (kaosOk && Math.random() < .3 ? pick(SOLO_KAOS) : pick(SOLO_POW)) : kaosOk && Math.random() < .45 ? pick(duel ? DUEL_KAOS : ARENA_KAOS) : pick(duel ? DUEL_POW : ARENA_POW);
+// Kaos-fredag: every Friday kaos power-ups come much more often (add #kaos to the address to try it on other days)
+const kaosFri = () => new Date().getDay() === 5 || /kaos/i.test(location.hash);
+const pickPow = (duel, kaosOk = true, solo) => { const kc = kaosFri() ? .75 : solo ? .3 : .45; return solo ? (kaosOk && Math.random() < kc ? pick(SOLO_KAOS) : pick(SOLO_POW)) : kaosOk && Math.random() < kc ? pick(duel ? DUEL_KAOS : ARENA_KAOS) : pick(duel ? DUEL_POW : ARENA_POW); };
 const ABIL = {
   fire: { n: 'ILDKUGLE', d: 'Alle kugler brager mod modstanderens mål', c: '#ff7a30' },
   frz: { n: 'FRYS', d: 'Modstanderens flippere fryser fast i 2 sek.', c: '#7de8ff' },
@@ -1234,9 +1275,10 @@ class Table {
     this.tokenT -= dt;
     // pacing: no new power-ups while the table is cooling down after a big moment
     if (this.tokenT <= 0 && this.tokens.length < 2 && this.calm <= 0) {
-      this.tokenT = duel ? rnd(8, 12) : rnd(6, 9);
+      const kf = kaosFri();
+      this.tokenT = (duel ? rnd(8, 12) : rnd(6, 9)) * (kf ? .6 : 1);
       const s = this.freeSpot();
-      if (s) this.tokens.push({ x: s[0], y: s[1], type: pickPow(duel, this.time - this.lastKaos > 25, this.solo), t: 0 });
+      if (s) this.tokens.push({ x: s[0], y: s[1], type: pickPow(duel, this.time - this.lastKaos > (kf ? 8 : 25), this.solo), t: 0 });
     }
     this.calm = Math.max(0, this.calm - dt);
     this.tilt = Math.max(0, this.tilt - dt); this.tiltW = Math.max(0, this.tiltW - dt * .6);
@@ -1456,6 +1498,21 @@ const MODS = {
 const MEGA_LV = CAMP.map((C, i) => C.mega ? i : -1).filter(i => i >= 0);
 // how many mega bosses you have beaten decides which skills are unlocked
 const megaWins = () => { const st = campStars(); return MEGA_LV.filter(i => (st[i] | 0) > 0).length; };
+// daily challenge: a virtual level after the campaign. Table, boss and rule are seeded from today's date, so everyone gets the same one
+const DAILY = CAMP.length;
+const dayKey = (off = 0) => { const d = new Date(); d.setDate(d.getDate() + off); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
+let dailyMemo = null;
+function dailyC() {
+  const key = dayKey(); if (dailyMemo && dailyMemo.daily === key) return dailyMemo;
+  let h = 2166136261; for (const ch of 'fd' + key) h = Math.imul(h ^ ch.charCodeAt(0), 16777619);
+  const r = () => { h = Math.imul(h ^ h >>> 15, 2246822507); h = Math.imul(h ^ h >>> 13, 3266489909); return ((h ^= h >>> 16) >>> 0) / 4294967296; };
+  r(); const li = Math.floor(r() * DUELS.length), mk = Object.keys(MODS), rush = r() < .2;
+  const C = { li, mul: rush ? 2.6 : 4 + Math.floor(r() * 5) * .5, mod: mk[Math.floor(r() * mk.length)], time: rush ? 420 : 330, daily: key };
+  if (rush) { const ks = BOSS_KEYS.slice(); C.rush = []; for (let i = 0; i < 3; i++) C.rush.push(ks.splice(Math.floor(r() * ks.length), 1)[0]); }
+  else C.boss = BOSS_KEYS[Math.floor(r() * BOSS_KEYS.length)];
+  return dailyMemo = C;
+}
+const campC = i => (i == null ? G.camp : i) === DAILY ? dailyC() : CAMP[i == null ? G.camp : i];
 const SOLO_HP = 300, SOLO_HURT = 10;
 // campaign skills: you pick 3 before the fight, the energy bar fills as you hit things, and you spend it when you like
 const SKILLS = {
@@ -1515,14 +1572,41 @@ const BALLS = [
   { n: 'Slim', c: ['#f0fff0', '#7dff9a', '#0a5a2a'], need: () => STATS.combo >= 20, how: 'Lav en combo på 20' },
   { n: 'Galakse', c: ['#efe4ff', '#7b6bff', '#140a40'], need: () => STATS.goals >= 25, how: 'Scor 25 mål i Arena' },
   { n: 'Regnbue', rainbow: 1, c: ['#fff', '#f0f', '#0ff'], need: () => campStars().reduce((a, v) => a + (v | 0), 0) >= 12, how: 'Saml 12 kampagne-stjerner' },
+  // shop balls (bought with coins)
+  { n: 'Is', c: ['#ffffff', '#9fe8ff', '#1a4a7a'], cost: 120, how: 'Køb i butikken' },
+  { n: 'Pink', c: ['#fff0fb', '#ff3fd2', '#5a0040'], cost: 150, how: 'Køb i butikken' },
+  { n: 'Lava', c: ['#ffe680', '#ff3a10', '#300000'], cost: 180, how: 'Køb i butikken' },
+  { n: 'Skygge', c: ['#b0a8d8', '#2a2440', '#000000'], cost: 250, how: 'Køb i butikken' },
+  { n: 'Diamant', c: ['#ffffff', '#d8f4ff', '#6a8ab0'], cost: 320, how: 'Køb i butikken' },
 ];
-const FLIPS = [{ n: 'Din farve', c: null }, { n: 'Guld', c: '#ffd84a' }, { n: 'Grøn', c: '#7dff9a' }, { n: 'Orange', c: '#ff9a3c' }, { n: 'Lilla', c: '#b98cff' }, { n: 'Hvid', c: '#ffffff' }];
+const FLIPS = [{ n: 'Din farve', c: null }, { n: 'Guld', c: '#ffd84a' }, { n: 'Grøn', c: '#7dff9a' }, { n: 'Orange', c: '#ff9a3c' }, { n: 'Lilla', c: '#b98cff' }, { n: 'Hvid', c: '#ffffff' },
+  { n: 'Pink', c: '#ff3fd2', cost: 80, how: 'Køb i butikken' }, { n: 'Is', c: '#7dffea', cost: 80, how: 'Køb i butikken' }, { n: 'Rød', c: '#ff4060', cost: 80, how: 'Køb i butikken' }, { n: 'Regnbue', c: '#fff', rainbow: 1, cost: 260, how: 'Køb i butikken' }];
+// table backgrounds: g = sky gradient, l = grid lines, s = horizon glow, fx = extra animation
+const BGS = [
+  { n: 'Neon', g: ['#07060f', '#0d0820', '#1a0b33'], l: 'rgba(170,90,255,.14)', s: 'rgba(255,63,210,.14)' },
+  { n: 'Solnedgang', g: ['#14061e', '#4a1238', '#b8402a'], l: 'rgba(255,150,90,.2)', s: 'rgba(255,190,80,.28)', fx: 'sun', cost: 200 },
+  { n: 'Dybhav', g: ['#00080f', '#00243a', '#00485a'], l: 'rgba(90,220,255,.13)', s: 'rgba(90,220,255,.16)', fx: 'bubbles', cost: 200 },
+  { n: 'Matrix', g: ['#000400', '#001408', '#00220c'], l: 'rgba(60,255,120,.12)', s: 'rgba(60,255,120,.1)', fx: 'rain', cost: 250 },
+  { n: 'Galakse', g: ['#02010a', '#090626', '#1c0a3a'], l: 'rgba(120,140,255,.08)', s: 'rgba(120,90,255,.2)', fx: 'stars', cost: 300 },
+];
+// victory dances play over the screen when you win
+const DANCES = [{ n: 'Guldregn', i: '✨' }, { n: 'Konfetti', i: '🎉', cost: 150 }, { n: 'Fyrværkeri', i: '🎆', cost: 180 }, { n: 'Lynshow', i: '⚡', cost: 220 }, { n: 'Disco', i: '🪩', cost: 280 }];
 const loadJ = (k, d) => { try { const v = JSON.parse(store.get(k, '{}')); return Object.assign(d, v && typeof v === 'object' ? v : {}); } catch (e) { return d; } };
-const SET = loadJ('fd-set', { cpu: 1, ball: 0, flip: 0 });
+const SET = loadJ('fd-set', { cpu: 1, ball: 0, flip: 0, bg: 0, dance: 0 });
+// coins and bought items (kept on this device)
+const SHOP = loadJ('fd-shop', { coins: 0, own: [] }); if (!Array.isArray(SHOP.own)) SHOP.own = [];
+const saveShop = () => store.set('fd-shop', JSON.stringify(SHOP));
+const owns = id => SHOP.own.includes(id);
+const flipOpen = i => !!FLIPS[i] && (!FLIPS[i].cost || owns('f' + i));
+const bgOpen = i => !!BGS[i] && (!BGS[i].cost || owns('t' + i));
+const danceOpen = i => !!DANCES[i] && (!DANCES[i].cost || owns('d' + i));
+// daily challenge records: today's best, plus a streak of days in a row you beat it
+const DLY = loadJ('fd-daily', { d: '', tries: 0, won: 0, hp: 0, t: 0, st: 0, streak: 0, last: '', days: 0 });
+const dailyRec = () => { if (DLY.d !== dayKey()) Object.assign(DLY, { d: dayKey(), tries: 0, won: 0, hp: 0, t: 0, st: 0 }); return DLY; };
 for (const m in LO_KEY) { const a = SET[LO_KEY[m]]; if (!Array.isArray(a) || a.length < NSK || !a.slice(0, NSK).every(k => SKILLS[k] && SKILLS[k].m.includes(m))) SET[LO_KEY[m]] = LO_DEF[m].slice(); else SET[LO_KEY[m]] = a.slice(0, NSK); }
-const STATS = loadJ('fd-stats', { played: 0, won: 0, duelW: 0, arenaW: 0, online: 0, onlineW: 0, boss: 0, combo: 0, goals: 0, supers: 0, dmg: 0, camp: 0, fastBoss: 0 });
+const STATS = loadJ('fd-stats', { played: 0, won: 0, duelW: 0, arenaW: 0, online: 0, onlineW: 0, boss: 0, combo: 0, goals: 0, supers: 0, dmg: 0, camp: 0, fastBoss: 0, coins: 0 });
 const cpuLv = () => CPU_LV[SET.cpu] || CPU_LV[1];
-const ballOpen = i => !!BALLS[i] && (!BALLS[i].need || BALLS[i].need());
+const ballOpen = i => !!BALLS[i] && (BALLS[i].cost ? owns('b' + i) : !BALLS[i].need || BALLS[i].need());
 const saveSet = () => store.set('fd-set', JSON.stringify(SET));
 function stat(k, v, how) {
   if (G.demo) return;
@@ -1613,7 +1697,7 @@ function sendEmo(i) {
   if (!online() || G.demo || !EMOJI[i] || G.emCd > 0) return;
   G.emCd = .7; G.emSeq++; G.emIdx = i; G.emoList.push({ e: EMOJI[i], t: 2.2, me: 1, x: rnd(-20, 20) }); SFX.emo();
 }
-const soloTime = () => (CAMP[G.camp] && CAMP[G.camp].time) || 300;
+const soloTime = () => (campC() && campC().time) || 300;
 const goalsNeeded = () => ARENA_GOALS;
 const campStars = () => { try { const a = JSON.parse(store.get('fd-camp', '[]')); return Array.isArray(a) ? a.map(v => v | 0) : []; } catch (e) { return []; } };
 const online = () => G.type === 'host' || G.type === 'guest';
@@ -1652,7 +1736,7 @@ function resetRoundState() {
 }
 function startRound() {
   G.rid++; let li; do { li = Math.floor(Math.random() * DUELS.length); } while ((li === G.li || (DUELS[li].giant && Math.random() < .4)) && DUELS.length > 1); G.li = li;
-  const C = CAMP[G.camp]; if (C) G.li = C.li;
+  const C = G.type === 'boss' ? campC() : null; if (C) G.li = C.li;
   resetRoundState(); G.countT = 3.2;
   if (C) { const t = G.tables[0]; t.solo = true; t.rush = C.rush ? C.rush.slice() : null; t.forceBoss = C.boss || null; t.bossMul = C.mul * (C.mod === 'tiny' ? .85 : 1); t.mega = !!C.mega; t.bossT = 1.5; t.misT = 1e9;
     t.mod = C.mod || null; t.gmul = C.mod === 'moon' ? .55 : C.mod === 'heavy' ? 1.3 : 1; t.modT = 9; }
@@ -1734,7 +1818,7 @@ function applyPower(t, p, d) {
     else if (ty === 'cannon') { const dir = q === 0 ? -1 : 1; t.grav = dir; for (const b of t.balls) { b.vx = rnd(-400, 400); b.vy = dir * rnd(1300, 1700); } }
   }
   const P = POW[ty];
-  if (P) { t.calm = Math.max(t.calm, P.k ? 14 : 5); if (P.k) { t.lastKaos = t.time; t.atkCalm = Math.max(t.atkCalm, 5); } }
+  if (P) { t.calm = Math.max(t.calm, P.k ? (kaosFri() ? 6 : 14) : 5); if (P.k) { t.lastKaos = t.time; t.atkCalm = Math.max(t.atkCalm, 5); } }
   if (ty === 'mega') t.spawnMulti(10, d.x, d.y, t.kind === 'duel' ? 1 : (d.p === 0 ? 1 : -1), 6);
   else if (ty === 'giant' || ty === 'rage') t.eff[ty] = 10;
   else if (ty === 'moon') t.eff.moon = 8;
@@ -2526,20 +2610,51 @@ function neon(path, col, w, glow = 1) {
 }
 function line(ax, ay, bx, by) { const p = new Path2D(); p.moveTo(ax, ay); p.lineTo(bx, by); return p; }
 
+// deterministic pseudo-random 0..1 for background decorations
+const hash01 = i => { let h = Math.imul(i + 1, 2654435761) ^ 0x5bd1e995; h = Math.imul(h ^ h >>> 13, 1274126177); return ((h ^ h >>> 16) >>> 0) / 4294967296; };
+function drawBgFx(fx, now, cw, ch, hy) {
+  const t = REDUCED ? 0 : now / 1000;
+  if (fx === 'sun') { // big striped synthwave sun sitting on the horizon
+    const r = Math.min(cw, ch) * .24, g = ctx.createLinearGradient(0, hy - r, 0, hy);
+    g.addColorStop(0, '#ffe680'); g.addColorStop(.6, '#ff7a50'); g.addColorStop(1, '#ff3fa0');
+    ctx.save(); ctx.beginPath(); ctx.arc(cw / 2, hy, r, Math.PI, 0); ctx.closePath(); ctx.clip();
+    ctx.globalAlpha = .55; ctx.fillStyle = g; ctx.fillRect(cw / 2 - r, hy - r, r * 2, r);
+    ctx.globalAlpha = 1; ctx.fillStyle = '#2a0c30';
+    for (let i = 0; i < 6; i++) { const y = hy - r * .55 + i * r * .1 + (t * 6 % (r * .1)); ctx.fillRect(cw / 2 - r, y, r * 2, 2 + i * 1.4); }
+    ctx.restore();
+  } else if (fx === 'stars') {
+    const n = Math.round(cw * ch / 2600);
+    for (let i = 0; i < n; i++) { const a = .25 + .6 * (.5 + .5 * Math.sin(t * (1 + hash01(i * 3) * 3) + i)); ctx.fillStyle = `rgba(230,225,255,${a})`; const sz = hash01(i * 7) < .1 ? 2 : 1; ctx.fillRect(hash01(i * 5) * cw, hash01(i * 11) * ch * .9, sz, sz); }
+    const nb = ctx.createRadialGradient(cw * .25, ch * .3, 10, cw * .25, ch * .3, Math.max(cw, ch) * .35);
+    nb.addColorStop(0, 'rgba(255,90,200,.12)'); nb.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = nb; ctx.fillRect(0, 0, cw, ch);
+  } else if (fx === 'bubbles') {
+    ctx.strokeStyle = 'rgba(160,240,255,.28)'; ctx.lineWidth = 1.5;
+    for (let i = 0; i < 34; i++) { const sp = 30 + hash01(i) * 60, r = 2 + hash01(i * 3) * 7, y = ch + 20 - ((t * sp + hash01(i * 9) * ch * 1.2) % (ch + 40)), x = hash01(i * 5) * cw + Math.sin(t * 1.5 + i) * 10; ctx.beginPath(); ctx.arc(x, y, r, 0, TAU); ctx.stroke(); }
+    ctx.fillStyle = 'rgba(120,230,255,.04)'; for (let i = 0; i < 5; i++) { const x = cw * (i + .5) / 5 + Math.sin(t * .4 + i) * 40; ctx.beginPath(); ctx.moveTo(x - 30, 0); ctx.lineTo(x + 30, 0); ctx.lineTo(x + 120, ch); ctx.lineTo(x - 60, ch); ctx.fill(); }
+  } else if (fx === 'rain') { // falling green code
+    ctx.font = '14px monospace'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    const cols = Math.ceil(cw / 26);
+    for (let c = 0; c < cols; c++) {
+      const sp = 60 + hash01(c) * 110, y0 = (t * sp + hash01(c * 7) * ch * 2) % (ch + 160) - 80;
+      for (let k = 0; k < 7; k++) { ctx.fillStyle = k === 0 ? 'rgba(200,255,210,.55)' : `rgba(60,255,120,${.36 - k * .05})`; ctx.fillText(String.fromCharCode(48 + Math.floor(hash01(c * 31 + k + Math.floor(y0 / 18)) * 42)), c * 26 + 13, y0 - k * 17); }
+    }
+  }
+}
 function drawBackground(now) {
   const cw = LAY.cw, ch = LAY.ch;
   const g = ctx.createLinearGradient(0, 0, 0, ch);
-  const od = G.overdrive && !G.demo;
-  g.addColorStop(0, od ? '#1a0610' : '#07060f'); g.addColorStop(.65, od ? '#240818' : '#0d0820'); g.addColorStop(1, od ? '#3a0c1a' : '#1a0b33');
+  const od = G.overdrive && !G.demo, B = (bgOpen(SET.bg) && BGS[SET.bg]) || BGS[0];
+  g.addColorStop(0, od ? '#1a0610' : B.g[0]); g.addColorStop(.65, od ? '#240818' : B.g[1]); g.addColorStop(1, od ? '#3a0c1a' : B.g[2]);
   ctx.fillStyle = g; ctx.fillRect(0, 0, cw, ch);
   const hy = ch * .62, sp = (now / 1000 * (od ? 90 : 40)) % 40;
-  ctx.strokeStyle = od ? 'rgba(255,90,60,.16)' : 'rgba(170,90,255,.14)'; ctx.lineWidth = 1;
+  if (B.fx && !od) drawBgFx(B.fx, now, cw, ch, hy);
+  ctx.strokeStyle = od ? 'rgba(255,90,60,.16)' : B.l; ctx.lineWidth = 1;
   ctx.beginPath();
   for (let i = 0; i < 14; i++) { const t = (i * 40 + sp) / 560; const y = hy + (ch - hy) * t * t; ctx.moveTo(0, y); ctx.lineTo(cw, y); }
   for (let i = -12; i <= 12; i++) { ctx.moveTo(cw / 2 + i * 30, hy); ctx.lineTo(cw / 2 + i * cw / 6, ch); }
   ctx.stroke();
   const sun = ctx.createRadialGradient(cw / 2, hy, 10, cw / 2, hy, Math.max(cw, ch) * .5);
-  sun.addColorStop(0, od ? 'rgba(255,90,50,.22)' : 'rgba(255,63,210,.14)'); sun.addColorStop(1, 'rgba(0,0,0,0)');
+  sun.addColorStop(0, od ? 'rgba(255,90,50,.22)' : B.s); sun.addColorStop(1, 'rgba(0,0,0,0)');
   ctx.fillStyle = sun; ctx.fillRect(0, 0, cw, ch);
 }
 
@@ -2631,7 +2746,7 @@ function drawBoss(t, now) {
 
 function drawTable(t, R, pi, opt = {}) {
   const col = COL[pi], rgb = COLRGB[pi], now = performance.now() / 1000;
-  const mineT = !G.demo && pi === 0 && t !== G.ghost, myFl = FLIPS[SET.flip] && FLIPS[SET.flip].c;
+  const mineT = !G.demo && pi === 0 && t !== G.ghost, FLs = flipOpen(SET.flip) && FLIPS[SET.flip], myFl = FLs && (FLs.rainbow ? `hsl(${now * 160 % 360},100%,64%)` : FLs.c);
   const L = t.L, duel = t.kind === 'duel', TH = L.H, TT = THEMES[L.theme] || THEMES.neon, wcol = TT.wall || col, bcol = TT.bc || col;
   const cam = opt.mini || opt.full ? { y: 0, h: TH } : t.cam, z = Math.min(W / L.W, H / cam.h), ox = (W - L.W * z) / 2, oy = Math.max(0, (H - cam.h * z) / 2);
   // world point -> viewport point (the W x H box on screen)
@@ -3042,7 +3157,7 @@ function drawCenter() {
     ctx.save(); ctx.translate(T.x, T.y); ctx.scale(s, s); ctx.textAlign = T.left ? 'left' : 'center'; ctx.textBaseline = 'middle';
     ctx.font = '20px Bungee, sans-serif'; ctx.fillStyle = G.overdrive ? '#ff7a30' : '#ece9ff';
     const mm = Math.floor(rem / 60), ss = String(Math.floor(rem % 60)).padStart(2, '0');
-    if (G.type === 'boss') ctx.fillText(`BOSS-KAMP ${G.camp + 1} · ${duelL().name} · ${mm}:${ss}`, 0, 0); else ctx.fillText(T.left ? `R${G.round} · ${mm}:${ss}${G.overdrive ? ' · OVERDRIVE' : ' · ' + duelL().name}` : `RUNDE ${G.round} · ${duelL().name} · ${mm}:${ss}${G.overdrive ? ' · OVERDRIVE' : ''}`, 0, 0);
+    if (G.type === 'boss') ctx.fillText(`${G.camp === DAILY ? 'DAGENS UDFORDRING' : 'BOSS-KAMP ' + (G.camp + 1)} · ${duelL().name} · ${mm}:${ss}`, 0, 0); else ctx.fillText(T.left ? `R${G.round} · ${mm}:${ss}${G.overdrive ? ' · OVERDRIVE' : ' · ' + duelL().name}` : `RUNDE ${G.round} · ${duelL().name} · ${mm}:${ss}${G.overdrive ? ' · OVERDRIVE' : ''}`, 0, 0);
     ctx.restore();
   }
   if (G.phase === 'count' && !G.demo) {
@@ -3050,15 +3165,16 @@ function drawCenter() {
     const txt = n > 0 ? String(n) : 'KØR!';
     ctx.save(); ctx.translate(cw / 2, ch / 2); const sc = Math.min(cw, ch) / 500; ctx.scale(sc, sc);
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    const CL = G.mode === 'arena' ? G.tables[0].L : duelL(), CM = G.type === 'boss' && CAMP[G.camp] && MODS[CAMP[G.camp].mod];
-    ctx.fillStyle = 'rgba(5,3,15,.7)'; ctx.fillRect(-260, -170, 520, 70 + (CL.sigTxt ? 26 : 0) + (CM ? 46 : 0));
+    const CC = G.type === 'boss' && campC(), CL = G.mode === 'arena' ? G.tables[0].L : duelL(), CM = CC && MODS[CC.mod], KF = kaosFri();
+    ctx.fillStyle = 'rgba(5,3,15,.7)'; ctx.fillRect(-260, -170, 520, 70 + (CL.sigTxt ? 26 : 0) + (CM ? 46 : 0) + (KF ? 26 : 0));
     ctx.font = '22px Bungee, sans-serif'; ctx.fillStyle = '#ffd84a';
-    ctx.fillText(G.mode === 'arena' ? `FØRST TIL ${goalsNeeded()} MÅL` : G.type === 'boss' ? (CAMP[G.camp] && CAMP[G.camp].rush ? 'BOSS-RUSH' : CAMP[G.camp] && CAMP[G.camp].mega ? 'MEGA-BOSS!' : 'BOSS-KAMP ' + (G.camp + 1)) : `RUNDE ${G.round}`, 0, -150);
+    ctx.fillText(G.mode === 'arena' ? `FØRST TIL ${goalsNeeded()} MÅL` : CC ? (G.camp === DAILY ? 'DAGENS UDFORDRING' : CC.rush ? 'BOSS-RUSH' : CC.mega ? 'MEGA-BOSS!' : 'BOSS-KAMP ' + (G.camp + 1)) : `RUNDE ${G.round}`, 0, -150);
     ctx.font = '16px Bungee, sans-serif'; ctx.fillStyle = '#ece9ff';
     ctx.fillText('BANE: ' + CL.name + (CL.giant ? ' · KÆMPEBANE!' : ''), 0, -120);
     let ly = -94; ctx.font = '13px Bungee, sans-serif';
     if (CL.sigTxt) { ctx.fillStyle = '#7dffea'; ctx.fillText(CL.sigTxt, 0, ly); ly += 26; }
-    if (CM) { ctx.fillStyle = CM.c; ctx.fillText('REGEL: ' + CM.n, 0, ly); ctx.font = '600 15px "Chakra Petch", sans-serif'; ctx.fillText(CM.d, 0, ly + 21); }
+    if (CM) { ctx.fillStyle = CM.c; ctx.fillText('REGEL: ' + CM.n, 0, ly); ctx.font = '600 15px "Chakra Petch", sans-serif'; ctx.fillText(CM.d, 0, ly + 21); ly += 46; ctx.font = '13px Bungee, sans-serif'; }
+    if (KF) { ctx.fillStyle = '#ff7a30'; ctx.fillText('KAOS-FREDAG: MASSER AF KAOS!', 0, ly); }
     ctx.scale(1 + k * .5, 1 + k * .5); ctx.font = '110px Bungee, sans-serif';
     ctx.globalAlpha = .4; ctx.fillStyle = '#ff3fd2'; ctx.fillText(txt, 4, 4); ctx.fillStyle = '#22e6ff'; ctx.fillText(txt, -4, -4);
     ctx.globalAlpha = 1; ctx.fillStyle = '#fff'; ctx.fillText(txt, 0, 0);
@@ -3073,8 +3189,55 @@ function drawCenter() {
   }
 }
 
+function playDance() {
+  const k = danceOpen(SET.dance) ? SET.dance : 0;
+  G.dance = { k, t: 0, dur: 5, last: 0, ps: [], bolts: [], acc: 0 };
+}
+// victory dance particles live in screen space and run on wall-clock time
+function drawDance(now) {
+  const D = G.dance; if (!D) return;
+  const cw = LAY.cw, ch = LAY.ch, dt = D.last ? Math.min(.05, (now - D.last) / 1000) : 0; D.last = now; D.t += dt;
+  if (D.t > D.dur + 2.5) { G.dance = null; return; }
+  const on = D.t < D.dur, ps = D.ps;
+  D.acc += dt;
+  if (on && ps.length < 700) {
+    if (D.k === 0) for (let i = 0; i < 3; i++) ps.push({ x: Math.random() * cw, y: -10, vx: rnd(-20, 20), vy: rnd(120, 260), l: 3, m: 3, c: Math.random() < .7 ? '#ffd84a' : '#fff6c0', s: rnd(2, 4), g: 60, kind: 'dot' });
+    else if (D.k === 1) for (let i = 0; i < 5; i++) ps.push({ x: Math.random() * cw, y: -10, vx: rnd(-40, 40), vy: rnd(90, 200), l: 4, m: 4, c: `hsl(${Math.random() * 360},95%,60%)`, s: rnd(5, 9), g: 30, rot: Math.random() * 6, vr: rnd(-8, 8), kind: 'conf' });
+    else if (D.k === 2 && D.acc > .32) { D.acc = 0; const x = rnd(cw * .1, cw * .9), y = rnd(ch * .12, ch * .5), hue = Math.random() * 360; SFX.boom && Math.random() < .5 && SFX.boom(); for (let i = 0; i < 46; i++) { const a = Math.random() * TAU, v = rnd(80, 300); ps.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, l: 1.4, m: 1.4, c: `hsl(${hue + rnd(-25, 25)},100%,${rnd(55, 75)}%)`, s: rnd(2, 3.5), g: 160, kind: 'dot' }); } }
+    else if (D.k === 3 && D.acc > .22) { D.acc = 0; const pts = []; let x = rnd(cw * .1, cw * .9), y = 0; const ex = x + rnd(-cw * .2, cw * .2), ey = rnd(ch * .5, ch * .95); while (y < ey) { pts.push([x, y]); y += rnd(20, 50); x += (ex - x) * .15 + rnd(-30, 30); } pts.push([ex, ey]); D.bolts.push({ pts, l: .22 }); D.flash = .25; }
+  }
+  ctx.save();
+  if (D.k === 4) { // disco: sweeping coloured beams from a spinning mirror ball
+    const a = clamp(Math.min(D.t * 2, D.dur + 1 - D.t), 0, 1), cx = cw / 2, cy = ch * .08, R = Math.max(cw, ch) * 1.2;
+    if (a > 0) {
+      ctx.globalCompositeOperation = 'lighter';
+      for (let i = 0; i < 8; i++) { const ang = Math.PI / 2 + Math.sin(now / 900 + i * 1.3) * 1.1; ctx.fillStyle = `hsla(${(i * 45 + now / 20) % 360},100%,60%,${.16 * a})`; ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx + Math.cos(ang - .07) * R, cy + Math.sin(ang - .07) * R); ctx.lineTo(cx + Math.cos(ang + .07) * R, cy + Math.sin(ang + .07) * R); ctx.fill(); }
+      ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = a;
+      const br = Math.min(cw, ch) * .05, bgr = ctx.createRadialGradient(cx - br * .3, cy - br * .3, 2, cx, cy, br); bgr.addColorStop(0, '#fff'); bgr.addColorStop(1, '#8a8aa8');
+      ctx.fillStyle = bgr; ctx.beginPath(); ctx.arc(cx, cy, br, 0, TAU); ctx.fill();
+      ctx.strokeStyle = 'rgba(40,40,60,.5)'; ctx.lineWidth = 1; for (let i = -2; i <= 2; i++) { ctx.beginPath(); ctx.moveTo(cx - br, cy + i * br * .38); ctx.lineTo(cx + br, cy + i * br * .38); ctx.stroke(); }
+      for (let i = 0; i < 4; i++) { const sa = now / 300 + i * 1.6; ctx.fillStyle = '#fff'; ctx.globalAlpha = a * (.5 + .5 * Math.sin(now / 90 + i)); ctx.fillRect(cx + Math.cos(sa) * br * .7 - 1.5, cy + Math.sin(sa) * br * .5 - 1.5, 3, 3); }
+      ctx.globalAlpha = 1;
+    }
+  }
+  if (D.flash > 0) { ctx.fillStyle = `rgba(200,230,255,${D.flash * .5})`; ctx.fillRect(0, 0, cw, ch); D.flash -= dt; }
+  for (let i = D.bolts.length - 1; i >= 0; i--) {
+    const b = D.bolts[i]; b.l -= dt; if (b.l <= 0) { D.bolts.splice(i, 1); continue; }
+    ctx.globalAlpha = clamp(b.l / .22, 0, 1); ctx.lineJoin = 'round';
+    for (const [w, c] of [[10, 'rgba(120,180,255,.35)'], [3, '#eaf4ff']]) { ctx.strokeStyle = c; ctx.lineWidth = w; ctx.beginPath(); b.pts.forEach(([x, y], j) => j ? ctx.lineTo(x, y) : ctx.moveTo(x, y)); ctx.stroke(); }
+  }
+  ctx.globalAlpha = 1;
+  for (let i = ps.length - 1; i >= 0; i--) {
+    const p = ps[i]; p.l -= dt; if (p.l <= 0 || p.y > ch + 20) { ps.splice(i, 1); continue; }
+    p.vy += p.g * dt; p.x += p.vx * dt; p.y += p.vy * dt; ctx.globalAlpha = clamp(p.l / p.m * 2, 0, 1); ctx.fillStyle = p.c;
+    if (p.kind === 'conf') { p.rot += p.vr * dt; p.vx += Math.sin(p.y / 30) * 20 * dt; ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot); ctx.fillRect(-p.s / 2, -p.s / 4, p.s, p.s / 2); ctx.restore(); }
+    else { ctx.beginPath(); ctx.arc(p.x, p.y, p.s, 0, TAU); ctx.fill(); }
+  }
+  ctx.restore();
+}
 function drawMoments(now) {
   const cw = LAY.cw, ch = LAY.ch;
+  drawDance(now);
   if (G.big > 0 && !G.demo) { // cinematic bars while a big moment plays in slow motion
     const k = clamp(Math.min(G.big, (G.bigMax || 1.6) - G.big) * 4, 0, 1), bh = ch * .11 * k;
     const v = ctx.createRadialGradient(cw / 2, ch / 2, Math.min(cw, ch) * .25, cw / 2, ch / 2, Math.max(cw, ch) * .7);
@@ -3249,22 +3412,74 @@ function showProf() {
     });
   };
   mk($('setCpu'), CPU_LV, SET.cpu, i => SET.cpu = i);
-  mk($('setBall'), BALLS, SET.ball, i => SET.ball = i, b => b.rainbow ? 'conic-gradient(#f44,#fd4,#4f8,#4df,#a4f,#f44)' : `radial-gradient(circle at 35% 35%, ${b.c[0]}, ${b.c[1]} 55%, ${b.c[2]})`, i => !ballOpen(i));
-  mk($('setFlip'), FLIPS, SET.flip, i => SET.flip = i, f => f.c || 'linear-gradient(90deg,var(--p1),var(--p2))');
+  mk($('setBall'), BALLS, SET.ball, i => SET.ball = i, ballSw, i => !ballOpen(i));
+  mk($('setFlip'), FLIPS, SET.flip, i => SET.flip = i, flipSw, i => !flipOpen(i));
   const st = campStars().reduce((a, v) => a + (v | 0), 0), dl = $('stats'); dl.textContent = '';
   [['Kampe spillet', STATS.played], ['Sejre', STATS.won], ['Sejre i Duel / Arena', STATS.duelW + ' / ' + STATS.arenaW], ['Online-kampe (sejre)', STATS.online + ' (' + STATS.onlineW + ')'],
    ['Bosser besejret', STATS.boss], ['Bedste combo', STATS.combo], ['Mål i Arena', STATS.goals], ['SUPER fyret af', STATS.supers],
-   ['Skade i alt', STATS.dmg], ['Kampagne-stjerner', st + ' / ' + CAMP.length * 3], ['Hurtigste boss-kamp', STATS.fastBoss ? fmtTime(STATS.fastBoss) : '–']]
+   ['Skade i alt', STATS.dmg], ['Kampagne-stjerner', st + ' / ' + CAMP.length * 3], ['Hurtigste boss-kamp', STATS.fastBoss ? fmtTime(STATS.fastBoss) : '–'], ['Mønter tjent i alt', STATS.coins | 0], ['Dagens udfordring klaret', (DLY.days | 0) + ' dage']]
     .forEach(([k, v]) => { const dt = document.createElement('dt'), dd = document.createElement('dd'); dt.textContent = k; dd.textContent = String(v); dl.append(dt, dd); });
   hide('menu'); show('prof');
 }
 $('bProf').onclick = () => { SFX.init(); showProf(); };
+const RAINBOW = 'conic-gradient(#f44,#fd4,#4f8,#4df,#a4f,#f44)';
+const ballSw = b => b.rainbow ? RAINBOW : `radial-gradient(circle at 35% 35%, ${b.c[0]}, ${b.c[1]} 55%, ${b.c[2]})`;
+const flipSw = f => f.rainbow ? RAINBOW : f.c || 'linear-gradient(90deg,var(--p1),var(--p2))';
+function showShop() {
+  $('shopCoins').textContent = '🪙 ' + SHOP.coins + ' mønter';
+  // one row of items: tap to buy (if you can afford it) or to use it
+  const row = (box, items, pre, key, sw, only) => {
+    box.textContent = '';
+    items.forEach((it, i) => {
+      if (only && !it.cost) return;
+      const own = !it.cost || owns(pre + i), b = document.createElement('button'); b.type = 'button';
+      b.setAttribute('aria-pressed', own && SET[key] === i);
+      const ic = document.createElement('i'); if (it.i) { b.className = 'dn'; ic.textContent = it.i; } else ic.style.setProperty('--c', sw(it)); b.append(ic);
+      const nm = document.createElement('span'); nm.textContent = it.n; b.append(nm);
+      const sm = document.createElement('small'); sm.textContent = own ? (SET[key] === i ? 'Valgt' : 'Vælg') : '🪙 ' + it.cost; b.append(sm);
+      if (!own && SHOP.coins < it.cost) b.disabled = true;
+      b.onclick = () => {
+        if (!own) { if (SHOP.coins < it.cost) return; SHOP.coins -= it.cost; SHOP.own.push(pre + i); saveShop(); SFX.jackpot(); }
+        SET[key] = i; saveSet(); showShop();
+      };
+      box.append(b);
+    });
+  };
+  row($('shBall'), BALLS, 'b', 'ball', ballSw, true);
+  row($('shFlip'), FLIPS, 'f', 'flip', flipSw, true);
+  row($('shBg'), BGS, 't', 'bg', b => `linear-gradient(${b.g[0]},${b.g[1]},${b.g[2]})`);
+  row($('shDance'), DANCES, 'd', 'dance');
+  hide('menu'); show('shop');
+}
+$('bShop').onclick = () => { SFX.init(); showShop(); };
+$('bShopBack').onclick = () => { hide('shop'); show('menu'); };
+function showDaily() {
+  const C = dailyC(), R = dailyRec(), L = DUELS[C.li];
+  $('dSub').textContent = 'Samme bane, boss og regel for alle i dag. En ny kommer i morgen.';
+  const dl = $('dInfo'); dl.textContent = '';
+  [['Dato', C.daily], ['Bane', L.name + (L.giant ? ' (kæmpebane)' : '')], ['Boss', C.rush ? 'Boss-rush: ' + C.rush.map(k => BOSS[k].n).join(', ') : BOSS[C.boss].n + ' · ' + Math.round(BOSS[C.boss].hp * C.mul * (C.mod === 'tiny' ? .85 : 1)) + ' træf'],
+   ['Regel', MODS[C.mod].n], ['Tid', fmtTime(C.time)], ['Din rekord i dag', R.won ? '★'.repeat(R.st) + ' · ' + R.hp + ' liv · ' + fmtTime(R.t) : R.tries ? 'Ikke klaret endnu (' + R.tries + ' forsøg)' : '–'],
+   ['Stime', R.streak && (R.last === dayKey() || R.last === dayKey(-1)) ? R.streak + (R.streak === 1 ? ' dag' : ' dage') : '0 dage'], ['Belønning', R.won ? '15 mønter pr. sejr' : (50 + Math.min(R.streak + 1, 7) * 5) + ' mønter første gang']]
+    .forEach(([k, v]) => { const dt = document.createElement('dt'), dd = document.createElement('dd'); dt.textContent = k; dd.textContent = String(v); dl.append(dt, dd); });
+  drawLoadout('b', $('dSkl'), $('dSklHint'));
+  hide('menu'); hide('over'); show('daily');
+}
+$('bDaily').onclick = () => { SFX.init(); showDaily(); };
+$('bDailyGo').onclick = () => startCamp(DAILY);
+$('bDailyBack').onclick = () => { hide('daily'); show('menu'); };
+// menu labels that change: coins, today's challenge, Kaos-fredag
+function menuLabels() {
+  $('bShop').textContent = 'Butik · 🪙 ' + SHOP.coins;
+  $('bDaily').textContent = 'Dagens udfordring' + (dailyRec().won ? ' ✓' : '');
+  $('kaosFri').hidden = !kaosFri();
+}
+menuLabels(); setInterval(() => { if (!$('menu').hidden) menuLabels(); }, 500);
 $('bSk').onclick = () => { SFX.init(); showPick(); };
 $('bPickDone').onclick = () => { hide('pick'); show('menu'); menuSkills(); };
 $('bProfBack').onclick = () => { hide('prof'); show('menu'); };
 function startCamp(i) {
-  const C = CAMP[i]; if (!C) return;
-  SFX.init(); menuErr(); hide('camp');
+  const C = campC(i); if (!C) return;
+  SFX.init(); menuErr(); hide('camp'); hide('daily');
   G.camp = i; startGame('duel', 'boss', [myName(), 'BOSS']); G.camp = i; startMatch(); layout();
 }
 function drawLoadout(m, box, hint) {
@@ -3442,17 +3657,40 @@ setInterval(() => {
     G.rid = -1; G.phase = 'count'; layout();
   } else lobbyRefresh();
 }, 200);
+// coins for a finished match; Kaos-fredag gives 50% extra
+function earn(n) {
+  if (G.demo || n <= 0) return 0;
+  n = Math.round(n * (kaosFri() ? 1.5 : 1));
+  SHOP.coins += n; saveShop(); stat('coins', n);
+  return n;
+}
+const coinNote = n => n ? ' +' + n + ' mønter' + (kaosFri() ? ' (Kaos-fredag!)' : '') + '.' : '';
+function dailyResult() {
+  const R = dailyRec(), won = G.winner === 0, hp = Math.round(hpOf(0)), first = won && !R.won;
+  let st = 0; R.tries++;
+  if (won) {
+    const k = hpOf(0) / MAXHP; st = k > .6 ? 3 : k > .3 ? 2 : 1;
+    if (hp > R.hp || (hp === R.hp && (!R.t || G.t < R.t))) { R.hp = hp; R.t = Math.round(G.t); }
+    R.st = Math.max(R.st, st);
+    if (first) { R.streak = R.last === dayKey(-1) ? R.streak + 1 : 1; R.last = dayKey(); R.days++; }
+    R.won = 1;
+  }
+  store.set('fd-daily', JSON.stringify(R));
+  return { won, st, first, coins: earn(won ? (first ? 50 + Math.min(R.streak, 7) * 5 : 15) : 5) };
+}
 function campResult() {
   const i = G.camp, won = G.winner === 0, mw0 = megaWins();
   let st = 0;
   if (won) {
     if (G.mode === 'duel') { const k = hpOf(0) / MAXHP; st = k > .6 ? 3 : k > .3 ? 2 : 1; }
     else { const t = G.tables[0], d = t.score[0] - t.score[1]; st = t.score[1] === 0 ? 3 : d >= 2 ? 2 : 1; }
-    const a = campStars(); a[i] = Math.max(a[i] | 0, st); store.set('fd-camp', JSON.stringify(a));
+    const a = campStars(), firstClear = !(a[i] | 0); a[i] = Math.max(a[i] | 0, st); store.set('fd-camp', JSON.stringify(a));
+    st = { st, coins: earn(15 + st * 5 + (firstClear ? 20 : 0)) };
     stat('camp', 1); stat('fastBoss', Math.round(G.t), 'min');
     if (megaWins() > mw0) { const nu = SKILL_KEYS.filter(k => SKILLS[k].u === megaWins()).map(k => SKILLS[k].n); G.unlocks.push(...[...new Set(nu)].map(n => 'evnen ' + n)); }
+    return { won, st: st.st, coins: st.coins };
   }
-  return { won, st };
+  return { won, st, coins: earn(3) };
 }
 function unlockNote() {
   if (!G.unlocks.length) return;
@@ -3461,15 +3699,26 @@ function unlockNote() {
 function showOver() {
   SFX.music(false);
   const camp = G.camp >= 0;
-  $('bNext').hidden = true; $('bCampList').hidden = !camp; $('bRe').textContent = camp ? 'Prøv igen' : 'Revanche';
+  $('bNext').hidden = true; $('bCampList').hidden = !camp || G.camp === DAILY; $('bRe').textContent = camp ? 'Prøv igen' : 'Revanche';
+  if (G.camp === DAILY) {
+    const r = dailyResult(), R = dailyRec();
+    $('overTitle').textContent = r.won ? 'DAGENS UDFORDRING KLARET!' : 'BOSSEN VANDT';
+    $('overTitle').style.color = r.won ? 'var(--gold)' : 'var(--p2)';
+    $('overScore').textContent = r.won ? '★'.repeat(r.st) + '☆'.repeat(3 - r.st) : (G.t >= soloTime() ? 'Tiden løb ud' : 'Du løb tør for liv') + '. Prøv igen!';
+    $('overStatus').textContent = (R.won ? 'Dagens rekord: ' + R.hp + ' liv tilbage på ' + fmtTime(R.t) + '. ' : '') + 'Forsøg i dag: ' + R.tries + '.' + (R.streak && R.last === dayKey() ? ' Stime: ' + R.streak + (R.streak === 1 ? ' dag' : ' dage') + ' i træk.' : '') + coinNote(r.coins);
+    $('bRe').disabled = false;
+    if (r.won) { const t = G.tables[0], cy = t.cam.y + t.cam.h * .4; t.burst(t.L.cx, cy, '#ffd84a', 80, 600, 1.4, 5, 200); playDance(); }
+    unlockNote(); show('over'); return;
+  }
   if (camp) {
     const r = campResult(), last = G.camp === CAMP.length - 1;
     $('overTitle').textContent = r.won ? (last ? 'KAMPAGNEN KLARET!' : 'BOSSEN ER BESEJRET!') : 'BOSSEN VANDT';
     $('overTitle').style.color = r.won ? 'var(--gold)' : 'var(--p2)';
     $('overScore').textContent = r.won ? '★'.repeat(r.st) + '☆'.repeat(3 - r.st) : (G.t >= soloTime() ? 'Tiden løb ud' : 'Du løb tør for liv') + '. Prøv igen!';
     $('overStatus').textContent = (G.camp + 1) + ' / ' + CAMP.length + ' · ' + (CAMP[G.camp].rush ? 'Boss-rush' : (CAMP[G.camp].mega ? 'MEGA-' : '') + BOSS[CAMP[G.camp].boss].n);
+    $('overStatus').textContent += '.' + coinNote(r.coins);
     $('bNext').hidden = !r.won || last; $('bRe').disabled = false;
-    if (r.won) { const t = G.tables[0], cy = t.cam.y + t.cam.h * .4; t.burst(t.L.cx, cy, '#ffd84a', 80, 600, 1.4, 5, 200); }
+    if (r.won) { const t = G.tables[0], cy = t.cam.y + t.cam.h * .4; t.burst(t.L.cx, cy, '#ffd84a', 80, 600, 1.4, 5, 200); playDance(); }
     unlockNote(); show('over'); return;
   }
   let w = G.winner;
@@ -3483,7 +3732,10 @@ function showOver() {
   $('overScore').textContent = `${clean(G.names[0])} ${a} – ${b} ${clean(G.names[1])}`;
   $('overStatus').textContent = ''; $('bRe').disabled = false; G.wantRe = false;
   if (vs) { stat('played', 1); if (meWon) { stat('won', 1); stat(G.mode === 'duel' ? 'duelW' : 'arenaW', 1); } if (online()) { stat('online', 1); if (meWon) stat('onlineW', 1); } }
+  const cn = earn(!vs ? 10 : online() ? (meWon ? 30 : 10) : meWon ? [10, 20, 30, 40][SET.cpu] || 20 : 5);
+  $('overStatus').textContent = coinNote(cn).trim();
   unlockNote();
+  if (meWon) playDance();
   if (meWon || !vs) { const t = G.tables[0], cy = t.cam.y + t.cam.h * .4; t.burst(t.L.cx, cy, '#ffd84a', 80, 600, 1.4, 5, 200); t.burst(t.L.cx, cy, COL[0], 60, 500, 1.2, 4, 200); }
   show('over');
 }
