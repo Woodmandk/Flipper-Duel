@@ -21,6 +21,14 @@ Banerne er brede og zoomet godt ud. I Duel følger kameraet kuglen og viser hele
 - **Missioner** – små opgaver med tidsfrist, fx "Ram 8 bumpere". Klarer du dem, mister modstanderen 30 liv.
 - **Ryst bordet** med `S` eller `↓`. Ryster du for meget, kommer der TILT.
 
+## Lyd, slowmotion og indstillinger
+
+- **Musik til hvert tema** – hver bane har sin egen musik og sin egen bumper-lyd: invader-march i Ruminvasion, maskinlarm i Kaosfabrikken, drømmende toner i Dybhavet, uhyggeligt orgel i Spøgelseshuset, stadion-stomp, isklokker, 8-bit og tromme-tribal i Arena.
+- **Slowmotion** – boss-drab, mål og den afgørende sejr spilles i slowmotion med filmstriber.
+- **Indstillinger og statistik** (i menuen) – vælg computerens sværhedsgrad (Let, Normal, Svær, Umulig), din kugle og din flipperfarve. Statistikken viser sejre, bosser, bedste combo, mål, skade og kampagne-stjerner.
+- **Kugler at låse op** – Guld (vind 3 kampe), Ild (besejr 5 bosser), Slim (combo på 20), Galakse (25 mål i Arena) og Regnbue (12 kampagne-stjerner).
+- **Emojis online** – send 😂 😮 🔥 😈 👏 til modstanderen med tasterne 1–5 eller knapperne øverst til venstre.
+
 ## SUPER-angreb
 
 Alt du rammer, lader din gule SUPER-måler op. Når den er fuld, kan du se hvilket angreb du har klar, og **du bestemmer selv hvornår du fyrer det af**.

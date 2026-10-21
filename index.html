@@ -84,6 +84,19 @@ button.btn.ghost{background:transparent;font-size:14px;padding:9px;}
 @keyframes supP{to{box-shadow:0 0 44px rgba(255,216,74,1);filter:brightness(1.15);}}
 @media (prefers-reduced-motion:reduce){.sup{animation:none;}}
 .quick{margin:0;padding-left:18px;display:grid;gap:6px;line-height:1.45;}
+.seg{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;}
+.seg button,.sw button{cursor:pointer;font-family:var(--body);font-weight:700;font-size:14px;color:var(--fg);background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:9px;padding:9px 4px;min-width:0;}
+.seg button[aria-pressed=true],.sw button[aria-pressed=true]{border-color:var(--gold);box-shadow:inset 0 0 0 1px var(--gold);background:rgba(255,216,74,.1);}
+.sw{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:6px;}
+.sw button{display:flex;flex-direction:column;align-items:center;gap:5px;font-size:13px;line-height:1.2;}
+.sw button small{font-weight:600;font-size:11px;color:var(--muted);}
+.sw i{width:26px;height:26px;border-radius:50%;display:block;background:var(--c);box-shadow:0 0 10px rgba(255,255,255,.25);}
+.sw button:disabled{cursor:not-allowed;}
+.sw button:disabled i{filter:grayscale(1) brightness(.5);}
+.stats{display:grid;grid-template-columns:1fr auto;gap:5px 14px;margin:0;font-size:14px;}
+.stats dt{color:var(--muted);} .stats dd{margin:0;text-align:right;font-family:var(--display);color:var(--gold);}
+.emo{position:fixed;z-index:6;display:flex;gap:6px;top:calc(env(safe-area-inset-top,0px) + 10px);left:max(10px,env(safe-area-inset-left,0px));}
+.emo button{cursor:pointer;width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:rgba(10,8,26,.7);font-size:19px;padding:0;touch-action:manipulation;}
 .hud button{cursor:pointer;width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:rgba(10,8,26,.7);color:var(--fg);font-size:16px;font-family:var(--body);font-weight:700;}
 .big{font-family:var(--display);font-size:clamp(30px,8vw,46px);text-align:center;margin:0;line-height:1.05;text-wrap:balance;}
 .score{font-family:var(--display);font-size:22px;text-align:center;color:var(--muted);}
@@ -99,6 +112,7 @@ button.btn.ghost{background:transparent;font-size:14px;padding:9px;}
   <button id="bHelp" type="button" aria-label="Sådan spiller du">?</button>
   <button id="bExit" type="button" aria-label="Tilbage til menuen">✕</button>
 </div>
+<div class="emo" id="emo" hidden aria-label="Send en reaktion"></div>
 <button class="sup" id="bSuper0" type="button" hidden>SUPER</button>
 <button class="sup" id="bSuper1" type="button" hidden>SUPER</button>
 
@@ -122,6 +136,7 @@ button.btn.ghost{background:transparent;font-size:14px;padding:9px;}
       <button class="btn" type="button" id="bCamp">Kampagne: boss-kampe</button>
       <button class="btn" type="button" id="bCpu">Spil mod computeren</button>
       <button class="btn" type="button" id="bLocal">2 spillere på samme skærm</button>
+      <button class="btn ghost" type="button" id="bProf">Indstillinger og statistik</button>
       <button class="btn ghost" type="button" id="bHelp2">Sådan spiller du</button>
     </div>
     <div class="field">
@@ -134,6 +149,17 @@ button.btn.ghost{background:transparent;font-size:14px;padding:9px;}
     <p class="info" id="menuInfo" hidden>Du er inviteret! Skriv dit navn og tryk Deltag.</p>
     <p class="err" id="menuErr" hidden></p>
     <p class="hint">Flippere <kbd>A</kbd> <kbd>D</kbd> · SUPER <kbd>W</kbd> · Ryst <kbd>S</kbd> · Mobil: tryk i venstre/højre side<br>Spiller 2 på samme skærm: <kbd>←</kbd> <kbd>→</kbd> · SUPER <kbd>↑</kbd> · Ryst <kbd>↓</kbd></p>
+  </div>
+</div>
+
+<div class="ov" id="prof" hidden>
+  <div class="card">
+    <h2>Indstillinger og statistik</h2>
+    <div class="field"><span class="lbl">Computerens sværhedsgrad</span><div class="seg" id="setCpu"></div></div>
+    <div class="field"><span class="lbl">Din kugle</span><div class="sw" id="setBall"></div></div>
+    <div class="field"><span class="lbl">Dine flippere</span><div class="sw" id="setFlip"></div></div>
+    <div class="field"><span class="lbl">Statistik</span><dl class="stats" id="stats"></dl></div>
+    <button class="btn" type="button" id="bProfBack">Tilbage</button>
   </div>
 </div>
 
@@ -173,6 +199,8 @@ button.btn.ghost{background:transparent;font-size:14px;padding:9px;}
         <li><b>Mist ikke kuglen</b>. Det koster dig selv liv.</li>
         <li><b>Hver bane har sin egen form og sit eget tema:</b> Neon Klassik, Ruminvasion (Space Invaders), Kaosfabrikken, Dybhavet og Spøgelseshuset. Kameraet følger kuglen.</li>
         <li><b>Ryst bordet</b> med <kbd>S</kbd> eller <kbd>↓</kbd> for at redde en kugle. Ryster du for meget, kommer der TILT.</li>
+        <li><b>Indstillinger og statistik</b> i menuen: vælg computerens sværhedsgrad, din kugle og dine flippers farve. Nye kugler låses op, når du spiller.</li>
+        <li><b>Online</b> kan du sende emojis til modstanderen med tasterne <kbd>1</kbd>–<kbd>5</kbd> eller knapperne øverst til venstre.</li>
       </ul>
     </section>
     <section>
@@ -307,18 +335,87 @@ const SFX = (() => {
     g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(.0008, t + d);
     s.connect(f); f.connect(g); g.connect(dest || master); s.start(t); s.stop(t + d + .03);
   }
-  const BASS = [55, 55, 43.65, 43.65, 65.41, 65.41, 49, 49];
-  const ARP = [[220, 261.6, 329.6], [174.6, 220, 261.6], [261.6, 329.6, 392], [196, 246.9, 293.7]];
+  // background music: one 16-step pattern per table theme
+  let song = 'neon';
+  const ch4 = (C, bar) => C[Math.floor(bar / 2) % 4];
+  const SONGS = {
+    neon(s, bar, t) {
+      const BASS = [55, 55, 43.65, 43.65, 65.41, 65.41, 49, 49], a = ch4([[220, 261.6, 329.6], [174.6, 220, 261.6], [261.6, 329.6, 392], [196, 246.9, 293.7]], bar);
+      if (s % 4 === 0) tone(110, .16, 'sine', .5, .35, t, mus);
+      if (s % 4 === 2) noise(.04, .12, 7000, t, mus);
+      if (s === 4 || s === 12) noise(.12, .14, 1500, t, mus, 'bandpass');
+      if (s % 2 === 0) tone(BASS[bar] * (s % 4 === 2 ? 2 : 1), .2, 'sawtooth', .09, 0, t, mus);
+      if (tempo > 120 || s % 2 === 0) tone(a[step % 3] * 2, .09, 'square', .025, 0, t, mus);
+    },
+    space(s, bar, t) { // the classic four-note invader march plus a chiptune arpeggio
+      const a = ch4([[220, 261.6, 329.6], [196, 246.9, 293.7], [174.6, 220, 261.6], [164.8, 207.7, 246.9]], bar);
+      if (s % 4 === 0) tone([98, 92.5, 87.3, 82.4][s / 4] * (bar % 4 === 3 ? 1.5 : 1), .22, 'square', .1, 0, t, mus);
+      if (s === 4 || s === 12) noise(.07, .12, 3500, t, mus, 'bandpass');
+      if (s % 2 === 1) noise(.02, .05, 8000, t, mus);
+      tone(a[s % 3] * 4, .05, 'square', .018, 0, t, mus);
+      if (s === 14 && bar % 2 === 0) tone(1600, .18, 'square', .03, .3, t, mus);
+    },
+    fabrik(s, bar, t) { // heavy machine beat with metal clangs
+      const r = [41.2, 41.2, 49, 36.7][Math.floor(bar / 2) % 4];
+      if (s === 0 || s === 6 || s === 8 || (s === 14 && bar % 2)) tone(62, .22, 'sine', .6, .4, t, mus);
+      if (s === 4 || s === 12) { noise(.16, .18, 2600, t, mus, 'bandpass'); tone(1870, .1, 'square', .025, .97, t, mus); }
+      if (s % 2 === 1) noise(.025, .07, 9000, t, mus);
+      if (s % 2 === 0) tone(r * (s % 8 === 6 ? 2 : 1), .14, 'sawtooth', .13, 0, t, mus);
+      if (s === 10 && bar % 4 === 3) tone(r * 16, .45, 'sawtooth', .035, .5, t, mus);
+    },
+    hav(s, bar, t) { // slow, dreamy pads, waves and bubbles
+      const a = ch4([[196, 246.9, 293.7], [164.8, 196, 246.9], [174.6, 220, 261.6], [146.8, 185, 220]], bar);
+      if (s === 0 && bar % 2 === 0) a.forEach(f => tone(f, 2.4, 'sine', .045, 0, t, mus));
+      if (s === 0 || s === 10) tone(a[0] / 2, .7, 'triangle', .2, 0, t, mus);
+      if (s % 4 === 2) tone(a[(s >> 2) % 3] * 2, .5, 'sine', .045, 0, t, mus);
+      if (s === 8 && bar % 2) noise(1.4, .07, 500, t, mus, 'lowpass');
+      if (s === 13 && Math.random() < .5) tone(rnd(700, 1100), .1, 'sine', .04, 1.9, t, mus);
+    },
+    spook(s, bar, t) { // creepy minor organ and a ghost wail
+      const a = ch4([[220, 261.6, 311.1], [207.7, 246.9, 293.7], [196, 233.1, 277.2], [207.7, 246.9, 311.1]], bar);
+      if (s === 0) { tone(a[0] / 4, .8, 'sine', .35, 0, t, mus); tone(a[0] / 2, .7, 'triangle', .14, 0, t, mus); }
+      if (s === 6 || s === 12) tone(a[1] / 2, .25, 'triangle', .09, 0, t, mus);
+      if (s % 4 === 0) { const f = a[(s >> 2) % 3] * 2; tone(f, .35, 'sine', .05, 0, t, mus); tone(f * 1.012, .35, 'sine', .04, 0, t, mus); }
+      if (s === 8) noise(.05, .08, 6000, t, mus);
+      if (s === 2 && bar % 4 === 3) tone(1318, 1.1, 'triangle', .04, .5, t, mus);
+    },
+    grass(s, bar, t) { // stadium stomp-stomp-clap and a brass hook
+      const a = ch4([[261.6, 329.6, 392], [349.2, 440, 523.3], [392, 493.9, 587.3], [261.6, 329.6, 392]], bar);
+      if (s === 0 || s === 2 || s === 8 || s === 10) tone(70, .2, 'sine', .55, .4, t, mus);
+      if (s === 4 || s === 12) { noise(.14, .2, 1400, t, mus, 'bandpass'); noise(.1, .1, 2200, t + .012, mus, 'bandpass'); }
+      if (s % 4 === 0) tone(a[0] / 2, .22, 'sawtooth', .08, 0, t, mus);
+      if (bar % 2 === 1 && (s === 0 || s === 3 || s === 6)) tone(a[s / 3], .25, 'sawtooth', .04, 0, t, mus);
+    },
+    ice(s, bar, t) { // glassy bells over a soft beat
+      const a = ch4([[329.6, 392, 493.9], [293.7, 370, 440], [261.6, 329.6, 392], [293.7, 370, 440]], bar);
+      if (s === 0 || s === 8) tone(a[0] / 4, .5, 'sine', .4, .5, t, mus);
+      if (s % 2 === 1) noise(.02, .05, 10000, t, mus);
+      if (s === 4 || s === 12) noise(.08, .1, 5000, t, mus, 'bandpass');
+      if (s % 3 === 0) { const f = a[(s / 3) % 3] * 4; tone(f, .6, 'triangle', .035, 0, t, mus); tone(f * 2.76, .3, 'sine', .012, 0, t, mus); }
+    },
+    retro(s, bar, t) { // happy 8-bit
+      const a = ch4([[261.6, 329.6, 392], [220, 261.6, 329.6], [174.6, 220, 261.6], [196, 246.9, 293.7]], bar);
+      if (s % 4 === 0) tone(110, .12, 'square', .2, .3, t, mus);
+      if (s === 4 || s === 12) noise(.06, .12, 4000, t, mus, 'bandpass');
+      tone(a[0] / 2 * (s % 2 ? 2 : 1), .08, 'triangle', .12, 0, t, mus);
+      tone(a[s % 3] * (s >= 8 ? 4 : 2), .06, 'square', .022, 0, t, mus);
+    },
+    lava(s, bar, t) { // tribal drums over a low drone
+      const r = [36.7, 36.7, 41.2, 32.7][Math.floor(bar / 2) % 4];
+      if (s === 0 || s === 3 || s === 8 || s === 11) tone(65, .3, 'sine', .55, .35, t, mus);
+      if (s === 6 || s === 14) tone(140, .2, 'sine', .3, .5, t, mus);
+      if (s === 12) noise(.25, .16, 900, t, mus, 'bandpass');
+      if (s % 2 === 0) noise(.03, .05, 7000, t, mus);
+      if (s === 0) tone(r, 1.6, 'sawtooth', .1, 0, t, mus);
+      if (s === 8 && bar % 2) tone(r * 6, .5, 'sawtooth', .03, .7, t, mus);
+    },
+  };
   function sched() {
     if (!ac || !musicOn) return;
     if (nextT < ac.currentTime) nextT = ac.currentTime + .05;
+    const play = SONGS[song] || SONGS.neon;
     while (nextT < ac.currentTime + .15) {
-      const s16 = step % 16, bar = Math.floor(step / 16) % 8, chord = Math.floor(bar / 2) % 4;
-      if (s16 % 4 === 0) { tone(110, .16, 'sine', .5, .35, nextT, mus); }
-      if (s16 % 4 === 2) noise(.04, .12, 7000, nextT, mus);
-      if (s16 === 4 || s16 === 12) noise(.12, .14, 1500, nextT, mus, 'bandpass');
-      if (s16 % 2 === 0) tone(BASS[bar] * (s16 % 4 === 2 ? 2 : 1), .2, 'sawtooth', .09, 0, nextT, mus);
-      if (tempo > 120 || s16 % 2 === 0) { const a = ARP[chord]; tone(a[step % 3] * 2, .09, 'square', .025, 0, nextT, mus); }
+      play(step % 16, Math.floor(step / 16) % 8, nextT);
       nextT += 60 / tempo / 4; step++;
     }
   }
@@ -327,8 +424,19 @@ const SFX = (() => {
     get muted() { return muted; },
     toggle() { muted = !muted; store.set('fd-mute', muted ? '1' : '0'); if (master) master.gain.value = muted ? 0 : .55; return muted; },
     music(on, bpm) { musicOn = on; if (bpm) tempo = bpm; },
+    theme(k) { song = k; },
+    slowmo() { tone(320, 1, 'sine', .16, .3); noise(.8, .08, 800, 0, null, 'lowpass'); },
+    emo() { tone(880, .08, 'triangle', .1); tone(1320, .12, 'triangle', .08, 0, ac ? ac.currentTime + .06 : 0); },
     flip() { tone(150, .05, 'square', .07, .5); noise(.03, .05, 3000); },
-    bumper() { tone(rnd(520, 760), .13, 'square', .12, .45); tone(1500, .05, 'sine', .07); },
+    bumper() { // each theme has its own bumper sound
+      if (song === 'space' || song === 'retro') { tone(1200, .12, 'square', .09, .25); return; }
+      if (song === 'fabrik') { noise(.12, .14, 3000, 0, null, 'bandpass'); tone(1870, .1, 'square', .05, .97); return; }
+      if (song === 'hav') { tone(rnd(300, 420), .14, 'sine', .22, 2.6); return; }
+      if (song === 'spook') { tone(rnd(500, 640), .3, 'triangle', .1, .5); tone(rnd(505, 645), .3, 'sine', .06, .5); return; }
+      if (song === 'ice') { const f = rnd(1300, 1800); tone(f, .35, 'triangle', .1); tone(f * 2.76, .2, 'sine', .03); return; }
+      if (song === 'lava') { tone(rnd(110, 150), .2, 'sine', .4, .4); noise(.12, .1, 700, 0, null, 'lowpass'); return; }
+      tone(rnd(520, 760), .13, 'square', .12, .45); tone(1500, .05, 'sine', .07);
+    },
     sling() { tone(330, .09, 'sawtooth', .1, .5); },
     roll(i) { tone(880 + i * 220, .1, 'triangle', .14); },
     jackpot() { [523, 659, 784, 1047].forEach((f, i) => tone(f, .16, 'square', .09, 0, ac ? ac.currentTime + i * .07 : 0)); },
@@ -1104,15 +1212,16 @@ class Table {
 
 /* ================= AI ================= */
 class AI {
-  constructor(skill) { this.skill = skill; this.hold = []; }
+  constructor(skill) { this.skill = skill; this.hold = []; this.skip = []; }
   press(t, fi, dt) {
     if (this.hold[fi] > 0) { this.hold[fi] -= dt; return true; }
+    if (this.skip[fi] > 0) { this.skip[fi] -= dt; return false; }
     const f = t.fl[fi], c = Math.cos(f.rest), s = Math.sin(f.rest);
     const tx = f.px + f.sx * f.len * c, ty = f.py + f.sy * f.len * s;
     for (const b of t.balls) {
       const q = closest(b.x, b.y, f.px, f.py, tx, ty), d = Math.hypot(b.x - q[0], b.y - q[1]);
       const toward = f.sy > 0 ? b.vy > -60 : b.vy < 60;
-      if (d < 30 && toward && q[2] > .15 && Math.random() < this.skill) { this.hold[fi] = rnd(.14, .24); return true; }
+      if (d < 30 && toward && q[2] > .15) { if (Math.random() < this.skill) { this.hold[fi] = rnd(.14, .24); return true; } this.skip[fi] = .3; return false; }
     }
     return false;
   }
@@ -1127,6 +1236,7 @@ const G = {
   rid: 0, li: 0, camp: -1, atkSeq: 0, atkList: [], oppAtkSeen: 0, ai: [null, null], winner: -1, slow: 0, slowCd: 0,
   over: false, fxId: 0, fxList: [], fxSeen: 0, overdrive: false, me: 0, flash: 0,
   nextAtk: [null, null], aiFire: [0, 0], supReq: 0, supSeen: 0,
+  big: 0, unlocks: [], emSeq: 0, emIdx: 0, emSeen: 0, emCd: 0, emoList: [],
 };
 const DMG = { alien: 5, alienAll: 20, bumper: 2, sling: 1, roll: 3, rollAll: 10, drop: 4, dropAll: 12, kaos: 3, strike: 2, saucer: 3, orbit: 6, spin: 1, ramp: 8, portal: 2, bossHit: 4 };
 const BOSS_DMG = 100, BOSS_HURT = 15, MIS_DMG = 30;
@@ -1139,6 +1249,45 @@ const CAMP = [
   { li: 0, rush: ['crab', 'ufo', 'robot', 'kraken', 'ghost'], mul: 1.5, fin: 1, time: 480 },
 ];
 const SOLO_HP = 300, SOLO_HURT = 8;
+// settings, lifetime stats and unlockable balls (all kept on this device)
+const CPU_LV = [{ n: 'Let', s: .6, f: [4, 8] }, { n: 'Normal', s: .9, f: [1.5, 5] }, { n: 'Svær', s: .95, f: [.8, 2.5] }, { n: 'Umulig', s: 1, f: [.2, .6] }];
+const BALLS = [
+  { n: 'Sølv', c: ['#ffffff', '#c9c6e0', '#4a4668'] },
+  { n: 'Guld', c: ['#fff8d0', '#ffd84a', '#8a5a00'], need: () => STATS.won >= 3, how: 'Vind 3 kampe' },
+  { n: 'Ild', c: ['#fff0a0', '#ff7a30', '#7a1000'], need: () => STATS.boss >= 5, how: 'Besejr 5 bosser' },
+  { n: 'Slim', c: ['#f0fff0', '#7dff9a', '#0a5a2a'], need: () => STATS.combo >= 20, how: 'Lav en combo på 20' },
+  { n: 'Galakse', c: ['#efe4ff', '#7b6bff', '#140a40'], need: () => STATS.goals >= 25, how: 'Scor 25 mål i Arena' },
+  { n: 'Regnbue', rainbow: 1, c: ['#fff', '#f0f', '#0ff'], need: () => campStars().reduce((a, v) => a + (v | 0), 0) >= 12, how: 'Saml 12 kampagne-stjerner' },
+];
+const FLIPS = [{ n: 'Din farve', c: null }, { n: 'Guld', c: '#ffd84a' }, { n: 'Grøn', c: '#7dff9a' }, { n: 'Orange', c: '#ff9a3c' }, { n: 'Lilla', c: '#b98cff' }, { n: 'Hvid', c: '#ffffff' }];
+const loadJ = (k, d) => { try { const v = JSON.parse(store.get(k, '{}')); return Object.assign(d, v && typeof v === 'object' ? v : {}); } catch (e) { return d; } };
+const SET = loadJ('fd-set', { cpu: 1, ball: 0, flip: 0 });
+const STATS = loadJ('fd-stats', { played: 0, won: 0, duelW: 0, arenaW: 0, online: 0, onlineW: 0, boss: 0, combo: 0, goals: 0, supers: 0, dmg: 0, camp: 0, fastBoss: 0 });
+const cpuLv = () => CPU_LV[SET.cpu] || CPU_LV[1];
+const ballOpen = i => !!BALLS[i] && (!BALLS[i].need || BALLS[i].need());
+const saveSet = () => store.set('fd-set', JSON.stringify(SET));
+function stat(k, v, how) {
+  if (G.demo) return;
+  const before = BALLS.map((b, i) => ballOpen(i));
+  STATS[k] = how === 'max' ? Math.max(STATS[k] | 0, v) : how === 'min' ? (STATS[k] ? Math.min(STATS[k], v) : v) : (STATS[k] | 0) + v;
+  store.set('fd-stats', JSON.stringify(STATS));
+  BALLS.forEach((b, i) => {
+    if (before[i] || !ballOpen(i)) return;
+    G.unlocks.push(b.n); SFX.jackpot();
+    const t = G.tables[0]; if (t) t.ban('NY KUGLE: ' + b.n.toUpperCase() + '!', '#ffd84a', 2.2, 'Vælg den under Indstillinger');
+  });
+}
+// big moments (boss down, goal, round won) play out in slow motion
+function bigMoment(d) {
+  if (REDUCED || G.demo) return;
+  G.slow = Math.max(G.slow, d); G.slowCd = d + 1.5; G.big = d; SFX.slowmo();
+}
+// online emoji reactions
+const EMOJI = ['😂', '😮', '🔥', '😈', '👏'];
+function sendEmo(i) {
+  if (!online() || G.demo || !EMOJI[i] || G.emCd > 0) return;
+  G.emCd = .7; G.emSeq++; G.emIdx = i; G.emoList.push({ e: EMOJI[i], t: 2.2, me: 1, x: rnd(-20, 20) }); SFX.emo();
+}
 const soloTime = () => (CAMP[G.camp] && CAMP[G.camp].time) || 300;
 const goalsNeeded = () => ARENA_GOALS;
 const campStars = () => { try { const a = JSON.parse(store.get('fd-camp', '[]')); return Array.isArray(a) ? a.map(v => v | 0) : []; } catch (e) { return []; } };
@@ -1150,7 +1299,7 @@ const duelL = () => DUELS[G.li] || DUELS[0];
 function startDemo() {
   G.demo = true; G.phase = 'play'; G.type = 'cpu';
   G.tables = G.mode === 'duel' ? [new Table('duel', pick(DUELS)), new Table('duel', pick(DUELS))] : [new Table('arena', pick(ARENAS))];
-  G.ai = [new AI(.5), new AI(.5)];
+  G.ai = [new AI(.9), new AI(.9)];
   G.tables.forEach((t, i) => { t.hook = (ty, d) => fxOnly(t, i, ty, d); t.labelT = 1e9; });
   G.me = 0; G.overdrive = false;
   SFX.music(false);
@@ -1161,7 +1310,7 @@ function startGame(mode, type, names) {
   G.me = (type === 'guest' && mode === 'arena') ? 1 : 0; G.supReq = 0; G.supSeen = 0;
   if (mode === 'duel') G.tables = online() || type === 'boss' ? [new Table('duel')] : [new Table('duel'), new Table('duel')];
   else G.tables = [new Table('arena')];
-  G.ai = [null, type === 'cpu' ? new AI(.55) : null];
+  G.ai = [null, type === 'cpu' ? new AI(cpuLv().s) : null];
   G.tables.forEach((t, i) => t.hook = (ty, d) => onEvent(i, ty, d));
   hide('menu'); hide('lobby'); hide('over'); hide('help'); show('hud');
   startMatch();
@@ -1186,6 +1335,8 @@ function endRound(w) {
   if (G.phase !== 'play') return;
   G.winner = w; if (w >= 0) G.wins[w]++;
   G.phase = 'roundover'; G.overT = 3.2;
+  if (w >= 0) bigMoment(1.4);
+  if (G.mode === 'duel' && G.type !== 'boss') stat('dmg', Math.round(G.dealt[0]));
   SFX.music(false);
   if (w >= 0) { SFX.win(); const t = tableOf(w); if (t) { t.ban('VINDER!', COL[w], 3); t.boom(t.L.cx, t.cam.y + t.cam.h * .4, COL[w], true); } }
 }
@@ -1285,6 +1436,7 @@ function onEvent(i, type, d) {
     if (playing) { const h = G.type === 'boss' ? SOLO_HURT : BOSS_HURT; G.drain[p] += h; t.text(d.x, d.y, 'BOSS-ANGREB −' + h, '#ff4060', 20); }
     return;
   }
+  if (type === 'bossDown' && playing) { bigMoment(1.1); if (p === 0) stat('boss', 1); }
   if (type === 'bossDown' && G.type === 'boss') {
     if (playing) {
       const left = t.rush ? t.rush.length - 1 : 0;
@@ -1299,6 +1451,7 @@ function onEvent(i, type, d) {
   }
   if (DMG[type] != null) {
     t.combo = t.comboT > 0 ? t.combo + 1 : 1; t.comboT = 1.6;
+    if (p === 0 && playing && t.combo > (STATS.combo | 0)) stat('combo', t.combo, 'max');
     const mult = (G.overdrive ? 2 : 1) * (t.eff.x2 > 0 ? 2 : 1) * (t.combo >= 5 ? 1.25 : 1) * (type === 'bumper' && t.eff.rage > 0 ? 3 : 1);
     const dmg = Math.round(DMG[type] * mult * (type === 'ramp' ? Math.min(4, t.rampN) : 1));
     if (type === 'bumper') { SFX.bumper(); t.burst(d.x, d.y, c, 12, 300, .4); t.ring(d.x, d.y, 46, c, .3, 3); t.punch = Math.max(t.punch, .25); }
@@ -1356,6 +1509,7 @@ function onArenaEvent(t, type, d) {
     case 'goal':
       SFX.goal(); t.boom(d.x, d.y, COL[1 - d.p], true);
       if (!playing) break;
+      bigMoment(.9); if (d.p === G.me) stat('goals', 1);
       { const two = t.dbl[d.p] > 0; t.score[d.p] = Math.min(goalsNeeded(), t.score[d.p] + (two ? 2 : 1)); t.dbl[d.p] = 0; t.goals++; t.ban(two ? 'DOBBELT MÅL!' : 'MÅL!', COL[d.p], 1.3, clean(G.names[d.p === G.me ? 0 : 1]).toUpperCase() + ' SCORER'); } pushFx('g', d.x, d.y, d.p); vibrate(150);
       chargeMeter(1 - d.p, 20);
       if (t.score[d.p] >= goalsNeeded()) endRound(d.p);
@@ -1385,7 +1539,7 @@ function chargeMeter(p, amt) {
   if (G.meter[p] < 100) return;
   const arena = G.mode === 'arena';
   G.nextAtk[p] = pick(arena ? ABIL_KEYS : Object.keys(ATK));
-  if (G.ai[p]) G.aiFire[p] = rnd(1.5, 5);
+  if (G.ai[p]) G.aiFire[p] = rnd(...cpuLv().f);
   const t = tableOf(p), info = arena ? ABIL[G.nextAtk[p]] : ATK[G.nextAtk[p]];
   if (t && isHuman(p) && !(arena && G.type === 'local')) { SFX.beep(true); t.ban('SUPER KLAR!', '#ffd84a', 1.3, info.n.replace('!', '') + ' · ' + fireKeys(p)); }
   else if (isHuman(p)) SFX.beep(true);
@@ -1396,6 +1550,7 @@ function humanNudge(p) {
 }
 function humanFire(p) {
   if (G.phase !== 'play' || G.demo || G.ai[p]) return;
+  if (p === 0 && G.meter[G.mode === 'arena' && G.type === 'guest' ? 1 : 0] >= 100) stat('supers', 1);
   if (G.mode === 'arena' && G.type === 'guest') { if (G.meter[1] >= 100) G.supReq++; return; }
   fireSuper(p);
 }
@@ -1504,6 +1659,7 @@ async function netJoin(code, role) {
   await Net.r.presence({ n: myName(), role, mode: G.mode, ph: 'lobby', rid: 0 });
 }
 function netLeave() {
+  G.emSeen = 0; G.emoList = [];
   Net.unsub.forEach(u => { try { u(); } catch (e) {} }); Net.unsub = [];
   if (Net.r) { Net.r.leave().catch(() => {}); }
   Net.r = null; Net.role = null; Net.opp = null; Net.oppPeer = null;
@@ -1547,6 +1703,7 @@ function netSend(now) {
     if (Net.role === 'host') Object.assign(P.ar, { am: G.meter.map(Math.round), an: G.nextAtk.map(k => ABIL_KEYS.indexOf(k)), fz: t.frz.map(r1), fi: r1(t.fire) });
   }
   if (G.over) P.re = G.wantRe ? 1 : 0;
+  if (G.emSeq) P.em = [G.emSeq, G.emIdx];
   Net.r.presence(P).catch(() => {});
 }
 function netFollow(op) {
@@ -1644,6 +1801,7 @@ addEventListener('keydown', e => {
   keys.add(e.code); if (e.code.startsWith('Arrow') || e.code === 'Space') e.preventDefault(); SFX.init();
   if (!e.repeat && [...SUP0, ...SUP1].includes(e.code)) humanFire(G.type === 'local' && SUP1.includes(e.code) ? 1 : 0);
   if (!e.repeat && [...NUD0, ...NUD1].includes(e.code)) humanNudge(G.type === 'local' && NUD1.includes(e.code) ? 1 : 0);
+  if (!e.repeat && /^Digit[1-5]$/.test(e.code)) sendEmo(+e.code.slice(5) - 1);
 });
 addEventListener('keyup', e => keys.delete(e.code));
 addEventListener('blur', () => { keys.clear(); ptrs.clear(); });
@@ -1708,6 +1866,14 @@ function update(dt, now) {
   }
   applyInputs(dt);
   const authority = !online() || G.type === 'host';
+  if (!G.demo && G.tables[0]) SFX.theme(G.tables[0].L.theme);
+  if (G.big > 0) G.big -= dt;
+  G.emCd -= dt; G.emoList = G.emoList.filter(e => (e.t -= dt) > 0);
+  { const eh = !online() || G.demo; if (EMO.hidden !== eh) EMO.hidden = eh; }
+  if (online() && Net.opp && Net.opp.presence) {
+    const oe = Net.opp.presence.em;
+    if (Array.isArray(oe) && oe[0] > G.emSeen) { G.emSeen = oe[0] | 0; if (EMOJI[oe[1]]) { G.emoList.push({ e: EMOJI[oe[1]], t: 2.4, me: 0, x: rnd(-40, 40) }); SFX.emo(); } }
+  }
   if (G.type === 'guest') netFollow(Net.opp);
   if (G.mode === 'duel' && online()) oppDuel(Net.opp);
   if (G.mode === 'arena' && G.type === 'guest') oppArenaGuest(Net.opp);
@@ -2011,6 +2177,7 @@ function drawBoss(t, now) {
 
 function drawTable(t, R, pi, opt = {}) {
   const col = COL[pi], rgb = COLRGB[pi], now = performance.now() / 1000;
+  const mineT = !G.demo && pi === 0 && t !== G.ghost, myFl = FLIPS[SET.flip] && FLIPS[SET.flip].c;
   const L = t.L, duel = t.kind === 'duel', TH = L.H, TT = THEMES[L.theme] || THEMES.neon, wcol = TT.wall || col, bcol = TT.bc || col;
   const cam = opt.mini || opt.full ? { y: 0, h: TH } : t.cam, z = Math.min(W / L.W, H / cam.h), ox = (W - L.W * z) / 2, oy = Math.max(0, (H - cam.h * z) / 2);
   // world point -> viewport point (the W x H box on screen)
@@ -2182,7 +2349,7 @@ function drawTable(t, R, pi, opt = {}) {
   // flippers
   for (let i = 0; i < t.fl.length; i++) {
     const f = t.fl[i];
-    let fc = duel ? (t.tilt > 0 ? '#5a5470' : t.eff.mir > 0 ? '#ff7a30' : t.eff.small > 0 ? '#ff4060' : t.eff.big > 0 ? '#ffd84a' : col) : COL[f.p];
+    let fc = duel ? (t.tilt > 0 ? '#5a5470' : t.eff.mir > 0 ? '#ff7a30' : t.eff.small > 0 ? '#ff4060' : t.eff.big > 0 ? '#ffd84a' : (mineT && myFl) || col) : (!G.demo && f.p === G.me && myFl) || COL[f.p];
     if (!duel) { const p = f.p; if (t.frz[p] > 0) fc = '#d8f8ff'; else if (t.slowP[p] > 0) fc = '#b98cff'; else if (t.bigP[p] > 0) fc = '#ffd84a'; }
     const tx = f.px + f.sx * f.len * Math.cos(f.a), ty = f.py + f.sy * f.len * Math.sin(f.a);
     const ang = Math.atan2(ty - f.py, tx - f.px), nx = -Math.sin(ang), ny = Math.cos(ang), fr = f.len < 56 ? 8 : 10;
@@ -2202,7 +2369,11 @@ function drawTable(t, R, pi, opt = {}) {
     if (b.ramp) { ctx.fillStyle = 'rgba(0,0,0,.45)'; ctx.beginPath(); ctx.arc(b.x + 6, b.y + 9, b.r * 1.2, 0, TAU); ctx.fill(); }
     const r = b.r * up, bg = ctx.createRadialGradient(b.x - 3, b.y - 3, 1, b.x, b.y, r);
     if (b.bomb) { bg.addColorStop(0, '#ffd0c0'); bg.addColorStop(.5, '#ff3030'); bg.addColorStop(1, '#600'); }
-    else { bg.addColorStop(0, '#ffffff'); bg.addColorStop(.55, '#c9c6e0'); bg.addColorStop(1, '#4a4668'); }
+    else {
+      const sk = (duel ? mineT : !G.demo && t.last === G.me) && ballOpen(SET.ball) ? BALLS[SET.ball] : BALLS[0], h = now * 220 % 360;
+      const c3 = sk.rainbow ? [`hsl(${h},100%,88%)`, `hsl(${(h + 70) % 360},100%,60%)`, `hsl(${(h + 140) % 360},90%,30%)`] : sk.c;
+      bg.addColorStop(0, c3[0]); bg.addColorStop(.55, c3[1]); bg.addColorStop(1, c3[2]);
+    }
     ctx.fillStyle = `rgba(${tc},.25)`; ctx.beginPath(); ctx.arc(b.x, b.y, r + 6, 0, TAU); ctx.fill();
     if (b.extra && b.life < 1.5 && Math.sin(now * 24) < 0) ctx.globalAlpha = .35;
     if (!duel && t.fire > 0) { ctx.fillStyle = 'rgba(255,122,48,.55)'; ctx.beginPath(); ctx.arc(b.x, b.y, r + 8 + 4 * Math.sin(now * 30), 0, TAU); ctx.fill(); if (t.parts.length < 900) t.parts.push({ x: b.x + rnd(-4, 4), y: b.y + rnd(-4, 4), vx: rnd(-60, 60), vy: rnd(-60, 60), life: .35, max: .35, col: Math.random() < .5 ? '#ff7a30' : '#ffd84a', size: 3 }); }
@@ -2409,6 +2580,28 @@ function drawCenter() {
   }
 }
 
+function drawMoments(now) {
+  const cw = LAY.cw, ch = LAY.ch;
+  if (G.big > 0 && !G.demo) { // cinematic bars while a big moment plays in slow motion
+    const k = clamp(Math.min(G.big, 1.6 - G.big) * 4, 0, 1), bh = ch * .07 * k;
+    ctx.fillStyle = 'rgba(0,0,0,.85)'; ctx.fillRect(0, 0, cw, bh); ctx.fillRect(0, ch - bh, cw, bh);
+    const v = ctx.createRadialGradient(cw / 2, ch / 2, Math.min(cw, ch) * .3, cw / 2, ch / 2, Math.max(cw, ch) * .75);
+    v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, `rgba(0,0,0,${.5 * k})`); ctx.fillStyle = v; ctx.fillRect(0, 0, cw, ch);
+  }
+  for (const e of G.emoList) { // emoji reactions float up; the opponent's are big, yours small
+    const a = clamp(e.t * 2, 0, 1), rise = (2.4 - e.t) * 40;
+    ctx.save(); ctx.globalAlpha = a; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    if (e.me) { ctx.font = '34px sans-serif'; ctx.fillText(e.e, 120 + e.x, 110 - rise * .5); }
+    else {
+      const x = cw / 2 + e.x, y = ch * .3 - rise, sc = 1 + Math.max(0, e.t - 2) * 2;
+      ctx.translate(x, y); ctx.scale(sc, sc);
+      ctx.fillStyle = 'rgba(6,4,18,.7)'; ctx.beginPath(); ctx.arc(0, 0, 46, 0, TAU); ctx.fill(); ctx.strokeStyle = COL[1]; ctx.lineWidth = 2; ctx.stroke();
+      ctx.font = '56px sans-serif'; ctx.fillText(e.e, 0, 3);
+      ctx.font = '12px Bungee, sans-serif'; ctx.fillStyle = COL[1]; ctx.fillText(clean(G.names[1]).toUpperCase(), 0, 62);
+    }
+    ctx.restore();
+  }
+}
 function render(now) {
   ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
   drawBackground(now);
@@ -2436,6 +2629,7 @@ function render(now) {
     }
   }
   if (G.demo) { ctx.fillStyle = 'rgba(7,6,15,.5)'; ctx.fillRect(0, 0, LAY.cw, LAY.ch); }
+  drawMoments(now);
   drawCenter();
   superButtons();
 }
@@ -2493,6 +2687,33 @@ $('bHelpClose').onclick = () => hide('help');
 $('bMute').onclick = () => { SFX.init(); $('bMute').textContent = SFX.toggle() ? '×' : '♪'; };
 $('bMute').textContent = SFX.muted ? '×' : '♪';
 $('bMenu').onclick = () => toMenu();
+const EMO = $('emo');
+EMOJI.forEach((e, i) => { const b = document.createElement('button'); b.type = 'button'; b.textContent = e; b.title = 'Send ' + e + ' (tast ' + (i + 1) + ')'; b.addEventListener('pointerdown', ev => { ev.preventDefault(); ev.stopPropagation(); SFX.init(); sendEmo(i); }); EMO.append(b); });
+function fmtTime(s) { return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); }
+function showProf() {
+  const mk = (box, items, cur, pick, swatch, lock) => {
+    box.textContent = '';
+    items.forEach((it, i) => {
+      const b = document.createElement('button'); b.type = 'button'; b.setAttribute('aria-pressed', i === cur);
+      if (swatch) { const ic = document.createElement('i'); ic.style.setProperty('--c', swatch(it)); b.append(ic); }
+      const nm = document.createElement('span'); nm.textContent = it.n; b.append(nm);
+      if (lock && lock(i)) { b.disabled = true; const sm = document.createElement('small'); sm.textContent = '🔒 ' + it.how; b.append(sm); }
+      b.onclick = () => { pick(i); saveSet(); showProf(); };
+      box.append(b);
+    });
+  };
+  mk($('setCpu'), CPU_LV, SET.cpu, i => SET.cpu = i);
+  mk($('setBall'), BALLS, SET.ball, i => SET.ball = i, b => b.rainbow ? 'conic-gradient(#f44,#fd4,#4f8,#4df,#a4f,#f44)' : `radial-gradient(circle at 35% 35%, ${b.c[0]}, ${b.c[1]} 55%, ${b.c[2]})`, i => !ballOpen(i));
+  mk($('setFlip'), FLIPS, SET.flip, i => SET.flip = i, f => f.c || 'linear-gradient(90deg,var(--p1),var(--p2))');
+  const st = campStars().reduce((a, v) => a + (v | 0), 0), dl = $('stats'); dl.textContent = '';
+  [['Kampe spillet', STATS.played], ['Sejre', STATS.won], ['Sejre i Duel / Arena', STATS.duelW + ' / ' + STATS.arenaW], ['Online-kampe (sejre)', STATS.online + ' (' + STATS.onlineW + ')'],
+   ['Bosser besejret', STATS.boss], ['Bedste combo', STATS.combo], ['Mål i Arena', STATS.goals], ['SUPER fyret af', STATS.supers],
+   ['Skade i alt', STATS.dmg], ['Kampagne-stjerner', st + ' / ' + CAMP.length * 3], ['Hurtigste boss-kamp', STATS.fastBoss ? fmtTime(STATS.fastBoss) : '–']]
+    .forEach(([k, v]) => { const dt = document.createElement('dt'), dd = document.createElement('dd'); dt.textContent = k; dd.textContent = String(v); dl.append(dt, dd); });
+  hide('menu'); show('prof');
+}
+$('bProf').onclick = () => { SFX.init(); showProf(); };
+$('bProfBack').onclick = () => { hide('prof'); show('menu'); };
 function startCamp(i) {
   const C = CAMP[i]; if (!C) return;
   SFX.init(); menuErr(); hide('camp');
@@ -2600,8 +2821,13 @@ function campResult() {
     if (G.mode === 'duel') { const k = hpOf(0) / MAXHP; st = k > .6 ? 3 : k > .3 ? 2 : 1; }
     else { const t = G.tables[0], d = t.score[0] - t.score[1]; st = t.score[1] === 0 ? 3 : d >= 2 ? 2 : 1; }
     const a = campStars(); a[i] = Math.max(a[i] | 0, st); store.set('fd-camp', JSON.stringify(a));
+    stat('camp', 1); stat('fastBoss', Math.round(G.t), 'min');
   }
   return { won, st };
+}
+function unlockNote() {
+  if (!G.unlocks.length) return;
+  $('overStatus').textContent = ($('overStatus').textContent + ' Ny kugle låst op: ' + G.unlocks.join(', ') + '!').trim(); G.unlocks = [];
 }
 function showOver() {
   SFX.music(false);
@@ -2615,7 +2841,7 @@ function showOver() {
     $('overStatus').textContent = (G.camp + 1) + ' / ' + CAMP.length + ' · ' + (CAMP[G.camp].fin ? 'Boss-rush' : BOSS[CAMP[G.camp].boss].n);
     $('bNext').hidden = !r.won || last; $('bRe').disabled = false;
     if (r.won) { const t = G.tables[0], cy = t.cam.y + t.cam.h * .4; t.burst(t.L.cx, cy, '#ffd84a', 80, 600, 1.4, 5, 200); }
-    show('over'); return;
+    unlockNote(); show('over'); return;
   }
   let w = G.winner;
   const meWon = w === 0;
@@ -2627,6 +2853,8 @@ function showOver() {
   else { const t = G.tables[0]; a = t.score[G.me]; b = t.score[1 - G.me]; }
   $('overScore').textContent = `${clean(G.names[0])} ${a} – ${b} ${clean(G.names[1])}`;
   $('overStatus').textContent = ''; $('bRe').disabled = false; G.wantRe = false;
+  if (vs) { stat('played', 1); if (meWon) { stat('won', 1); stat(G.mode === 'duel' ? 'duelW' : 'arenaW', 1); } if (online()) { stat('online', 1); if (meWon) stat('onlineW', 1); } }
+  unlockNote();
   if (meWon || !vs) { const t = G.tables[0], cy = t.cam.y + t.cam.h * .4; t.burst(t.L.cx, cy, '#ffd84a', 80, 600, 1.4, 5, 200); t.burst(t.L.cx, cy, COL[0], 60, 500, 1.2, 4, 200); }
   show('over');
 }
