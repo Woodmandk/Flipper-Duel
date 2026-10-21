@@ -97,7 +97,11 @@ button.btn.ghost{background:transparent;font-size:14px;padding:9px;}
 .stats dt{color:var(--muted);} .stats dd{margin:0;text-align:right;font-family:var(--display);color:var(--gold);}
 .skills{position:fixed;z-index:6;display:flex;gap:6px;}
 .skills.col{flex-direction:column;}
-.skills button{cursor:pointer;touch-action:manipulation;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;min-width:82px;padding:5px 8px;border-radius:12px;border:1.5px solid var(--c);background:rgba(10,8,26,.82);color:var(--fg);font-family:var(--display);font-size:11px;letter-spacing:.03em;opacity:.45;}
+.skills button{cursor:pointer;touch-action:manipulation;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;min-width:104px;padding:7px 10px;border-radius:14px;border:1.5px solid var(--c);background:linear-gradient(to top,var(--cf) var(--p,0%),rgba(10,8,26,.85) var(--p,0%));color:var(--fg);font-family:var(--display);font-size:12px;letter-spacing:.03em;opacity:.75;}
+.skills button b{font-size:22px!important;}
+.skills button.on{animation:skP .6s ease-in-out infinite alternate;}
+@keyframes skP{to{box-shadow:0 0 26px var(--c);transform:scale(1.04);}}
+@media (prefers-reduced-motion:reduce){.skills button.on{animation:none;}}
 .skills button b{font-family:var(--body);font-size:18px;line-height:1.1;color:var(--c);}
 .skills button small{font-family:var(--body);font-weight:700;font-size:10px;color:var(--muted);}
 .skills button.on{opacity:1;box-shadow:0 0 16px var(--c);}
@@ -186,7 +190,7 @@ button.btn.ghost{background:transparent;font-size:14px;padding:9px;}
 <div class="ov" id="pick" hidden>
   <div class="card">
     <h2 id="pickTitle">Dine evner</h2>
-    <p class="sub">Vælg 3 evner. Din energi lader op, når du rammer ting, og du bruger evnerne, når du vil. Flere evner låses op, når du slår mega-bosserne i kampagnen.</p>
+    <p class="sub">Vælg 2 evner. Hver evne lader op for sig selv, når du rammer ting, og dyre evner tager længere tid. Du bruger dem, når de er klar. Flere evner låses op, når du slår mega-bosserne i kampagnen.</p>
     <div class="skl" id="pickList"></div>
     <p class="hint" id="pickHint"></p>
     <button class="btn pri" type="button" id="bPickDone">Færdig</button>
@@ -196,8 +200,8 @@ button.btn.ghost{background:transparent;font-size:14px;padding:9px;}
 <div class="ov" id="camp" hidden>
   <div class="card">
     <h2>Kampagne</h2>
-    <p class="sub">Dig alene mod hver banes boss. Slå den for at låse den næste op. Hver 5. bane er en mega-boss, der låser nye evner op. Du har 300 liv og 5–7 minutter. Vælg 3 evner: din energi lader op, når du rammer ting, og du bruger evnerne, når du vil. Jo flere liv du har tilbage, jo flere stjerner.</p>
-    <div class="field"><span class="lbl">Dine evner · vælg 3</span><div class="skl" id="skl"></div><p class="hint" id="sklHint"></p></div>
+    <p class="sub">Dig alene mod hver banes boss. Slå den for at låse den næste op. Hver 5. bane er en mega-boss, der låser nye evner op. Du har 300 liv og 5–7 minutter. Vælg 2 evner: hver lader op for sig selv, når du rammer ting, og du bruger dem, når de er klar. Jo flere liv du har tilbage, jo flere stjerner.</p>
+    <div class="field"><span class="lbl">Dine evner · vælg 2</span><div class="skl" id="skl"></div><p class="hint" id="sklHint"></p></div>
     <ul class="lvls" id="lvls"></ul>
     <p class="hint" id="campSum"></p>
     <button class="btn" type="button" id="bCampBack">Tilbage</button>
@@ -225,12 +229,12 @@ button.btn.ghost{background:transparent;font-size:14px;padding:9px;}
       <ul class="quick">
         <li><b>Flippere:</b> <kbd>A</kbd> <kbd>D</kbd> eller <kbd>←</kbd> <kbd>→</kbd>. På mobil trykker du i venstre eller højre side.</li>
         <li><b>Ram ting</b> for at skade modstanderen og lade din gule energi op.</li>
-        <li><b>Nok energi?</b> Brug dine 3 evner med <kbd>Q</kbd> <kbd>W</kbd> <kbd>E</kbd> (eller <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd>) eller knapperne ved bordet. Stregerne på energibaren viser, hvad hver evne koster.</li>
+        <li><b>Evne klar?</b> Når en af dine 2 bjælker er fuld, står der KLAR! Brug den med <kbd>Q</kbd> eller <kbd>E</kbd> eller knappen ved bordet.</li>
         <li><b>Sekskanter</b> er power-ups. Dem med regnbue-ring er KAOS.</li>
         <li><b>Mist ikke kuglen</b>. Det koster dig selv liv.</li>
         <li><b>Hver bane har sin egen form og sit eget tema:</b> Neon Klassik, Ruminvasion (Space Invaders), Kaosfabrikken, Dybhavet og Spøgelseshuset. Kameraet følger kuglen.</li>
         <li><b>Ryst bordet</b> med <kbd>S</kbd> eller <kbd>↓</kbd> for at redde en kugle. Ryster du for meget, kommer der TILT.</li>
-        <li><b>Evner:</b> du vælger selv 3 evner i menuen (fx Homing, Super-skade, Tåge) og i kampagnen (fx Lyn, Frys bossen, Meteor). Din energi lader op, når du rammer ting, og du bruger evnerne med <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd>, <kbd>Q</kbd> <kbd>W</kbd> <kbd>E</kbd> eller knapperne. Spiller 2 på samme skærm bruger <kbd>8</kbd> <kbd>9</kbd> <kbd>0</kbd> eller <kbd>I</kbd> <kbd>O</kbd> <kbd>P</kbd>.</li>
+        <li><b>Evner:</b> du vælger selv 2 evner i menuen (fx Homing, Vampyr, Tåge) og i kampagnen (fx Lyn, Sneglefart, Meteor). Hver evne lader op for sig selv, når du rammer ting, og dyre evner tager længere tid. Brug dem med <kbd>Q</kbd> og <kbd>E</kbd> (eller <kbd>1</kbd> <kbd>2</kbd>) eller knapperne. Spiller 2 på samme skærm bruger <kbd>I</kbd> og <kbd>O</kbd>.</li>
         <li><b>Kampagnen</b> har en mega-boss på hver 5. bane. Slår du den, låser du nye evner op.</li>
         <li><b>Indstillinger og statistik</b> i menuen: vælg computerens sværhedsgrad, din kugle og dine flippers farve. Nye kugler låses op, når du spiller.</li>
         <li><b>Online</b> kan du sende emojis til modstanderen med tasterne <kbd>6</kbd>–<kbd>0</kbd> eller knapperne øverst til venstre.</li>
@@ -274,7 +278,7 @@ button.btn.ghost{background:transparent;font-size:14px;padding:9px;}
     <section>
       <h3><span class="b">ARENA</span> · flipper-fodbold, først til 5</h3>
       <p>Banen er en fodboldbane. Du har en målmand (to flippere foran dit mål) og to angribere ude på modstanderens halvdel, ligesom i bordfodbold. Dine knapper styrer dem alle på én gang. Der er ingen tyngdekraft, så kuglen flyver frit. Banen skifter for hver 2 mål: Stadion, Ishallen, Retro-arkaden eller Vulkanen. På Stadion har hver spiller sin egen rampe, der skyder kuglen mod modstanderens mål.</p>
-      <p>Din energi lader op, når du rammer kuglen, rammer bumpere og når du får mål imod dig. Du vælger selv 3 evner, fx:</p>
+      <p>Din energi lader op, når du rammer kuglen, rammer bumpere og når du får mål imod dig. Du vælger selv 2 evner, fx:</p>
       <ul class="legend">
         <li><i style="--c:#ff7a30">🔥</i><b>Ildkugle</b><span>Alle kugler brager mod modstanderens mål</span></li>
         <li><i style="--c:#7de8ff">❄</i><b>Frys</b><span>Modstanderens flippere fryser fast i 2 sek.</span></li>
@@ -743,6 +747,8 @@ const ATK = {
   rain: { n: 'BOMBEREGN!', d: '3 bomber på vej. Hold dem i live!' },
   small: { n: 'MINI-FLIPPERE!', d: 'Dine flippere er krympet' },
   quake: { n: 'JORDSKÆLV!', d: 'Bordet ryster kuglerne rundt' },
+  ice: { n: 'FROSNE FLIPPERE!', d: 'Dine flippere er frosset fast' },
+  steal: { n: 'ENERGITYV!', d: 'Din opladning er stjålet' },
 };
 const POW = {
   multi: { n: 'MULTIBALL', d: 'Ekstra kugler i 10 sek.', c: '#ff9a3c', i: '3' },
@@ -813,7 +819,7 @@ class Table {
     this.bf = L.bumpers.map(() => 0); this.mf = L.movers.map(() => 0); this.sensCd = 0; this.sf = [0, 0];
     this.rolls = [false, false, false]; this.rollCd = [0, 0, 0]; this.rollReset = 0;
     this.drops = [false, false, false]; this.dropReset = 0; this.kaosCd = 0; this.kaosF = 0;
-    this.eff = { mir: 0, fog: 0, bh: 0, small: 0, quake: 0, x2: 0, big: 0, giant: 0, moon: 0, rage: 0, flip: 0 };
+    this.eff = { mir: 0, fog: 0, bh: 0, small: 0, quake: 0, x2: 0, big: 0, giant: 0, moon: 0, rage: 0, flip: 0, ice: 0 };
     this.inv = null; this.dbl = [0, 0];
     this.quakeT = 0; this.dshield = 0; this.storm = 0; this.stormT = 0; this.bolts = []; this.zapB = 0; this.zapBT = 0;
     this.laneRest = 0; this.save = 0; this.time = 0;
@@ -873,7 +879,7 @@ class Table {
   setInput(l, r) {
     if (this.kind !== 'duel') return;
     if (this.eff.mir > 0) { const t = l; l = r; r = t; }
-    if (this.tilt > 0) l = r = false;
+    if (this.tilt > 0 || this.eff.ice > 0) l = r = false;
     for (const f of this.fl) f.on = !!(f.side === 'l' ? l : r);
   }
   stepFlippers(h) {
@@ -1182,6 +1188,7 @@ class Table {
   directors(dt) {
     const L = this.L, bo = this.boss;
     // boss: arrives during a calm stretch, stays ~35 s, then a long break
+    if (bo && this.eff.slowB > 0) dt *= .45;
     if (bo && this.eff.frzB > 0) { bo.cd -= dt; bo.f = Math.max(0, bo.f - dt * 4); bo.vy = 0; bo.laser = null; bo.sh = 0; bo.inv = 0; }
     else if (bo) {
       const BI = BOSS[bo.k]; bo.t += dt; bo.f = Math.max(0, bo.f - dt * 4); bo.cd -= dt; bo.sh -= dt; bo.inv -= dt;
@@ -1292,7 +1299,7 @@ const G = {
   rid: 0, li: 0, camp: -1, atkSeq: 0, atkList: [], oppAtkSeen: 0, ai: [null, null], winner: -1, slow: 0, slowCd: 0,
   over: false, fxId: 0, fxList: [], fxSeen: 0, overdrive: false, me: 0, flash: 0,
   nextAtk: [null, null], aiFire: [0, 0], supReq: 0, supSeen: 0,
-  big: 0, skCd: [0, 0], lo: [null, null], aiSk: [null, null], skReqK: 0, unlocks: [], emSeq: 0, emIdx: 0, emSeen: 0, emCd: 0, emoList: [],
+  big: 0, sk: [[0, 0], [0, 0]], skCd: [0, 0], lo: [null, null], aiSk: [null, null], skReqK: 0, unlocks: [], emSeq: 0, emIdx: 0, emSeen: 0, emCd: 0, emoList: [],
 };
 const DMG = { alien: 5, alienAll: 20, bumper: 2, sling: 1, roll: 3, rollAll: 10, drop: 4, dropAll: 12, kaos: 3, strike: 2, saucer: 3, orbit: 6, spin: 1, ramp: 8, portal: 2, bossHit: 4 };
 const BOSS_DMG = 100, BOSS_HURT = 15, MIS_DMG = 30;
@@ -1314,38 +1321,47 @@ const megaWins = () => { const st = campStars(); return MEGA_LV.filter(i => (st[
 const SOLO_HP = 300, SOLO_HURT = 10;
 // campaign skills: you pick 3 before the fight, the energy bar fills as you hit things, and you spend it when you like
 const SKILLS = {
-  // campaign (m: b)
-  zap: { n: 'LYN', d: '3 lyn rammer bossen for 1 hver', c: '#fff36b', i: '⚡', cost: 35, boss: 1, m: 'b', u: 0 },
-  frz: { n: 'FRYS BOSSEN', d: 'Bossen står stille og angriber ikke i 5 sek.', c: '#7de8ff', i: '❄', cost: 40, boss: 1, m: 'b', u: 1 },
-  mag: { n: 'MAGNET', d: 'Kuglerne trækkes mod bossen i 4 sek.', c: '#ff5cf0', i: 'M', cost: 45, boss: 1, m: 'b', u: 2 },
-  pow2: { n: 'KRAFTSLAG', d: 'Hvert træf på bossen tæller dobbelt i 8 sek.', c: '#ff5c8a', i: '×2', cost: 50, boss: 1, m: 'b', u: 2 },
-  meteor: { n: 'METEOR', d: 'Kæmpe slag: bossen mister 4 liv', c: '#ff7a30', i: '☄', cost: 100, boss: 1, m: 'b', u: 3 },
+  // campaign (m: b). cost = energy needed to charge that slot
+  zap: { n: 'LYN', d: '3 lyn rammer bossen for 1 hver', c: '#fff36b', i: '⚡', cost: 90, boss: 1, m: 'b', u: 0 },
+  slowb: { n: 'SNEGLEFART', d: 'Bossen er sløv og angriber sjældnere i 10 sek.', c: '#9cff6b', i: '🐌', cost: 50, boss: 1, m: 'b', u: 0 },
+  frz: { n: 'FRYS BOSSEN', d: 'Bossen står stille og angriber ikke i 5 sek.', c: '#7de8ff', i: '❄', cost: 70, boss: 1, m: 'b', u: 1 },
+  mag: { n: 'MAGNET', d: 'Kuglerne trækkes mod bossen i 4 sek.', c: '#ff5cf0', i: 'M', cost: 70, boss: 1, m: 'b', u: 2 },
+  pow2: { n: 'KRAFTSLAG', d: 'Hvert træf på bossen tæller dobbelt i 8 sek.', c: '#ff5c8a', i: '×2', cost: 85, boss: 1, m: 'b', u: 2 },
+  meteor: { n: 'METEOR', d: 'Kæmpe slag: bossen mister 4 liv', c: '#ff7a30', i: '☄', cost: 160, boss: 1, m: 'b', u: 3 },
   // Duel (m: d)
-  home: { n: 'HOMING', d: 'Kuglerne styrer selv mod bumpere og bossen i 8 sek.', c: '#7dffea', i: '➶', cost: 40, m: 'd', u: 0 },
-  x2: { n: 'SUPER-SKADE', d: 'Al din skade ×2 i 10 sek.', c: '#ff5c8a', i: '×2', cost: 45, m: 'd', u: 0 },
-  mega: { n: 'MEGA-SLAG', d: 'Modstanderen mister 60 liv med det samme', c: '#ff7a30', i: '☄', cost: 100, m: 'd', u: 3 },
-  fog: { n: 'TÅGE', d: 'Send tåge over modstanderens bord (−15)', c: '#b98cff', i: '≋', cost: 45, m: 'd', u: 0, atk: 1 },
-  bomb: { n: 'BOMBE', d: 'Send en bombe til modstanderen (−15)', c: '#ff4060', i: '✸', cost: 40, m: 'd', u: 0, atk: 1 },
-  quake: { n: 'JORDSKÆLV', d: 'Ryst modstanderens kugler rundt (−15)', c: '#ff9a3c', i: '≈', cost: 35, m: 'd', u: 0, atk: 1 },
-  mir: { n: 'SPEJLVENDT', d: 'Byt modstanderens flippere om (−15)', c: '#ff7a30', i: '⇄', cost: 50, m: 'd', u: 1, atk: 1 },
-  small: { n: 'MINI-FLIPPERE', d: 'Krymp modstanderens flippere (−15)', c: '#ff4060', i: '↘', cost: 50, m: 'd', u: 1, atk: 1 },
-  bh: { n: 'SORT HUL', d: 'Modstanderens kugle suges mod midten (−15)', c: '#c070ff', i: '●', cost: 50, m: 'd', u: 2, atk: 1 },
-  rain: { n: 'BOMBEREGN', d: 'Send 3 bomber til modstanderen (−15)', c: '#ff4060', i: '✸', cost: 75, m: 'd', u: 2, atk: 1 },
+  home: { n: 'HOMING', d: 'Kuglerne styrer selv mod bumpere og bossen i 8 sek.', c: '#7dffea', i: '➶', cost: 55, m: 'd', u: 0 },
+  x2: { n: 'SUPER-SKADE', d: 'Al din skade ×2 i 10 sek.', c: '#ff5c8a', i: '×2', cost: 60, m: 'd', u: 0 },
+  storm: { n: 'LYNSTORM', d: '8 lyn rammer dit bord for −2 hver', c: '#fff36b', i: '⚡', cost: 70, m: 'd', u: 1 },
+  mega: { n: 'MEGA-SLAG', d: 'Modstanderen mister 60 liv med det samme', c: '#ff7a30', i: '☄', cost: 140, m: 'd', u: 3 },
+  fog: { n: 'TÅGE', d: 'Send tåge over modstanderens bord (−15)', c: '#b98cff', i: '≋', cost: 60, m: 'd', u: 0, atk: 1 },
+  bomb: { n: 'BOMBE', d: 'Send en bombe til modstanderen (−15)', c: '#ff4060', i: '✸', cost: 55, m: 'd', u: 0, atk: 1 },
+  quake: { n: 'JORDSKÆLV', d: 'Ryst modstanderens kugler rundt (−15)', c: '#ff9a3c', i: '≈', cost: 45, m: 'd', u: 0, atk: 1 },
+  mir: { n: 'SPEJLVENDT', d: 'Byt modstanderens flippere om (−15)', c: '#ff7a30', i: '⇄', cost: 65, m: 'd', u: 1, atk: 1 },
+  small: { n: 'MINI-FLIPPERE', d: 'Krymp modstanderens flippere (−15)', c: '#ff4060', i: '↘', cost: 65, m: 'd', u: 1, atk: 1 },
+  ice: { n: 'FRYS MODSTANDER', d: 'Modstanderens flippere fryser i 2½ sek. (−15)', c: '#7de8ff', i: '❄', cost: 75, m: 'd', u: 1, atk: 1 },
+  bh: { n: 'SORT HUL', d: 'Modstanderens kugle suges mod midten (−15)', c: '#c070ff', i: '●', cost: 65, m: 'd', u: 2, atk: 1 },
+  steal: { n: 'ENERGITYV', d: 'Modstanderen mister al sin opladning (−15)', c: '#ffd84a', i: '⚡', cost: 70, m: 'd', u: 2, atk: 1 },
+  rain: { n: 'BOMBEREGN', d: 'Send 3 bomber til modstanderen (−15)', c: '#ff4060', i: '✸', cost: 100, m: 'd', u: 2, atk: 1 },
   // shared by several modes
-  multi: { n: 'MULTIBALL', d: 'Ekstra kugler i 10 sek.', c: '#ff9a3c', i: '3', cost: 35, m: 'bda', u: 0 },
-  big: { n: 'KÆMPE-FLIPPERE', d: 'Længere flippere i 10–12 sek.', c: '#ffd84a', i: 'B', cost: 25, m: 'bda', u: 0 },
-  shield: { n: 'SKJOLD', d: 'Næste tabte kugle teleporteres op igen', c: '#5cf2ff', i: 'S', cost: 25, m: 'bd', u: 0 },
-  heal: { n: 'HELBRED', d: '+60 liv', c: '#7dff9a', i: '+', cost: 50, m: 'bd', u: 1 },
+  multi: { n: 'MULTIBALL', d: 'Ekstra kugler i 10 sek.', c: '#ff9a3c', i: '3', cost: 50, m: 'bda', u: 0 },
+  big: { n: 'KÆMPE-FLIPPERE', d: 'Længere flippere i 10–12 sek.', c: '#ffd84a', i: 'B', cost: 35, m: 'bda', u: 0 },
+  shield: { n: 'SKJOLD', d: 'Næste tabte kugle teleporteres op igen', c: '#5cf2ff', i: 'S', cost: 35, m: 'bd', u: 0 },
+  net: { n: 'REDNINGSNET', d: 'Tabte kugler er gratis i 10 sek.', c: '#7dff9a', i: 'N', cost: 50, m: 'bd', u: 0 },
+  vamp: { n: 'VAMPYR', d: 'Halvdelen af din skade bliver til liv i 10 sek.', c: '#ff3060', i: '🦇', cost: 60, m: 'bd', u: 1 },
+  heal: { n: 'HELBRED', d: '+60 liv', c: '#7dff9a', i: '+', cost: 70, m: 'bd', u: 1 },
   // Arena (m: a)
-  afire: { n: 'ILDKUGLE', d: 'Alle kugler brager mod modstanderens mål', c: '#ff7a30', i: '🔥', cost: 60, m: 'a', u: 0 },
-  afrz: { n: 'FRYS', d: 'Modstanderens flippere fryser i 2 sek.', c: '#7de8ff', i: '❄', cost: 50, m: 'a', u: 0 },
-  wall: { n: 'MUR', d: 'Et skjold foran dit mål teleporterer ét skud væk', c: '#5cf2ff', i: '▬', cost: 40, m: 'a', u: 0 },
-  ahome: { n: 'HOMING', d: 'Kuglen styrer mod modstanderens mål i 4 sek.', c: '#7dffea', i: '➶', cost: 45, m: 'a', u: 0 },
-  slow: { n: 'SLØV MODSTANDER', d: 'Modstanderens flippere går langsomt i 6 sek.', c: '#b98cff', i: 'Z', cost: 45, m: 'a', u: 2 },
-  dbl: { n: 'DOBBELT MÅL', d: 'Dit næste mål tæller 2', c: '#ffd84a', i: '2', cost: 55, m: 'a', u: 3 },
+  afire: { n: 'ILDKUGLE', d: 'Alle kugler brager mod modstanderens mål', c: '#ff7a30', i: '🔥', cost: 80, m: 'a', u: 0 },
+  afrz: { n: 'FRYS', d: 'Modstanderens flippere fryser i 2 sek.', c: '#7de8ff', i: '❄', cost: 65, m: 'a', u: 0 },
+  wall: { n: 'MUR', d: 'Et skjold foran dit mål teleporterer ét skud væk', c: '#5cf2ff', i: '▬', cost: 50, m: 'a', u: 0 },
+  ahome: { n: 'HOMING', d: 'Kuglen styrer mod modstanderens mål i 4 sek.', c: '#7dffea', i: '➶', cost: 60, m: 'a', u: 0 },
+  agiant: { n: 'KÆMPEKUGLER', d: 'Kuglerne bliver dobbelt så store i 8 sek.', c: '#7dffea', i: 'G', cost: 50, m: 'a', u: 0 },
+  acannon: { n: 'KANON', d: 'Alle kugler skydes mod modstanderens mål', c: '#ff9a3c', i: 'K', cost: 60, m: 'a', u: 1 },
+  slow: { n: 'SLØV MODSTANDER', d: 'Modstanderens flippere går langsomt i 6 sek.', c: '#b98cff', i: 'Z', cost: 60, m: 'a', u: 2 },
+  amega: { n: 'KUGLEREGN', d: '4 ekstra kugler i 6 vilde sekunder', c: '#ff3fd2', i: '10', cost: 85, m: 'a', u: 2 },
+  dbl: { n: 'DOBBELT MÅL', d: 'Dit næste mål tæller 2', c: '#ffd84a', i: '2', cost: 70, m: 'a', u: 3 },
 };
 const SKILL_KEYS = Object.keys(SKILLS), SK_ATK_DMG = 15;
-const LO_KEY = { b: 'skills', d: 'dsk', a: 'ask' }, LO_DEF = { b: ['zap', 'multi', 'big'], d: ['home', 'x2', 'fog'], a: ['afire', 'afrz', 'ahome'] };
+const LO_KEY = { b: 'skills', d: 'dsk', a: 'ask' }, LO_DEF = { b: ['zap', 'multi'], d: ['home', 'fog'], a: ['afire', 'ahome'] }, NSK = 2;
 const skPool = m => SKILL_KEYS.filter(k => SKILLS[k].m.includes(m));
 const skOpen = k => !!SKILLS[k] && SKILLS[k].u <= megaWins();
 const MEGA_NAMES = ['første', 'anden', 'tredje'];
@@ -1362,7 +1378,7 @@ const BALLS = [
 const FLIPS = [{ n: 'Din farve', c: null }, { n: 'Guld', c: '#ffd84a' }, { n: 'Grøn', c: '#7dff9a' }, { n: 'Orange', c: '#ff9a3c' }, { n: 'Lilla', c: '#b98cff' }, { n: 'Hvid', c: '#ffffff' }];
 const loadJ = (k, d) => { try { const v = JSON.parse(store.get(k, '{}')); return Object.assign(d, v && typeof v === 'object' ? v : {}); } catch (e) { return d; } };
 const SET = loadJ('fd-set', { cpu: 1, ball: 0, flip: 0 });
-for (const m in LO_KEY) { const a = SET[LO_KEY[m]]; if (!Array.isArray(a) || a.length !== 3 || !a.every(k => SKILLS[k] && SKILLS[k].m.includes(m))) SET[LO_KEY[m]] = LO_DEF[m].slice(); }
+for (const m in LO_KEY) { const a = SET[LO_KEY[m]]; if (!Array.isArray(a) || a.length < NSK || !a.slice(0, NSK).every(k => SKILLS[k] && SKILLS[k].m.includes(m))) SET[LO_KEY[m]] = LO_DEF[m].slice(); else SET[LO_KEY[m]] = a.slice(0, NSK); }
 const STATS = loadJ('fd-stats', { played: 0, won: 0, duelW: 0, arenaW: 0, online: 0, onlineW: 0, boss: 0, combo: 0, goals: 0, supers: 0, dmg: 0, camp: 0, fastBoss: 0 });
 const cpuLv = () => CPU_LV[SET.cpu] || CPU_LV[1];
 const ballOpen = i => !!BALLS[i] && (!BALLS[i].need || BALLS[i].need());
@@ -1381,22 +1397,23 @@ function stat(k, v, how) {
 const skMode = () => G.type === 'boss' ? 'b' : G.mode === 'arena' ? 'a' : 'd';
 // the loadout each player brings: humans use their own picks, the CPU gets a random one
 function loadout(p) { return G.lo[p] || SET[LO_KEY[skMode()]].map(k => skOpen(k) ? k : LO_DEF[skMode()][0]); }
-const skKeys = lp => COARSE ? 'TRYK PÅ EVNERNE' : G.type === 'local' ? (lp === 0 ? 'EVNER: 1 2 3 ELLER Q W E' : 'EVNER: 8 9 0 ELLER I O P') : 'EVNER: 1 2 3 ELLER Q W E';
+const skKeys = lp => COARSE ? '' : G.type === 'local' && lp === 1 ? ['I', 'O'] : ['Q', 'E'];
 // a human presses skill i (lp is the local player: 0, or 1 on a shared screen)
 function useSkill(lp, i) {
-  if (G.phase !== 'play' || G.demo || G.ai[lp]) return;
+  if (G.phase !== 'play' || G.demo || G.ai[lp] || i >= NSK) return;
   const k = loadout(lp)[i], S = SKILLS[k]; if (!S) return;
   if (G.mode === 'arena' && G.type === 'guest') { // the host runs the Arena, so ask it
-    if (G.meter[1] >= S.cost && G.skCd[0] <= 0) { G.skCd[0] = .4; G.supReq++; G.skReqK = SKILL_KEYS.indexOf(k); stat('supers', 1); }
+    if (G.sk[1][i] >= 100 && G.skCd[0] <= 0) { G.skCd[0] = .4; G.supReq++; G.skReqK = i; stat('supers', 1); }
     return;
   }
-  if (trySkill(lp, k) && lp === 0) stat('supers', 1);
+  if (trySkill(lp, i) && lp === 0) stat('supers', 1);
 }
-function trySkill(p, k) {
-  const S = SKILLS[k], t = tableOf(p);
-  if (!S || !t || G.phase !== 'play' || G.skCd[p] > 0 || G.meter[p] < S.cost) return false;
-  if (S.boss && !t.boss) { if (isHuman(p)) t.ban('INGEN BOSS LIGE NU', '#ff6080', .9, 'Gem din energi til bossen kommer'); return false; }
-  G.meter[p] -= S.cost; G.skCd[p] = .35;
+// p is the world player, i the skill slot
+function trySkill(p, i) {
+  const k = loadout(p)[i], S = SKILLS[k], t = tableOf(p);
+  if (!S || !t || G.phase !== 'play' || G.skCd[p] > 0 || G.sk[p][i] < 100) return false;
+  if (S.boss && !t.boss) { if (isHuman(p)) t.ban('INGEN BOSS LIGE NU', '#ff6080', .9, 'Gem din evne til bossen kommer'); return false; }
+  G.sk[p][i] = 0; G.skCd[p] = .35;
   doSkill(p, k, t);
   return true;
 }
@@ -1414,6 +1431,9 @@ function doSkill(p, k, t) {
     else if (k === 'big') t.bigP[p] = 10;
     else if (k === 'slow') t.slowP[1 - p] = 6;
     else if (k === 'dbl') t.dbl[p] = 15;
+    else if (k === 'agiant') t.eff.giant = 8;
+    else if (k === 'acannon') { const dir = p === 0 ? -1 : 1; t.grav = dir; t.last = p; for (const b of t.balls) { b.vx = rnd(-400, 400); b.vy = dir * rnd(1300, 1700); b.held = 0; } }
+    else if (k === 'amega') t.spawnMulti(4, cx, t.L.H / 2, p === 0 ? 1 : -1, 6);
     skillFx(t, p, k); pushFx('K', 200, 360, p, SKILL_KEYS.indexOf(k));
     return;
   }
@@ -1431,6 +1451,10 @@ function doSkill(p, k, t) {
   else if (k === 'heal') { G.drain[p] = Math.max(-G.dealt[1 - p], G.drain[p] - 60); t.text(cx, cy, '+60', '#7dff9a', 34); }
   else if (k === 'home') t.eff.home = 8;
   else if (k === 'x2') t.eff.x2 = 10;
+  else if (k === 'storm') { t.storm = 8; t.stormT = .2; }
+  else if (k === 'net') t.save = Math.max(t.save, 10);
+  else if (k === 'vamp') t.eff.vamp = 10;
+  else if (k === 'slowb') t.eff.slowB = 10;
   else if (k === 'mega') { const dm = 60; G.dealt[p] += dm; SFX.boom(); t.boom(cx, t.cam.y + 40, '#ff7a30', true); t.text(cx, t.cam.y + 100, '-' + dm, COL[1 - p], 44); t.shake = 14; }
 }
 // big moments (boss down, goal, round won) play out in slow motion
@@ -1467,14 +1491,14 @@ function startGame(mode, type, names) {
   if (mode === 'duel') G.tables = online() || type === 'boss' ? [new Table('duel')] : [new Table('duel'), new Table('duel')];
   else G.tables = [new Table('arena')];
   G.ai = [null, type === 'cpu' ? new AI(cpuLv().s) : null];
-  { const m = type === 'boss' ? 'b' : mode === 'arena' ? 'a' : 'd', pool = skPool(m).sort(() => Math.random() - .5); G.lo = [null, type === 'cpu' ? pool.slice(0, 3) : null]; G.aiSk = [null, null]; G.skCd = [0, 0]; G.skReqK = 0; }
+  { const m = type === 'boss' ? 'b' : mode === 'arena' ? 'a' : 'd', pool = skPool(m).sort(() => Math.random() - .5); G.lo = [null, type === 'cpu' ? pool.slice(0, NSK) : null]; G.aiSk = [null, null]; G.skCd = [0, 0]; G.skReqK = 0; }
   G.tables.forEach((t, i) => t.hook = (ty, d) => onEvent(i, ty, d));
   hide('menu'); hide('lobby'); hide('over'); hide('help'); show('hud');
   startMatch();
 }
 function startMatch() { G.wins = [0, 0]; G.round = 1; G.over = false; hide('over'); startRound(); }
 function resetRoundState() {
-  G.t = 0; G.dealt = [0, 0]; G.drain = [0, 0]; G.meter = [0, 0]; G.hpShow = [MAXHP, MAXHP]; G.hpLag = [MAXHP, MAXHP];
+  G.t = 0; G.dealt = [0, 0]; G.drain = [0, 0]; G.meter = [0, 0]; G.sk = [[0, 0], [0, 0]]; G.hpShow = [MAXHP, MAXHP]; G.hpLag = [MAXHP, MAXHP];
   G.atkList = []; G.winner = -1; G.overdrive = false; G.oppAtkSeen = 0; G.nextAtk = [null, null]; G.aiFire = [0, 0];
   for (const t of G.tables) { if (t.kind === 'duel') t.L = duelL(); else t.L = ARENAS[0]; t.reset(); }
   G.ghost.L = duelL(); G.ghost.reset(); G.ghost.balls = [];
@@ -1628,6 +1652,7 @@ function onEvent(i, type, d) {
     if (t.combo === 5 || (t.combo > 5 && t.combo % 10 === 0)) { t.ban('COMBO ×' + t.combo, '#ffd84a', .9, t.combo === 5 ? '+25% skade så længe du holder den' : 'Helt vildt!'); t.ring(d.x, d.y, 120, '#ffd84a', .5, 5); }
     if (!playing) return;
     G.dealt[p] += dmg;
+    if (t.eff.vamp > 0) G.drain[p] = Math.max(-G.dealt[1 - p], G.drain[p] - dmg * .5);
     chargeMeter(p, dmg * .5 + (type === 'kaos' ? 12 : 0));
     t.text(d.x, d.y - 12, '-' + dmg, COL[1 - p], dmg >= 10 ? 32 : 18);
     return;
@@ -1692,10 +1717,17 @@ const COARSE = matchMedia('(pointer: coarse)').matches;
 const isHuman = p => !G.ai[p] && (p === 0 || G.type === 'local');
 const fireKeys = p => COARSE ? 'TRYK SUPER-KNAPPEN' : G.type === 'local' ? (p === 0 ? 'TRYK W' : 'TRYK ↑') : 'TRYK W / ↑ / MELLEMRUM';
 function chargeMeter(p, amt) {
-  if (G.phase !== 'play' || G.demo || G.meter[p] >= 100) return;
-  const before = G.meter[p];
-  G.meter[p] = Math.min(100, G.meter[p] + amt * (G.type === 'boss' ? 1.1 : 1));
-  if (isHuman(p) && !(G.mode === 'arena' && G.type === 'local') && loadout(p).some(k => SKILLS[k] && before < SKILLS[k].cost && G.meter[p] >= SKILLS[k].cost)) SFX.beep(false);
+  if (G.phase !== 'play' || G.demo) return;
+  const lo = loadout(p), mul = G.type === 'boss' ? 1.1 : 1;
+  for (let i = 0; i < NSK; i++) {
+    const S = SKILLS[lo[i]]; if (!S || G.sk[p][i] >= 100) continue;
+    G.sk[p][i] = Math.min(100, G.sk[p][i] + amt * mul * 100 / S.cost);
+    if (G.sk[p][i] >= 100 && isHuman(p)) { // tell the player it is ready
+      SFX.beep(true); const t = tableOf(p);
+      if (t && !(G.mode === 'arena' && G.type === 'local')) t.text(t.L.cx, t.kind === 'arena' ? (p === 0 ? t.L.H - 230 : 230) : t.cam.y + 150, S.n + ' KLAR!', S.c, 22);
+    }
+  }
+  G.meter[p] = Math.max(...G.sk[p]);
 }
 function humanNudge(p) {
   if (G.mode !== 'duel' || G.phase !== 'play' || G.demo || G.ai[p]) return;
@@ -1730,7 +1762,7 @@ function useAbility(p, type) {
 }
 function abilityFx(t, p, type) {
   const A = ABIL[type];
-  SFX.send(); SFX.wave(); t.ban('SUPER: ' + A.n, A.c, 1.6, A.d); t.boom(t.L.cx, p === 0 ? t.L.H - 160 : 160, A.c, true); t.flashCol = A.c; vibrate([40, 30, 80]);
+  SFX.send(); SFX.wave(); t.ban(A.n + '!', A.c, 1.6, A.d); t.boom(t.L.cx, p === 0 ? t.L.H - 160 : 160, A.c, true); t.flashCol = A.c; vibrate([40, 30, 80]);
 }
 function sendAttack(p, type) {
   const t = G.tables[p];
@@ -1747,7 +1779,8 @@ function doAttack(p, type) {
   const t = G.tables[p]; if (!t || G.phase !== 'play') return;
   if (type === 'bomb') t.spawnBomb();
   else if (type === 'rain') { t.spawnBomb(); t.spawnBomb(); t.spawnBomb(); }
-  else t.eff[type] = type === 'fog' ? 7 : 6;
+  else if (type === 'steal') G.sk[p] = [0, 0];
+  else t.eff[type] = type === 'fog' ? 7 : type === 'ice' ? 2.5 : 6;
   t.ban(ATK[type].n, '#ff4060', 1.8, ATK[type].d); t.flash = .6; t.flashCol = '#ff2050'; t.shake = 12; t.punch = 1; SFX.alarm();
   if (p === 0 || !online()) vibrate([60, 40, 60]);
 }
@@ -1853,8 +1886,8 @@ function netSend(now) {
     const t = G.tables[0];
     if (Net.role === 'host') P.ar = { b: t.balls.slice(0, MAXBALLS).map(b => [Math.round(b.x), Math.round(b.y), Math.round(b.vx), Math.round(b.vy)]), f: t.fl.map(f => Math.round(f.a * 100) / 100),
       g: t.grav, sc: t.score, tk: tokOut(t), sh: t.shield, fx: G.fxList, l: t.last, li: ARENAS.indexOf(t.L), bp: t.bigP.map(r1), sp: t.slowP.map(r1), tb: r1(t.turbo), ef: [r1(t.eff.giant), r1(t.eff.moon), r1(t.eff.rage), r1(t.eff.ahome || 0)], tt: r1(t.time), iv: invOut(t.inv), db: t.dbl.map(r1) };
-    else { P.inp = ['l', 'r'].map(sd => t.fl.some(f => f.p === 1 && f.side === sd && f.on) ? 1 : 0); P.sx = G.supReq; P.sk = G.skReqK; }
-    if (Net.role === 'host') Object.assign(P.ar, { am: G.meter.map(Math.round), an: G.nextAtk.map(k => ABIL_KEYS.indexOf(k)), fz: t.frz.map(r1), fi: r1(t.fire) });
+    else { P.inp = ['l', 'r'].map(sd => t.fl.some(f => f.p === 1 && f.side === sd && f.on) ? 1 : 0); P.sx = G.supReq; P.sk = G.skReqK; P.lo = loadout(0).map(k => SKILL_KEYS.indexOf(k)); }
+    if (Net.role === 'host') Object.assign(P.ar, { ak: G.sk.map(a => a.map(Math.round)), am: G.meter.map(Math.round), an: G.nextAtk.map(k => ABIL_KEYS.indexOf(k)), fz: t.frz.map(r1), fi: r1(t.fire) });
   }
   if (G.over) P.re = G.wantRe ? 1 : 0;
   if (G.emSeq) P.em = [G.emSeq, G.emIdx];
@@ -1922,6 +1955,7 @@ function oppArenaGuest(op) {
   if (Array.isArray(a.sp)) t.slowP = [+a.sp[0] || 0, +a.sp[1] || 0];
   t.turbo = +a.tb || 0;
   if (Array.isArray(a.am)) G.meter = [+a.am[0] || 0, +a.am[1] || 0];
+  if (Array.isArray(a.ak)) G.sk = [0, 1].map(q => [0, 1].map(i => +(a.ak[q] || [])[i] || 0));
   if (Array.isArray(a.an)) G.nextAtk = [ABIL_KEYS[a.an[0]] || null, ABIL_KEYS[a.an[1]] || null];
   if (Array.isArray(a.fz)) t.frz = [+a.fz[0] || 0, +a.fz[1] || 0];
   t.fire = +a.fi || 0;
@@ -1957,7 +1991,7 @@ addEventListener('keydown', e => {
   if (!e.repeat && [...NUD0, ...NUD1].includes(e.code)) humanNudge(G.type === 'local' && NUD1.includes(e.code) ? 1 : 0);
   if (!e.repeat && online()) { const em = { Digit6: 0, Digit7: 1, Digit8: 2, Digit9: 3, Digit0: 4 }[e.code]; if (em != null) sendEmo(em); }
   if (!e.repeat) {
-    const k0 = { Digit1: 0, Digit2: 1, Digit3: 2, KeyQ: 0, KeyW: 1, KeyE: 2, Space: 0 }[e.code], k1 = { Digit8: 0, Digit9: 1, Digit0: 2, KeyI: 0, KeyO: 1, KeyP: 2, ArrowUp: 0, Enter: 0, NumpadEnter: 0 }[e.code];
+    const k0 = { Digit1: 0, Digit2: 1, KeyQ: 0, KeyE: 1, KeyW: 1, Space: 0 }[e.code], k1 = { Digit8: 0, Digit9: 1, KeyI: 0, KeyO: 1, ArrowUp: 0, Enter: 1, NumpadEnter: 1 }[e.code];
     if (k0 != null) useSkill(0, k0);
     else if (k1 != null && !(online() && /^Digit/.test(e.code))) useSkill(G.type === 'local' ? 1 : 0, k1);
   }
@@ -2066,12 +2100,12 @@ function update(dt, now) {
   if (G.phase === 'play' && !G.demo) {
     G.t += authority ? dt : 0; G.skCd[0] -= dt; G.skCd[1] -= dt;
     for (let p = 0; p < 2; p++) if (G.ai[p] && G.type !== 'boss') {
-      const lo = loadout(p); if (G.aiSk[p] == null) { G.aiSk[p] = Math.floor(Math.random() * 3); G.aiFire[p] = rnd(...cpuLv().f); }
-      const S = SKILLS[lo[G.aiSk[p]]];
-      if (!S) G.aiSk[p] = null; else if (G.meter[p] >= S.cost && (G.aiFire[p] -= dt) <= 0) { trySkill(p, lo[G.aiSk[p]]); G.aiSk[p] = null; }
+      if (G.aiSk[p] == null) { const rd = [0, 1].filter(i => G.sk[p][i] >= 100); if (rd.length) { G.aiSk[p] = pick(rd); G.aiFire[p] = rnd(...cpuLv().f); } }
+      else if ((G.aiFire[p] -= dt) <= 0) { trySkill(p, G.aiSk[p]); G.aiSk[p] = null; }
     }
     if (G.mode === 'arena' && authority) { chargeMeter(0, dt * 1.8); chargeMeter(1, dt * 1.8); }
-    if (G.mode === 'arena' && G.type === 'host') { const op = Net.opp && Net.opp.presence, sx = op ? op.sx | 0 : 0; if (sx > G.supSeen) { G.supSeen = sx; trySkill(1, SKILL_KEYS[op.sk | 0]); } }
+    if (G.mode === 'arena' && G.type === 'host' && Net.opp && Array.isArray(Net.opp.presence.lo)) { const lo = Net.opp.presence.lo.map(i => SKILL_KEYS[i]).filter(k => SKILLS[k] && SKILLS[k].m.includes('a')); if (lo.length === NSK) G.lo[1] = lo; }
+    if (G.mode === 'arena' && G.type === 'host') { const op = Net.opp && Net.opp.presence, sx = op ? op.sx | 0 : 0; if (sx > G.supSeen) { G.supSeen = sx; trySkill(1, op.sk | 0); } }
     if (G.mode === 'duel') {
       if (!G.overdrive && G.t >= OVERDRIVE_AT && G.type !== 'boss') { G.overdrive = true; SFX.music(true, 140); for (const t of G.tables) { t.ban('OVERDRIVE ×2', '#ff7a30', 1.8, 'Al skade tæller dobbelt'); t.flash = .6; t.flashCol = '#ff7a30'; } }
       if (G.type === 'boss') { if (rawHp(0) <= 0 || G.t >= soloTime()) endRound(1); }
@@ -2517,7 +2551,7 @@ function drawTable(t, R, pi, opt = {}) {
   // flippers
   for (let i = 0; i < t.fl.length; i++) {
     const f = t.fl[i];
-    let fc = duel ? (t.tilt > 0 ? '#5a5470' : t.eff.mir > 0 ? '#ff7a30' : t.eff.small > 0 ? '#ff4060' : t.eff.big > 0 ? '#ffd84a' : (mineT && myFl) || col) : (!G.demo && f.p === G.me && myFl) || COL[f.p];
+    let fc = duel ? (t.tilt > 0 ? '#5a5470' : t.eff.ice > 0 ? '#d8f8ff' : t.eff.mir > 0 ? '#ff7a30' : t.eff.small > 0 ? '#ff4060' : t.eff.big > 0 ? '#ffd84a' : (mineT && myFl) || col) : (!G.demo && f.p === G.me && myFl) || COL[f.p];
     if (!duel) { const p = f.p; if (t.frz[p] > 0) fc = '#d8f8ff'; else if (t.slowP[p] > 0) fc = '#b98cff'; else if (t.bigP[p] > 0) fc = '#ffd84a'; }
     const tx = f.px + f.sx * f.len * Math.cos(f.a), ty = f.py + f.sy * f.len * Math.sin(f.a);
     const ang = Math.atan2(ty - f.py, tx - f.px), nx = -Math.sin(ang), ny = Math.cos(ang), fr = f.len < 56 ? 8 : 10;
@@ -2685,18 +2719,23 @@ function drawHud(p, R, compact) {
   const hpTxt = 'LIV ' + Math.ceil(hpOf(p));
   ctx.font = '15px Bungee, sans-serif'; ctx.textAlign = 'right'; ctx.lineWidth = 4; ctx.strokeStyle = 'rgba(5,3,15,.85)'; ctx.strokeText(hpTxt, W - 8, 51); ctx.fillStyle = '#ffffff'; ctx.fillText(hpTxt, W - 8, 51);
   if (!compact) {
-    const m = clamp(G.meter[p] / 100, 0, 1), ready = m >= 1, pulse = .6 + .4 * Math.sin(performance.now() / 70);
-    rr(0, 62, W, 11, 5); ctx.fillStyle = 'rgba(255,216,74,.12)'; ctx.fill();
-    if (m > 0) { rr(0, 62, Math.max(11, W * m), 11, 5); ctx.fillStyle = ready ? `rgba(255,216,74,${pulse})` : '#ffd84a'; ctx.fill(); }
-    if (ready) { rr(-2, 60, W + 4, 15, 7); ctx.strokeStyle = `rgba(255,255,255,${pulse})`; ctx.lineWidth = 1.5; ctx.stroke(); }
-    ctx.font = '10px Bungee, sans-serif'; ctx.textAlign = 'left'; ctx.fillStyle = ready ? '#ffffff' : 'rgba(255,216,74,.85)';
-    const nx = G.nextAtk[p] && ATK[G.nextAtk[p]];
-    if (true) {
-      loadout(p).forEach(k => { const S = SKILLS[k]; if (!S) return; const x = W * S.cost / 100; ctx.fillStyle = m * 100 >= S.cost ? S.c : 'rgba(255,255,255,.5)'; ctx.fillRect(Math.min(W - 3, x - 1.5), 58, 3, 19); });
-      ctx.fillStyle = 'rgba(255,216,74,.9)'; ctx.fillText('ENERGI ' + Math.floor(m * 100) + '%' + (isHuman(p) ? '  ·  ' + skKeys(p) : '  ·  ' + loadout(p).map(k => SKILLS[k] ? SKILLS[k].n : '').join(' · ')), 0, 88);
-    } else ctx.fillText(!ready ? 'SUPER ' + Math.floor(m * 100) + '%  ·  LAD OP VED AT RAMME TING' : isHuman(p) && nx ? 'SUPER KLAR: ' + nx.n.replace('!', '') + '  ·  ' + fireKeys(p) : 'SUPER KLAR · KAN KOMME NÅR SOM HELST!', 0, 88);
+    drawSkBars(p, p, 0, 62, W, 11, 88, isHuman(p));
   }
   ctx.restore();
+}
+// charge bars for a player's skills (wp: world player for charges, lp: local player for keys/loadout)
+function drawSkBars(wp, lp, x0, y, w, h, ty, mine, small) {
+  const lo = loadout(lp), gap = 8, bw = (w - gap * (NSK - 1)) / NSK, now = performance.now(), keys = mine ? skKeys(lp) : '';
+  for (let i = 0; i < NSK; i++) {
+    const S = SKILLS[lo[i]], c = clamp((G.sk[wp] || [])[i] / 100 || 0, 0, 1), x = x0 + i * (bw + gap), ready = c >= 1;
+    const col = S ? S.c : '#ffd84a', pulse = .65 + .35 * Math.sin(now / 80);
+    rr(x, y, bw, h, h / 2); ctx.fillStyle = hexA(col, .14); ctx.fill();
+    if (c > 0) { rr(x, y, Math.max(h, bw * c), h, h / 2); ctx.fillStyle = ready ? hexA(col, pulse) : hexA(col, .75); ctx.fill(); }
+    if (ready) { rr(x - 2, y - 2, bw + 4, h + 4, h / 2 + 2); ctx.strokeStyle = `rgba(255,255,255,${pulse})`; ctx.lineWidth = 1.5; ctx.stroke(); }
+    if (!S || ty == null) continue;
+    ctx.font = (small ? 8 : 10) + 'px Bungee, sans-serif'; ctx.textAlign = 'left'; ctx.fillStyle = small ? (ready ? '#160c00' : '#ffffff') : ready ? '#ffffff' : hexA(col, .9);
+    ctx.fillText((keys ? keys[i] + ' · ' : '') + S.n + (ready ? ' · KLAR!' : ' ' + Math.floor(c * 100) + '%'), x + (small ? 8 : 2), ty);
+  }
 }
 
 function drawArenaHud(R) {
@@ -2708,15 +2747,11 @@ function drawArenaHud(R) {
     ctx.textAlign = 'left'; ctx.font = '22px Bungee, sans-serif'; ctx.fillStyle = COL[p]; ctx.fillText(clean(G.names[p === G.me ? 0 : 1]).toUpperCase(), 14, y);
     ctx.textAlign = 'right'; ctx.font = '32px Bungee, sans-serif'; ctx.fillText(t.score[p], W - 14, y);
     for (let i = 0, gn = goalsNeeded(); i < gn; i++) { ctx.beginPath(); ctx.arc(W - 60 - i * 13, y, 4.5, 0, TAU); ctx.fillStyle = t.score[p] > gn - 1 - i ? COL[p] : 'rgba(255,255,255,.12)'; ctx.fill(); }
-    const m = clamp(G.meter[p] / 100, 0, 1), ready = m >= 1, by = p === topP ? -12 : H + 2, pulse = .6 + .4 * Math.sin(performance.now() / 70);
-    rr(0, by, W, 10, 5); ctx.fillStyle = 'rgba(255,216,74,.12)'; ctx.fill();
-    if (m > 0) { rr(0, by, Math.max(10, W * m), 10, 5); ctx.fillStyle = ready ? `rgba(255,216,74,${pulse})` : 'rgba(255,216,74,.75)'; ctx.fill(); }
-    const lp = p === G.me ? 0 : 1, nx = G.nextAtk[p] && ABIL[G.nextAtk[p]];
-    ctx.font = '8px Bungee, sans-serif'; ctx.textAlign = 'center'; ctx.fillStyle = ready ? '#160c00' : 'rgba(255,255,255,.75)';
-    const mine = isHuman(lp) || G.type === 'guest' && lp === 0;
-    for (const k of (lp === 0 || G.type === 'local' ? loadout(lp) : [])) { const S = SKILLS[k]; if (S) { ctx.fillStyle = m * 100 >= S.cost ? S.c : 'rgba(255,255,255,.45)'; ctx.fillRect(Math.min(W - 3, W * S.cost / 100 - 1.5), by - 2, 3, 14); } }
-    ctx.fillStyle = ready ? '#160c00' : 'rgba(255,255,255,.75)';
-    ctx.fillText('ENERGI ' + Math.floor(m * 100) + '%' + (mine && !COARSE ? ' · ' + skKeys(lp).replace('EVNER: ', '') : ''), W / 2, by + 5.5);
+    const lp = p === G.me ? 0 : 1, by = p === topP ? -12 : H + 2, mine = isHuman(lp) || G.type === 'guest' && lp === 0;
+    const known = mine || !online() || G.type === 'host';
+    ctx.save(); ctx.textBaseline = 'middle';
+    drawSkBars(p, lp, 0, by, W, 10, known ? by + 5.5 : null, mine, true);
+    ctx.restore();
   }
   ctx.restore();
 }
@@ -2830,11 +2865,11 @@ function skillButtons() {
     const lo = loadout(lp), key = lo.join() + '|' + Math.round(pos.x) + ',' + Math.round(pos.y) + pos.tf;
     if (key !== skKey[lp]) {
       skKey[lp] = key; el.textContent = ''; el.style.left = Math.round(pos.x) + 'px'; el.style.top = Math.round(pos.y) + 'px'; el.style.transform = pos.tf; el.classList.toggle('col', !!pos.col);
-      lo.forEach((k, i) => {
-        const S = SKILLS[k], b = document.createElement('button'); b.type = 'button'; b.style.setProperty('--c', S.c);
+      lo.slice(0, NSK).forEach((k, i) => {
+        const S = SKILLS[k], b = document.createElement('button'); b.type = 'button'; b.style.setProperty('--c', S.c); b.style.setProperty('--cf', hexA(S.c, .38));
         b.title = S.n + ': ' + S.d;
         const ic = document.createElement('b'), nm = document.createElement('span'), co = document.createElement('small');
-        ic.textContent = S.i; nm.textContent = S.n; co.textContent = (COARSE ? '' : (lp === 0 ? 'QWE' : 'IOP')[i] + ' · ') + S.cost + '%';
+        ic.textContent = S.i; nm.textContent = S.n; co.textContent = '0%';
         b.append(ic, nm, co);
         b.addEventListener('pointerdown', ev => { ev.preventDefault(); ev.stopPropagation(); SFX.init(); useSkill(lp, i); });
         el.append(b);
@@ -2842,7 +2877,14 @@ function skillButtons() {
       el.hidden = false;
     }
     const wp = G.mode === 'arena' && G.type === 'guest' ? 1 : lp, t = tableOf(wp);
-    lo.forEach((k, i) => { const S = SKILLS[k], b = el.children[i]; if (b) b.classList.toggle('on', G.meter[wp] >= S.cost && (!S.boss || !!(t && t.boss))); });
+    lo.slice(0, NSK).forEach((k, i) => {
+      const S = SKILLS[k], b = el.children[i]; if (!b) return;
+      const c = Math.floor(clamp(G.sk[wp][i], 0, 100)), ready = c >= 100, ok = ready && (!S.boss || !!(t && t.boss)), kk = skKeys(lp);
+      const txt = (kk ? kk[i] + ' · ' : '') + (ready ? 'KLAR!' : c + '%');
+      if (b.dataset.c !== String(c)) { b.dataset.c = c; b.style.setProperty('--p', c + '%'); }
+      if (b.lastChild.textContent !== txt) b.lastChild.textContent = txt;
+      b.classList.toggle('on', ok);
+    });
   }
 }
 function superButtons() {
@@ -2940,10 +2982,10 @@ function drawLoadout(m, box, hint) {
     const S = SKILLS[k], b = document.createElement('button'), open = skOpen(k); b.type = 'button'; b.style.setProperty('--c', S.c);
     const on = SET[key].includes(k); b.setAttribute('aria-pressed', on); b.disabled = !open;
     const ic = document.createElement('i'), nm = document.createElement('b'), ds = document.createElement('span');
-    ic.textContent = open ? S.i : '🔒'; nm.textContent = (on ? (SET[key].indexOf(k) + 1) + '. ' : '') + S.n + ' · ' + S.cost + '%';
+    ic.textContent = open ? S.i : '🔒'; nm.textContent = (on ? (SET[key].indexOf(k) + 1) + '. ' : '') + S.n + ' · ' + (S.cost <= 50 ? 'hurtig' : S.cost <= 75 ? 'middel' : 'langsom');
     ds.textContent = open ? S.d : 'Slå den ' + MEGA_NAMES[S.u - 1] + ' mega-boss i kampagnen';
     b.append(ic, nm, ds);
-    b.onclick = () => { if (on || !open) return; SET[key] = [...SET[key].slice(1), k]; saveSet(); drawLoadout(m, box, hint); if (m !== 'b') menuSkills(); };
+    b.onclick = () => { if (on || !open) return; SET[key] = [...SET[key].slice(1 - NSK), k].slice(-NSK); saveSet(); drawLoadout(m, box, hint); if (m !== 'b') menuSkills(); };
     box.append(b);
   });
   hint.textContent = 'Valgt: ' + SET[key].map(k => SKILLS[k].n).join(', ') + '. Tryk på en ny for at skifte den ældste ud.';

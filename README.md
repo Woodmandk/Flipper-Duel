@@ -31,11 +31,11 @@ Banerne er brede og zoomet godt ud. I Duel følger kameraet kuglen og viser hele
 
 ## Evner (du vælger selv)
 
-Alt du rammer, lader din gule energi op. Du vælger selv **3 evner** (under "Dine evner" i menuen og i kampagnen), og du bruger dem, når du vil, med `Q` `W` `E` / `1` `2` `3` eller knapperne ved bordet. Hver evne har sin pris, vist som streger på energibaren. Computeren vælger også sine egne evner.
+Du vælger selv **2 evner** (under "Dine evner" i menuen og i kampagnen). Hver evne har sin egen bjælke, der lader op, når du rammer ting. Billige evner er hurtigt klar, og dyre tager længere tid. Når en bjælke er fuld, står der KLAR!, og du bruger evnen med `Q` / `E` (eller `1` / `2`) eller knappen ved bordet. Computeren vælger også sine egne evner.
 
-- **Duel:** Homing (kuglerne styrer mod bumpere og bossen), Super-skade (×2), Multiball, Kæmpe-flippere, Skjold, Helbred, Mega-slag og angreb du sender over (Tåge, Bombe, Jordskælv, Spejlvendt, Mini-flippere, Sort hul, Bomberegn). Angreb koster modstanderen 15 liv og står i kø, så de aldrig lander oven i hinanden.
-- **Arena:** Ildkugle, Frys, Mur, Homing (kuglen styrer mod modstanderens mål), Multiball, Kæmpe-flippere, Sløv modstander og Dobbelt mål.
-- **Kampagne:** Lyn, Frys bossen, Magnet, Kraftslag, Meteor, Multiball, Kæmpe-flippere, Skjold og Helbred.
+- **Duel:** Homing, Super-skade, Lynstorm, Vampyr (skade bliver til liv), Redningsnet, Multiball, Kæmpe-flippere, Skjold, Helbred, Mega-slag og angreb du sender over (Tåge, Bombe, Jordskælv, Spejlvendt, Mini-flippere, Frys modstander, Sort hul, Energityv, Bomberegn).
+- **Arena:** Ildkugle, Frys, Mur, Homing, Kæmpekugler, Kanon, Sløv modstander, Kugleregn, Dobbelt mål, Multiball og Kæmpe-flippere.
+- **Kampagne:** Lyn, Sneglefart, Frys bossen, Magnet, Kraftslag, Meteor, Vampyr, Redningsnet, Multiball, Kæmpe-flippere, Skjold og Helbred.
 
 Nogle evner er låst, indtil du slår mega-bosserne i kampagnen.
 
