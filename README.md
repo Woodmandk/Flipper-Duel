@@ -6,12 +6,12 @@ Et neon-flipperspil for to spillere, der kører direkte i browseren. Ingen insta
 
 ## Spiltyper
 
-- **Duel** – I har hvert jeres bord og 1200 liv hver. Alt du rammer, skader modstanderens liv. Bedst af 3 runder, og hver runde spilles på en tilfældig bane (Neon Klassik, Orbit-loopet, Kaosfabrikken, Tvillingerne eller Portal-labyrinten). Efter 2½ minut går runden i OVERDRIVE, hvor al skade tæller dobbelt. 5 hurtige træf i træk giver combo med +25% skade.
+- **Duel** – I har hvert jeres bord og 1200 liv hver. Alt du rammer, skader modstanderens liv. Bedst af 3 runder, og hver runde spilles på en tilfældig bane (Neon Klassik, Ruminvasion, Kaosfabrikken, Dybhavet eller Spøgelseshuset). Efter 2½ minut går runden i OVERDRIVE, hvor al skade tæller dobbelt. 5 hurtige træf i træk giver combo med +25% skade.
 - **Arena** – Flipper-fodbold: banen er en fodboldbane uden tyngdekraft. Hver spiller har en målmand (to flippere foran målet) og to angribere ude på modstanderens halvdel, ligesom i bordfodbold. Først til 5 mål, og banen skifter for hver 2 mål. Hver spiller har sin egen rampe, der skyder mod modstanderens mål.
 
 ## Brede baner
 
-Banerne er brede og zoomet godt ud. I Duel følger kameraet kuglen og viser hele bordet ved multiball. Arena-banerne er Klassik, Møllen, Diamanten og Bumper-stormen. På bordene finder du:
+Banerne er brede og zoomet godt ud. I Duel følger kameraet kuglen og viser hele bordet ved multiball. Hver bane har sin egen form og sit eget tema: Ruminvasion er Space Invaders med rumvæsen-bumpere og bunkere, Kaosfabrikken har flat loft, stempler og tandhjul, Dybhavet har vandmænd og klipper, og Spøgelseshuset har spidst tag, græskar og gravsten. Arena-banerne er Stadion, Ishallen, Retro-arkaden (timeglas-form) og Vulkanen. På bordene finder du:
 
 - **Ramper** – skyd hårdt ind i indgangen, så kører kuglen på skinner over bordet. Flere ramper i træk giver mere skade.
 - **Portaler** – orange og blå hænger sammen og teleporterer kuglen.
@@ -25,7 +25,7 @@ Banerne er brede og zoomet godt ud. I Duel følger kameraet kuglen og viser hele
 Alt du rammer, lader din gule SUPER-måler op. Når den er fuld, kan du se hvilket angreb du har klar, og **du bestemmer selv hvornår du fyrer det af**.
 
 - **Duel:** SUPER koster modstanderen 40 liv og sender et angreb over: spejlvendte flippere, tåge, sort hul, bombe, bomberegn, mini-flippere eller jordskælv. Angreb står i kø, så de aldrig lander oven i hinanden.
-- **Arena:** Ildkugle (alle kugler brager mod modstanderens mål), Frys (modstanderens flippere fryser i 2 sek.) eller Mur (et skjold foran dit mål).
+- **Arena:** Ildkugle (alle kugler brager mod modstanderens mål), Frys (modstanderens flippere fryser i 2 sek.) eller Mur (et skjold foran dit mål, der teleporterer ét skud væk).
 
 Efter et kaos-power-up får bordet en pause, før det næste dukker op: kaos, så ro, så kaos igen.
 
@@ -33,8 +33,8 @@ Efter et kaos-power-up får bordet en pause, før det næste dukker op: kaos, s�
 
 Sekskanter dukker op på bordet. Ram dem med kuglen. I Arena går de til den, der sidst ramte kuglen.
 
-- **Almindelige:** Multiball, Skjold, Dobbelt skade, Reparér (+50 liv), Kæmpe-flippere, Sløv modstander og Turbo. Ekstra kugler forsvinder igen efter kort tid.
-- **KAOS-power-ups** (med regnbue-ring): Mega-kaos +10 kugler, Kæmpekugler, Måne-tyngde (kun Duel), Bumper-raseri, Lynstorm og Kuglekanon.
+- **Almindelige:** Multiball, Skjold (teleporterer kuglen væk fra hullet), Dobbelt skade, Reparér (+50 liv), Kæmpe-flippere, ZAP-bonus, Redningsnet (gratis kugler i 15 sek.), Sløv modstander, Turbo og Dobbelt mål. Ekstra kugler forsvinder igen efter kort tid.
+- **KAOS-power-ups** (med regnbue-ring): Mega-kaos +10 kugler, Kæmpekugler, Måne-tyngde (kun Duel), Invasion (rumvæsner marcherer ind, skyd dem ned), Omvendt tyngde (kun Duel), Bumper-raseri, Lynstorm og Kuglekanon.
 
 Tryk på **?** i spillet for at se en forklaring på alt.
 
