@@ -979,7 +979,8 @@ class Table {
     for (let s = 0; s < N; s++) {
       this.stepFlippers(h);
       for (const b of this.balls) {
-        if (b.r !== br) b.r += clamp(br - b.r, -.15, .15);
+        const tr = duel && (b.x > this.L.laneX - 6 || b.lane) ? BR : br;
+        if (b.r !== tr) b.r += clamp(tr - b.r, -.15, .15);
         if (b.ramp) {
           const rp = b.ramp, RM = this.L.ramps[rp.i];
           rp.d += rp.v * h;
@@ -1171,6 +1172,7 @@ class Table {
           this.laneRest += dt;
           if (this.laneRest > .75) { b.vy = -rnd(1640, 1740) * Math.sqrt(this.L.giant || 1); b.vx = 0; b.lane = true; this.laneRest = 0; this.hook('launch', { x: b.x, y: this.L.H - 40 }); }
         }
+        if (b.x > this.L.laneX && b.y < this.L.H - 80 && sp < 40) { b.lt = (b.lt || 0) + dt; if (b.lt > 1.2) { b.lt = 0; b.x = this.L.laneX + 14; b.y = this.L.H - 28; b.vx = 0; b.vy = 0; b.r = BR; b.trail.length = 0; } } else b.lt = 0;
         if (b.bomb) { b.life -= dt; if (b.life <= 0) { this.balls.splice(i, 1); this.hook('bombPop', { x: b.x, y: b.y }); continue; } }
         if (b.extra && b.held <= 0) { b.life -= dt; if (b.life <= 0) { this.balls.splice(i, 1); this.hook('fade', { x: b.x, y: b.y }); continue; } }
         const TH = this.L.H;
