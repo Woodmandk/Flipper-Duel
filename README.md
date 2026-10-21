@@ -7,6 +7,7 @@ Et neon-flipperspil for to spillere, der kører direkte i browseren. Ingen insta
 ## Spiltyper
 
 - **Duel** – I har hvert jeres bord og 1200 liv hver. Alt du rammer, skader modstanderens liv. Bedst af 3 runder, og hver runde spilles på en tilfældig bane (Neon Klassik, Ruminvasion, Kaosfabrikken, Dybhavet eller Spøgelseshuset). Efter 2½ minut går runden i OVERDRIVE, hvor al skade tæller dobbelt. 5 hurtige træf i træk giver combo med +25% skade.
+- **Kampagne** – dig alene mod hver banes boss i 6 boss-kampe. Du har 300 liv og 5 minutter, og bossen tærer på dine liv. Vind for at låse næste bane op, og få 1–3 stjerner efter hvor mange liv du har tilbage. Finalen er en boss-rush mod alle 5 bosser i træk.
 - **Arena** – Flipper-fodbold: banen er en fodboldbane uden tyngdekraft. Hver spiller har en målmand (to flippere foran målet) og to angribere ude på modstanderens halvdel, ligesom i bordfodbold. Først til 5 mål, og banen skifter for hver 2 mål. Hver spiller har sin egen rampe, der skyder mod modstanderens mål.
 
 ## Brede baner
@@ -16,7 +17,7 @@ Banerne er brede og zoomet godt ud. I Duel følger kameraet kuglen og viser hele
 - **Ramper** – skyd hårdt ind i indgangen, så kører kuglen på skinner over bordet. Flere ramper i træk giver mere skade.
 - **Portaler** – orange og blå hænger sammen og teleporterer kuglen.
 - **Ekstra flipper** midt på nogle baner.
-- **BOSS** – i Duel dukker Øjet, Krabben eller Spøgelset op midt på bordet, hvor man kan nå dem. Besejr den, så mister modstanderen 80 liv.
+- **BOSS** – i Duel har hver bane sin egen boss: Øjet og Krabben (Neon Klassik), Moderskibet (Ruminvasion), Robotten (Kaosfabrikken), Kraken (Dybhavet) og Spøgelset (Spøgelseshuset). Bossen kæmper imod med sit eget angreb (bomber, laser, skjold, blæk, usynlighed eller et hurtigt udfald), skader dig så længe den lever, og dykker jævnligt ned mod flipperne, så du kan ramme den. Ved halv HP bliver den RASENDE og hurtigere. Besejr den, så mister modstanderen 100 liv. Ellers flygter den efter 45 sekunder.
 - **Missioner** – små opgaver med tidsfrist, fx "Ram 8 bumpere". Klarer du dem, mister modstanderen 30 liv.
 - **Ryst bordet** med `S` eller `↓`. Ryster du for meget, kommer der TILT.
 
