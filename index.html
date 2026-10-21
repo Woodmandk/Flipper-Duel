@@ -237,7 +237,7 @@ button.btn.ghost{background:transparent;font-size:14px;padding:9px;}
         <li><b>Hver bane har sin egen særlige mekanik</b>, som står på skærmen før runden. Neon Klassik: tænd alle bumpere for en lys-jackpot. Ruminvasion: skyd UFO'en ned. Kaosfabrikken: transportbånd. Dybhavet: lav tyngde og boblesøjler. Spøgelseshuset: lyset går ud. Kameraet følger kuglen.</li>
         <li><b>Kæmpebaner</b> dukker op en gang imellem: KÆMPEHALLEN i Duel og MEGASTADION i Arena er meget større end de andre baner.</li>
         <li><b>Ryst bordet</b> med <kbd>S</kbd> eller <kbd>↓</kbd> for at redde en kugle. Ryster du for meget, kommer der TILT.</li>
-        <li><b>Evner:</b> du vælger selv 2 evner i menuen (fx Homing, Vampyr, Tåge) og i kampagnen (fx Lyn, Sneglefart, Meteor). Du har én energibar, der fyldes, når du rammer ting, og hver evne koster energi. Mærkerne på bjælken viser, hvad dine evner koster. Brug dem med <kbd>Q</kbd> og <kbd>E</kbd> (eller <kbd>1</kbd> <kbd>2</kbd>) eller knapperne. Spiller 2 på samme skærm bruger <kbd>I</kbd> og <kbd>O</kbd>.</li>
+        <li><b>Evner:</b> du vælger selv 2 evner i menuen (fx Homing, Vampyr, Tåge) og i kampagnen (fx Lyn, Sneglefart, Meteor). Du har én energibar, der fyldes, når du rammer ting, og hver evne koster energi. Mærkerne på bjælken viser, hvad dine evner koster. Bruger du den samme evne igen, lægges tiden oven i. Brug dem med <kbd>Q</kbd> og <kbd>E</kbd> (eller <kbd>1</kbd> <kbd>2</kbd>) eller knapperne. Spiller 2 på samme skærm bruger <kbd>I</kbd> og <kbd>O</kbd>.</li>
         <li><b>Kampagnen</b> har 20 baner og en mega-boss på hver 5. Slår du den, låser du nye evner op. Mange baner har en særlig regel, fx stormvind, mørke eller bomberegn, og mega-bosser går i fase 2 med en invasion.</li>
         <li><b>Indstillinger og statistik</b> i menuen: vælg computerens sværhedsgrad, din kugle og dine flippers farve. Nye kugler låses op, når du spiller.</li>
         <li><b>Online</b> kan du sende emojis til modstanderen med tasterne <kbd>6</kbd>–<kbd>0</kbd> eller knapperne øverst til venstre.</li>
@@ -1455,46 +1455,46 @@ const SOLO_HP = 300, SOLO_HURT = 10;
 // campaign skills: you pick 3 before the fight, the energy bar fills as you hit things, and you spend it when you like
 const SKILLS = {
   // campaign (m: b). cost = energy needed to charge that slot
-  zap: { n: 'LYN', d: '3 lyn rammer bossen for 1 hver', c: '#fff36b', i: '⚡', cost: 90, boss: 1, m: 'b', u: 0 },
-  slowb: { n: 'SNEGLEFART', d: 'Bossen er sløv og angriber sjældnere i 10 sek.', c: '#9cff6b', i: '🐌', cost: 50, boss: 1, m: 'b', u: 0 },
-  frz: { n: 'FRYS BOSSEN', d: 'Bossen står stille og angriber ikke i 5 sek.', c: '#7de8ff', i: '❄', cost: 70, boss: 1, m: 'b', u: 1 },
-  mag: { n: 'MAGNET', d: 'Kuglerne trækkes mod bossen i 4 sek.', c: '#ff5cf0', i: 'M', cost: 70, boss: 1, m: 'b', u: 2 },
-  pow2: { n: 'KRAFTSLAG', d: 'Hvert træf på bossen tæller dobbelt i 8 sek.', c: '#ff5c8a', i: '×2', cost: 85, boss: 1, m: 'b', u: 2 },
-  meteor: { n: 'METEOR', d: 'Kæmpe slag: bossen mister 4 liv', c: '#ff7a30', i: '☄', cost: 160, boss: 1, m: 'b', u: 3 },
-  nova: { n: 'SUPERNOVA', d: 'Bossen mister 6 liv, og alle kugler skydes op', c: '#ffffff', i: '✺', cost: 200, boss: 1, m: 'b', u: 4 },
+  zap: { n: 'LYN', d: '3 lyn rammer bossen for 1 hver', c: '#fff36b', i: '⚡', cost: 45, boss: 1, m: 'b', u: 0 },
+  slowb: { n: 'SNEGLEFART', d: 'Bossen er sløv og angriber sjældnere i 10 sek.', c: '#9cff6b', i: '🐌', cost: 25, boss: 1, m: 'b', u: 0 },
+  frz: { n: 'FRYS BOSSEN', d: 'Bossen står stille og angriber ikke i 5 sek.', c: '#7de8ff', i: '❄', cost: 35, boss: 1, m: 'b', u: 1 },
+  mag: { n: 'MAGNET', d: 'Kuglerne trækkes mod bossen i 4 sek.', c: '#ff5cf0', i: 'M', cost: 35, boss: 1, m: 'b', u: 2 },
+  pow2: { n: 'KRAFTSLAG', d: 'Hvert træf på bossen tæller dobbelt i 8 sek.', c: '#ff5c8a', i: '×2', cost: 40, boss: 1, m: 'b', u: 2 },
+  meteor: { n: 'METEOR', d: 'Kæmpe slag: bossen mister 4 liv', c: '#ff7a30', i: '☄', cost: 75, boss: 1, m: 'b', u: 3 },
+  nova: { n: 'SUPERNOVA', d: 'Bossen mister 6 liv, og alle kugler skydes op', c: '#ffffff', i: '✺', cost: 100, boss: 1, m: 'b', u: 4 },
   // Duel (m: d)
-  home: { n: 'HOMING', d: 'Kuglerne styrer selv mod bumpere og bossen i 8 sek.', c: '#7dffea', i: '➶', cost: 55, m: 'd', u: 0 },
-  x2: { n: 'SUPER-SKADE', d: 'Al din skade ×2 i 10 sek.', c: '#ff5c8a', i: '×2', cost: 60, m: 'd', u: 0 },
-  storm: { n: 'LYNSTORM', d: '8 lyn rammer dit bord for −2 hver', c: '#fff36b', i: '⚡', cost: 70, m: 'd', u: 1 },
-  mega: { n: 'MEGA-SLAG', d: 'Modstanderen mister 60 liv med det samme', c: '#ff7a30', i: '☄', cost: 140, m: 'd', u: 3 },
-  twin: { n: 'DOBBELTANGREB', d: 'Send to tilfældige angreb på én gang (−30)', c: '#ff3fd2', i: '⚔', cost: 130, m: 'd', u: 4 },
-  fog: { n: 'TÅGE', d: 'Send tåge over modstanderens bord (−15)', c: '#b98cff', i: '≋', cost: 60, m: 'd', u: 0, atk: 1 },
-  bomb: { n: 'BOMBE', d: 'Send en bombe til modstanderen (−15)', c: '#ff4060', i: '✸', cost: 55, m: 'd', u: 0, atk: 1 },
-  quake: { n: 'JORDSKÆLV', d: 'Ryst modstanderens kugler rundt (−15)', c: '#ff9a3c', i: '≈', cost: 45, m: 'd', u: 0, atk: 1 },
-  mir: { n: 'SPEJLVENDT', d: 'Byt modstanderens flippere om (−15)', c: '#ff7a30', i: '⇄', cost: 65, m: 'd', u: 1, atk: 1 },
-  small: { n: 'MINI-FLIPPERE', d: 'Krymp modstanderens flippere (−15)', c: '#ff4060', i: '↘', cost: 65, m: 'd', u: 1, atk: 1 },
-  ice: { n: 'FRYS MODSTANDER', d: 'Modstanderens flippere fryser i 2½ sek. (−15)', c: '#7de8ff', i: '❄', cost: 75, m: 'd', u: 1, atk: 1 },
-  bh: { n: 'SORT HUL', d: 'Modstanderens kugle suges mod midten (−15)', c: '#c070ff', i: '●', cost: 65, m: 'd', u: 2, atk: 1 },
-  steal: { n: 'ENERGITYV', d: 'Modstanderen mister al sin energi (−15)', c: '#ffd84a', i: '⚡', cost: 70, m: 'd', u: 2, atk: 1 },
-  rain: { n: 'BOMBEREGN', d: 'Send 3 bomber til modstanderen (−15)', c: '#ff4060', i: '✸', cost: 100, m: 'd', u: 2, atk: 1 },
+  home: { n: 'HOMING', d: 'Kuglerne styrer selv mod bumpere og bossen i 8 sek.', c: '#7dffea', i: '➶', cost: 30, m: 'd', u: 0 },
+  x2: { n: 'SUPER-SKADE', d: 'Al din skade ×2 i 10 sek.', c: '#ff5c8a', i: '×2', cost: 35, m: 'd', u: 0 },
+  storm: { n: 'LYNSTORM', d: '8 lyn rammer dit bord for −2 hver', c: '#fff36b', i: '⚡', cost: 35, m: 'd', u: 1 },
+  mega: { n: 'MEGA-SLAG', d: 'Modstanderen mister 60 liv med det samme', c: '#ff7a30', i: '☄', cost: 70, m: 'd', u: 3 },
+  twin: { n: 'DOBBELTANGREB', d: 'Send to tilfældige angreb på én gang (−30)', c: '#ff3fd2', i: '⚔', cost: 60, m: 'd', u: 4 },
+  fog: { n: 'TÅGE', d: 'Send tåge over modstanderens bord (−15)', c: '#b98cff', i: '≋', cost: 30, m: 'd', u: 0, atk: 1 },
+  bomb: { n: 'BOMBE', d: 'Send en bombe til modstanderen (−15)', c: '#ff4060', i: '✸', cost: 25, m: 'd', u: 0, atk: 1 },
+  quake: { n: 'JORDSKÆLV', d: 'Ryst modstanderens kugler rundt (−15)', c: '#ff9a3c', i: '≈', cost: 20, m: 'd', u: 0, atk: 1 },
+  mir: { n: 'SPEJLVENDT', d: 'Byt modstanderens flippere om (−15)', c: '#ff7a30', i: '⇄', cost: 30, m: 'd', u: 1, atk: 1 },
+  small: { n: 'MINI-FLIPPERE', d: 'Krymp modstanderens flippere (−15)', c: '#ff4060', i: '↘', cost: 30, m: 'd', u: 1, atk: 1 },
+  ice: { n: 'FRYS MODSTANDER', d: 'Modstanderens flippere fryser i 2½ sek. (−15)', c: '#7de8ff', i: '❄', cost: 35, m: 'd', u: 1, atk: 1 },
+  bh: { n: 'SORT HUL', d: 'Modstanderens kugle suges mod midten (−15)', c: '#c070ff', i: '●', cost: 30, m: 'd', u: 2, atk: 1 },
+  steal: { n: 'ENERGITYV', d: 'Modstanderen mister al sin energi (−15)', c: '#ffd84a', i: '⚡', cost: 35, m: 'd', u: 2, atk: 1 },
+  rain: { n: 'BOMBEREGN', d: 'Send 3 bomber til modstanderen (−15)', c: '#ff4060', i: '✸', cost: 50, m: 'd', u: 2, atk: 1 },
   // shared by several modes
-  multi: { n: 'MULTIBALL', d: 'Ekstra kugler i 10 sek.', c: '#ff9a3c', i: '3', cost: 50, m: 'bda', u: 0 },
-  big: { n: 'KÆMPE-FLIPPERE', d: 'Længere flippere i 10–12 sek.', c: '#ffd84a', i: 'B', cost: 35, m: 'bda', u: 0 },
-  shield: { n: 'SKJOLD', d: 'Næste tabte kugle teleporteres op igen', c: '#5cf2ff', i: 'S', cost: 35, m: 'bd', u: 0 },
-  net: { n: 'REDNINGSNET', d: 'Tabte kugler er gratis i 10 sek.', c: '#7dff9a', i: 'N', cost: 50, m: 'bd', u: 0 },
-  vamp: { n: 'VAMPYR', d: 'Halvdelen af din skade bliver til liv i 10 sek.', c: '#ff3060', i: '🦇', cost: 60, m: 'bd', u: 1 },
-  heal: { n: 'HELBRED', d: '+60 liv', c: '#7dff9a', i: '+', cost: 70, m: 'bd', u: 1 },
+  multi: { n: 'MULTIBALL', d: 'Ekstra kugler i 10 sek.', c: '#ff9a3c', i: '3', cost: 25, m: 'bda', u: 0 },
+  big: { n: 'KÆMPE-FLIPPERE', d: 'Længere flippere i 10–12 sek.', c: '#ffd84a', i: 'B', cost: 20, m: 'bda', u: 0 },
+  shield: { n: 'SKJOLD', d: 'Næste tabte kugle teleporteres op igen', c: '#5cf2ff', i: 'S', cost: 20, m: 'bd', u: 0 },
+  net: { n: 'REDNINGSNET', d: 'Tabte kugler er gratis i 10 sek.', c: '#7dff9a', i: 'N', cost: 25, m: 'bd', u: 0 },
+  vamp: { n: 'VAMPYR', d: 'Halvdelen af din skade bliver til liv i 10 sek.', c: '#ff3060', i: '🦇', cost: 35, m: 'bd', u: 1 },
+  heal: { n: 'HELBRED', d: '+60 liv', c: '#7dff9a', i: '+', cost: 35, m: 'bd', u: 1 },
   // Arena (m: a)
-  afire: { n: 'ILDKUGLE', d: 'Alle kugler brager mod modstanderens mål', c: '#ff7a30', i: '🔥', cost: 80, m: 'a', u: 0 },
-  afrz: { n: 'FRYS', d: 'Modstanderens flippere fryser i 2 sek.', c: '#7de8ff', i: '❄', cost: 65, m: 'a', u: 0 },
-  wall: { n: 'MUR', d: 'Et skjold foran dit mål teleporterer ét skud væk', c: '#5cf2ff', i: '▬', cost: 50, m: 'a', u: 0 },
-  ahome: { n: 'HOMING', d: 'Kuglen styrer mod modstanderens mål i 4 sek.', c: '#7dffea', i: '➶', cost: 60, m: 'a', u: 0 },
-  agiant: { n: 'KÆMPEKUGLER', d: 'Kuglerne bliver dobbelt så store i 8 sek.', c: '#7dffea', i: 'G', cost: 50, m: 'a', u: 0 },
-  acannon: { n: 'KANON', d: 'Alle kugler skydes mod modstanderens mål', c: '#ff9a3c', i: 'K', cost: 60, m: 'a', u: 1 },
-  slow: { n: 'SLØV MODSTANDER', d: 'Modstanderens flippere går langsomt i 6 sek.', c: '#b98cff', i: 'Z', cost: 60, m: 'a', u: 2 },
-  amega: { n: 'KUGLEREGN', d: '4 ekstra kugler i 6 vilde sekunder', c: '#ff3fd2', i: '10', cost: 85, m: 'a', u: 2 },
-  dbl: { n: 'DOBBELT MÅL', d: 'Dit næste mål tæller 2', c: '#ffd84a', i: '2', cost: 70, m: 'a', u: 3 },
-  tri: { n: 'TREDOBBELT SKUD', d: '3 kugler skydes mod modstanderens mål', c: '#ff9a3c', i: '⫸', cost: 75, m: 'a', u: 4 },
+  afire: { n: 'ILDKUGLE', d: 'Alle kugler brager mod modstanderens mål', c: '#ff7a30', i: '🔥', cost: 40, m: 'a', u: 0 },
+  afrz: { n: 'FRYS', d: 'Modstanderens flippere fryser i 2 sek.', c: '#7de8ff', i: '❄', cost: 30, m: 'a', u: 0 },
+  wall: { n: 'MUR', d: 'Et skjold foran dit mål teleporterer ét skud væk', c: '#5cf2ff', i: '▬', cost: 25, m: 'a', u: 0 },
+  ahome: { n: 'HOMING', d: 'Kuglen styrer mod modstanderens mål i 4 sek.', c: '#7dffea', i: '➶', cost: 30, m: 'a', u: 0 },
+  agiant: { n: 'KÆMPEKUGLER', d: 'Kuglerne bliver dobbelt så store i 8 sek.', c: '#7dffea', i: 'G', cost: 25, m: 'a', u: 0 },
+  acannon: { n: 'KANON', d: 'Alle kugler skydes mod modstanderens mål', c: '#ff9a3c', i: 'K', cost: 30, m: 'a', u: 1 },
+  slow: { n: 'SLØV MODSTANDER', d: 'Modstanderens flippere går langsomt i 6 sek.', c: '#b98cff', i: 'Z', cost: 30, m: 'a', u: 2 },
+  amega: { n: 'KUGLEREGN', d: '4 ekstra kugler i 6 vilde sekunder', c: '#ff3fd2', i: '10', cost: 40, m: 'a', u: 2 },
+  dbl: { n: 'DOBBELT MÅL', d: 'Dit næste mål tæller 2', c: '#ffd84a', i: '2', cost: 35, m: 'a', u: 3 },
+  tri: { n: 'TREDOBBELT SKUD', d: '3 kugler skydes mod modstanderens mål', c: '#ff9a3c', i: '⫸', cost: 35, m: 'a', u: 4 },
 };
 const SKILL_KEYS = Object.keys(SKILLS), SK_ATK_DMG = 15;
 const LO_KEY = { b: 'skills', d: 'dsk', a: 'ask' }, LO_DEF = { b: ['zap', 'multi'], d: ['home', 'fog'], a: ['afire', 'ahome'] }, NSK = 2;
@@ -1558,16 +1558,17 @@ function skillFx(t, p, k) {
   SFX.send(); t.ban(S.n + '!', S.c, 1.2, S.d); t.burst(cx, cy, S.c, 24, 400, .5);
   if (!online() || p === 0) vibrate(40);
 }
+const stack = (o, key, v) => { o[key] = Math.min(40, Math.max(0, o[key] || 0) + v); };
 function doSkill(p, k, t) {
   const S = SKILLS[k], cx = t.L.cx;
   if (t.kind === 'arena') {
     if (k === 'afire' || k === 'afrz' || k === 'wall') { useAbility(p, { afire: 'fire', afrz: 'frz', wall: 'wall' }[k]); return; }
-    if (k === 'ahome') { t.eff.ahome = 4; t.homeP = p; t.last = p; t.grav = p === 0 ? -1 : 1; }
+    if (k === 'ahome') { stack(t.eff, 'ahome', 4); t.homeP = p; t.last = p; t.grav = p === 0 ? -1 : 1; }
     else if (k === 'multi') t.spawnMulti(2, cx, t.L.H / 2, p === 0 ? 1 : -1, 10);
-    else if (k === 'big') t.bigP[p] = 10;
-    else if (k === 'slow') t.slowP[1 - p] = 6;
-    else if (k === 'dbl') t.dbl[p] = 15;
-    else if (k === 'agiant') t.eff.giant = 8;
+    else if (k === 'big') stack(t.bigP, p, 10);
+    else if (k === 'slow') stack(t.slowP, 1 - p, 6);
+    else if (k === 'dbl') stack(t.dbl, p, 15);
+    else if (k === 'agiant') stack(t.eff, 'giant', 8);
     else if (k === 'acannon') { const dir = p === 0 ? -1 : 1; t.grav = dir; t.last = p; for (const b of t.balls) { b.vx = rnd(-400, 400); b.vy = dir * rnd(1300, 1700); b.held = 0; } }
     else if (k === 'amega') t.spawnMulti(4, cx, t.L.H / 2, p === 0 ? 1 : -1, 6);
     else if (k === 'tri') { t.spawnMulti(3, cx, p === 0 ? t.L.H - 230 : 230, p === 0 ? 1 : -1, 6); t.last = p; t.grav = p === 0 ? -1 : 1; }
@@ -1578,22 +1579,22 @@ function doSkill(p, k, t) {
   if (k === 'twin') { const A = ['fog', 'bomb', 'quake', 'mir', 'small', 'ice'], a = pick(A); let b2; do b2 = pick(A); while (b2 === a); G.dealt[p] += 2 * SK_ATK_DMG; sendAttack(p, a); sendAttack(p, b2); return; }
   const bo = t.boss, cy = t.cam.y + t.cam.h * .45;
   skillFx(t, p, k);
-  if (k === 'zap') { t.zapB = 3; t.zapBT = .1; }
-  else if (k === 'frz') { t.eff.frzB = 5; SFX.zap(); t.ring(bo.x, bo.y, 80, '#7de8ff', .5, 5); }
-  else if (k === 'mag') { t.eff.mag = 4; t.ring(bo.x, bo.y, 120, '#ff5cf0', .6, 4); }
-  else if (k === 'pow2') t.eff.pow2 = 8;
+  if (k === 'zap') { if (t.zapB <= 0) t.zapBT = .1; t.zapB += 3; }
+  else if (k === 'frz') { stack(t.eff, 'frzB', 5); SFX.zap(); t.ring(bo.x, bo.y, 80, '#7de8ff', .5, 5); }
+  else if (k === 'mag') { stack(t.eff, 'mag', 4); t.ring(bo.x, bo.y, 120, '#ff5cf0', .6, 4); }
+  else if (k === 'pow2') stack(t.eff, 'pow2', 8);
   else if (k === 'nova') { SFX.boom(); t.boom(bo.x, bo.y, '#ffffff', true); t.boom(bo.x, bo.y, '#ffd84a', true); t.shake = 20; for (const b of t.balls) if (!b.lane && !b.ramp) { b.vx = rnd(-400, 400); b.vy = -rnd(1300, 1700); b.held = 0; } t.hurtBoss(6); }
   else if (k === 'meteor') { SFX.boom(); t.bolts.push({ x: bo.x, y: bo.y, life: .4, seed: Math.random() * 1000 }); t.boom(bo.x, bo.y, '#ff7a30', true); t.shake = 16; t.hurtBoss(4); }
   else if (k === 'multi') t.spawnMulti(3, cx, t.L.H - 380, 1, 10);
-  else if (k === 'big') t.eff.big = G.type === 'boss' ? 12 : 10;
+  else if (k === 'big') stack(t.eff, 'big', G.type === 'boss' ? 12 : 10);
   else if (k === 'shield') t.dshield = 1;
   else if (k === 'heal') { G.drain[p] = Math.max(-G.dealt[1 - p], G.drain[p] - 60); t.text(cx, cy, '+60', '#7dff9a', 34); }
-  else if (k === 'home') t.eff.home = 8;
-  else if (k === 'x2') t.eff.x2 = 10;
-  else if (k === 'storm') { t.storm = 8; t.stormT = .2; }
-  else if (k === 'net') t.save = Math.max(t.save, 10);
-  else if (k === 'vamp') t.eff.vamp = 10;
-  else if (k === 'slowb') t.eff.slowB = 10;
+  else if (k === 'home') stack(t.eff, 'home', 8);
+  else if (k === 'x2') stack(t.eff, 'x2', 10);
+  else if (k === 'storm') { if (t.storm <= 0) t.stormT = .2; t.storm += 8; }
+  else if (k === 'net') stack(t, 'save', 10);
+  else if (k === 'vamp') stack(t.eff, 'vamp', 10);
+  else if (k === 'slowb') stack(t.eff, 'slowB', 10);
   else if (k === 'mega') { const dm = 60; G.dealt[p] += dm; SFX.boom(); t.boom(cx, t.cam.y + 40, '#ff7a30', true); t.text(cx, t.cam.y + 100, '-' + dm, COL[1 - p], 44); t.shake = 14; }
 }
 // big moments (boss down, goal, round won) play out in slow motion
@@ -1870,7 +1871,7 @@ const COARSE = matchMedia('(pointer: coarse)').matches;
 const isHuman = p => !G.ai[p] && (p === 0 || G.type === 'local');
 const fireKeys = p => COARSE ? 'TRYK SUPER-KNAPPEN' : G.type === 'local' ? (p === 0 ? 'TRYK W' : 'TRYK ↑') : 'TRYK W / ↑ / MELLEMRUM';
 // one energy bar per player; each skill costs some of it, so you choose what to spend it on
-const ENMAX = 200;
+const ENMAX = 100, EN_GAIN = .5;
 function skSync(p) {
   const lo = loadout(p);
   G.sk[p] = [0, 1].map(i => SKILLS[lo[i]] ? Math.min(100, G.en[p] * 100 / SKILLS[lo[i]].cost) : 0);
@@ -1879,7 +1880,7 @@ function skSync(p) {
 function chargeMeter(p, amt) {
   if (G.phase !== 'play' || G.demo) return;
   const lo = loadout(p), mul = G.type === 'boss' ? 1.1 : 1, was = G.sk[p].slice();
-  G.en[p] = Math.min(ENMAX, G.en[p] + amt * mul); skSync(p);
+  G.en[p] = Math.min(ENMAX, G.en[p] + amt * mul * EN_GAIN); skSync(p);
   for (let i = 0; i < NSK; i++) {
     const S = SKILLS[lo[i]]; if (!S || was[i] >= 100) continue;
     if (G.sk[p][i] >= 100 && isHuman(p)) { // tell the player it is ready
@@ -1913,8 +1914,8 @@ function fireSuper(p) {
 }
 function useAbility(p, type) {
   const t = G.tables[0], dir = p === 0 ? -1 : 1;
-  if (type === 'fire') { t.grav = dir; t.last = p; t.fire = 2.5; for (const b of t.balls) { b.vx = rnd(-260, 260); b.vy = dir * rnd(1450, 1750); b.held = 0; } }
-  else if (type === 'frz') t.frz[1 - p] = 2;
+  if (type === 'fire') { t.grav = dir; t.last = p; stack(t, 'fire', 2.5); for (const b of t.balls) { b.vx = rnd(-260, 260); b.vy = dir * rnd(1450, 1750); b.held = 0; } }
+  else if (type === 'frz') stack(t.frz, 1 - p, 2);
   else t.shield[p] = 1;
   abilityFx(t, p, type);
   pushFx('S', 200, 360, p, ABIL_KEYS.indexOf(type));
@@ -3244,7 +3245,7 @@ function drawLoadout(m, box, hint) {
     const S = SKILLS[k], b = document.createElement('button'), open = skOpen(k); b.type = 'button'; b.style.setProperty('--c', S.c);
     const on = SET[key].includes(k); b.setAttribute('aria-pressed', on); b.disabled = !open;
     const ic = document.createElement('i'), nm = document.createElement('b'), ds = document.createElement('span');
-    ic.textContent = open ? S.i : '🔒'; nm.textContent = (on ? (SET[key].indexOf(k) + 1) + '. ' : '') + S.n + ' · koster ' + S.cost;
+    ic.textContent = open ? S.i : '🔒'; nm.textContent = (on ? (SET[key].indexOf(k) + 1) + '. ' : '') + S.n + ' · ' + S.cost + ' energi';
     ds.textContent = open ? S.d : 'Slå den ' + MEGA_NAMES[S.u - 1] + ' mega-boss i kampagnen';
     b.append(ic, nm, ds);
     b.onclick = () => { if (on || !open) return; SET[key] = [...SET[key].slice(1 - NSK), k].slice(-NSK); saveSet(); drawLoadout(m, box, hint); if (m !== 'b') menuSkills(); };
