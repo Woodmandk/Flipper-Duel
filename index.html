@@ -95,6 +95,16 @@ button.btn.ghost{background:transparent;font-size:14px;padding:9px;}
 .sw button:disabled i{filter:grayscale(1) brightness(.5);}
 .sw button.dn i{background:none;box-shadow:none;font-size:22px;font-style:normal;line-height:26px;text-align:center;}
 .coins{font-family:var(--display);color:var(--gold);text-align:center;font-size:20px;margin:-6px 0 0;}
+.tut{position:fixed;z-index:7;left:50%;transform:translateX(-50%);top:calc(env(safe-area-inset-top,0px) + 58px);width:min(440px,calc(100% - 32px));box-sizing:border-box;background:rgba(10,6,28,.92);border:1px solid var(--gold);border-radius:12px;padding:12px 14px;box-shadow:0 0 30px rgba(255,216,74,.25);display:flex;flex-direction:column;gap:8px;}
+@media (min-width:900px){.tut{left:auto;right:24px;transform:none;top:50%;translate:0 -50%;width:340px;}}
+.tut .tn{font-family:var(--display);font-size:12px;color:var(--muted);letter-spacing:.08em;}
+.tut b{font-family:var(--display);font-weight:400;font-size:18px;color:var(--gold);}
+.tut p{margin:0;font-size:15px;line-height:1.4;}
+.tut .bar{height:6px;border-radius:3px;background:rgba(255,255,255,.1);overflow:hidden;}
+.tut .bar i{display:block;height:100%;width:0;background:var(--gold);transition:width .2s;}
+.tut .row{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;}
+.tut .row button{cursor:pointer;font-family:var(--display);font-size:13px;letter-spacing:.04em;padding:8px 14px;border-radius:9px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--fg);}
+.tut .row button.pri{background:var(--gold);color:#1a0d00;border-color:var(--gold);}
 .kaosfri{margin:0;text-align:center;font-family:var(--display);font-size:15px;letter-spacing:.04em;color:#ff7a30;border:1px solid rgba(255,122,48,.6);border-radius:10px;padding:8px 10px;background:rgba(255,122,48,.1);line-height:1.35;}
 .kbtn{cursor:pointer;width:100%;color:var(--muted);border-color:var(--line);background:rgba(255,255,255,.035);}
 .kbtn[aria-pressed=true]{color:#ff7a30;border-color:rgba(255,122,48,.8);background:rgba(255,122,48,.14);box-shadow:0 0 22px rgba(255,122,48,.25);}
@@ -176,6 +186,7 @@ button.btn.ghost{background:transparent;font-size:14px;padding:9px;}
       <button class="btn" type="button" id="bLocal">2 spillere på samme skærm</button>
       <button class="btn" type="button" id="bShop">Butik</button>
       <button class="btn ghost" type="button" id="bProf">Indstillinger og statistik</button>
+      <button class="btn ghost" type="button" id="bTut">Tutorial</button>
       <button class="btn ghost" type="button" id="bHelp2">Sådan spiller du</button>
     </div>
     <div class="field">
@@ -260,6 +271,26 @@ button.btn.ghost{background:transparent;font-size:14px;padding:9px;}
     <button class="btn" type="button" id="bMmCpu" hidden>Spil mod computeren i stedet</button>
     <button class="btn" type="button" id="bLeave">Annullér</button>
     <p class="hint" id="lobHint">Send koden eller linket til din ven. Din ven skal kunne åbne spillet i Claude, så del det med dem først.</p>
+  </div>
+</div>
+
+<div class="tut" id="tut" hidden>
+  <span class="tn" id="tutN"></span>
+  <b id="tutT"></b>
+  <p id="tutD"></p>
+  <div class="bar" id="tutBar"><i id="tutFill"></i></div>
+  <div class="row"><button type="button" id="tutSkip">Skip</button><button type="button" id="tutAlt" hidden></button><button type="button" class="pri" id="tutNext" hidden>Next</button></div>
+</div>
+
+<div class="ov" id="tutAsk" hidden>
+  <div class="card">
+    <h2>New to Flipper Duel?</h2>
+    <p class="sub">Take the short tutorial. You'll learn the flippers, energy, skills and power-ups on a practice table in about 2 minutes.</p>
+    <div class="btns">
+      <button class="btn pri" type="button" id="bTutYes">Start the tutorial</button>
+      <button class="btn" type="button" id="bTutNo">Skip, I know how to play</button>
+    </div>
+    <p class="hint">You can always start it again from the menu.</p>
   </div>
 </div>
 
@@ -1573,7 +1604,8 @@ function dailyC() {
   else C.boss = BOSS_KEYS[Math.floor(r() * BOSS_KEYS.length)];
   return dailyMemo = C;
 }
-const campC = i => (i == null ? G.camp : i) === DAILY ? dailyC() : CAMP[i == null ? G.camp : i];
+const TUT = DAILY + 1, TUT_C = { li: 0, mul: 1, time: 99999, tut: 1 };
+const campC = i => { const k = i == null ? G.camp : i; return k === DAILY ? dailyC() : k === TUT ? TUT_C : CAMP[k]; };
 const SOLO_HP = 300, SOLO_HURT = 10;
 // campaign skills: you pick 3 before the fight, the energy bar fills as you hit things, and you spend it when you like
 const SKILLS = {
@@ -1692,7 +1724,7 @@ function useSkill(lp, i) {
     if (G.sk[1][i] >= 100 && G.skCd[0] <= 0) { G.skCd[0] = .4; G.supReq++; G.skReqK = i; stat('supers', 1); }
     return;
   }
-  if (trySkill(lp, i) && lp === 0) stat('supers', 1);
+  if (trySkill(lp, i) && lp === 0) { stat('supers', 1); if (G.camp === TUT) tutEvent('skill'); }
 }
 // p is the world player, i the skill slot
 function trySkill(p, i) {
@@ -1899,6 +1931,7 @@ function onEvent(i, type, d) {
   if (G.mode === 'arena') return onArenaEvent(t, type, d);
   const p = i, c = COL[p], playing = G.phase === 'play';
   const mine = !online() || p === 0;
+  if (G.camp === TUT && playing) tutEvent(type);
   if (type !== 'rampOut') featureFx(t, type, d, c);
   if (type === 'rampOut') { SFX.rampOut(); t.burst(d.x, d.y, '#7dffea', 16, 300, .4); type = 'ramp'; t.rampN = t.rampT > 0 ? t.rampN + 1 : 1; t.rampT = 8; }
   if (t.mis && playing && MIS[t.mis.k].ev.includes(type)) {
@@ -2042,6 +2075,7 @@ function chargeMeter(p, amt) {
 function humanNudge(p) {
   if (G.mode !== 'duel' || G.phase !== 'play' || G.demo || G.ai[p]) return;
   const t = G.tables[p]; if (t) t.nudge();
+  if (G.camp === TUT) tutEvent('nudge');
 }
 function humanFire(p) {
   if (G.phase !== 'play' || G.demo || G.ai[p]) return;
@@ -2319,6 +2353,7 @@ const SUP0 = ['KeyW', 'Space'], SUP1 = ['ArrowUp', 'Enter', 'NumpadEnter', 'KeyI
 addEventListener('keydown', e => {
   if (e.target && e.target.tagName === 'INPUT') return;
   keys.add(e.code); if (e.code.startsWith('Arrow') || e.code === 'Space') e.preventDefault(); SFX.init();
+  if (G.camp === TUT) { if ([...KL0, ...KL1].includes(e.code)) TS.l = 1; if ([...KR0, ...KR1].includes(e.code)) TS.r = 1; }
   if (!e.repeat && [...NUD0, ...NUD1].includes(e.code)) humanNudge(G.type === 'local' && NUD1.includes(e.code) ? 1 : 0);
   if (!e.repeat && online()) { const em = { Digit6: 0, Digit7: 1, Digit8: 2, Digit9: 3, Digit0: 4 }[e.code]; if (em != null) sendEmo(em); }
   if (!e.repeat) {
@@ -2338,7 +2373,7 @@ function ptrTarget(x, y) {
   }
   return { p: 0, s: x < cw / 2 ? 'l' : 'r' };
 }
-cv.addEventListener('pointerdown', e => { SFX.init(); ptrs.set(e.pointerId, ptrTarget(e.clientX, e.clientY)); try { cv.setPointerCapture(e.pointerId); } catch (er) {} e.preventDefault(); });
+cv.addEventListener('pointerdown', e => { SFX.init(); ptrs.set(e.pointerId, ptrTarget(e.clientX, e.clientY)); if (G.camp === TUT) TS[ptrTarget(e.clientX, e.clientY).s] = 1; try { cv.setPointerCapture(e.pointerId); } catch (er) {} e.preventDefault(); });
 const ptrUp = e => ptrs.delete(e.pointerId);
 cv.addEventListener('pointerup', ptrUp); cv.addEventListener('pointercancel', ptrUp);
 cv.addEventListener('contextmenu', e => e.preventDefault());
@@ -2429,6 +2464,7 @@ function update(dt, now) {
     const t = G.tables[0]; t.stepFlippers(dt); t.tokens.forEach(k => k.t += dt);
   }
   if (G.phase === 'play' && !G.demo) {
+    if (G.camp === TUT) tutTick(dt);
     G.t += authority ? dt : 0; G.skCd[0] -= dt; G.skCd[1] -= dt;
     for (let p = 0; p < 2; p++) if (G.ai[p] && G.type !== 'boss') {
       if (G.aiSk[p] == null) { const rd = [0, 1].filter(i => G.sk[p][i] >= 100); if (rd.length) { G.aiSk[p] = pick(rd); G.aiFire[p] = rnd(...cpuLv().f); } }
@@ -3218,7 +3254,7 @@ function drawCenter() {
     ctx.save(); ctx.translate(T.x, T.y); ctx.scale(s, s); ctx.textAlign = T.left ? 'left' : 'center'; ctx.textBaseline = 'middle';
     ctx.font = '20px Bungee, sans-serif'; ctx.fillStyle = G.overdrive ? '#ff7a30' : '#ece9ff';
     const mm = Math.floor(rem / 60), ss = String(Math.floor(rem % 60)).padStart(2, '0');
-    if (G.type === 'boss') ctx.fillText(`${G.camp === DAILY ? 'DAGENS UDFORDRING' : 'BOSS-KAMP ' + (G.camp + 1)} · ${duelL().name} · ${mm}:${ss}`, 0, 0); else ctx.fillText(T.left ? `R${G.round} · ${mm}:${ss}${G.overdrive ? ' · OVERDRIVE' : ' · ' + duelL().name}` : `RUNDE ${G.round} · ${duelL().name} · ${mm}:${ss}${G.overdrive ? ' · OVERDRIVE' : ''}`, 0, 0);
+    if (G.type === 'boss') ctx.fillText(G.camp === TUT ? 'TUTORIAL · ' + duelL().name : `${G.camp === DAILY ? 'DAGENS UDFORDRING' : 'BOSS-KAMP ' + (G.camp + 1)} · ${duelL().name} · ${mm}:${ss}`, 0, 0); else ctx.fillText(T.left ? `R${G.round} · ${mm}:${ss}${G.overdrive ? ' · OVERDRIVE' : ' · ' + duelL().name}` : `RUNDE ${G.round} · ${duelL().name} · ${mm}:${ss}${G.overdrive ? ' · OVERDRIVE' : ''}`, 0, 0);
     ctx.restore();
   }
   if (G.phase === 'count' && !G.demo) {
@@ -3229,7 +3265,7 @@ function drawCenter() {
     const CC = G.type === 'boss' && campC(), CL = G.mode === 'arena' ? G.tables[0].L : duelL(), CM = CC && MODS[CC.mod], KF = kaosFri();
     ctx.fillStyle = 'rgba(5,3,15,.7)'; ctx.fillRect(-260, -170, 520, 70 + (CL.sigTxt ? 26 : 0) + (CM ? 46 : 0) + (KF ? 26 : 0));
     ctx.font = '22px Bungee, sans-serif'; ctx.fillStyle = '#ffd84a';
-    ctx.fillText(G.mode === 'arena' ? `FØRST TIL ${goalsNeeded()} MÅL` : CC ? (G.camp === DAILY ? 'DAGENS UDFORDRING' : CC.rush ? 'BOSS-RUSH' : CC.mega ? 'MEGA-BOSS!' : 'BOSS-KAMP ' + (G.camp + 1)) : `RUNDE ${G.round}`, 0, -150);
+    ctx.fillText(G.mode === 'arena' ? `FØRST TIL ${goalsNeeded()} MÅL` : CC ? (G.camp === TUT ? 'TUTORIAL' : G.camp === DAILY ? 'DAGENS UDFORDRING' : CC.rush ? 'BOSS-RUSH' : CC.mega ? 'MEGA-BOSS!' : 'BOSS-KAMP ' + (G.camp + 1)) : `RUNDE ${G.round}`, 0, -150);
     ctx.font = '16px Bungee, sans-serif'; ctx.fillStyle = '#ece9ff';
     ctx.fillText('BANE: ' + CL.name + (CL.giant ? ' · KÆMPEBANE!' : ''), 0, -120);
     let ly = -94; ctx.font = '13px Bungee, sans-serif';
@@ -3446,7 +3482,7 @@ function setMode(m) {
 $('mDuel').onclick = () => setMode('duel'); $('mArena').onclick = () => setMode('arena');
 function menuErr(msg) { const e = $('menuErr'); e.textContent = msg || ''; e.hidden = !msg; }
 function toMenu(msg) {
-  netLeave(); hide('over'); hide('lobby'); hide('hud'); hide('help'); show('menu'); G.over = false; G.phase = 'menu';
+  netLeave(); hide('over'); hide('lobby'); hide('hud'); hide('help'); hide('tut'); show('menu'); G.over = false; G.phase = 'menu';
   startDemo(); layout(); menuErr(msg);
 }
 $('bCpu').onclick = () => { SFX.init(); menuErr(); startGame(G.mode, 'cpu', [myName(), 'CPU']); layout(); };
@@ -3540,6 +3576,66 @@ menuLabels(); setInterval(() => { if (!$('menu').hidden) menuLabels(); }, 500);
 $('bSk').onclick = () => { SFX.init(); showPick(); };
 $('bPickDone').onclick = () => { hide('pick'); show('menu'); menuSkills(); };
 $('bProfBack').onclick = () => { hide('prof'); show('menu'); };
+// ---------- tutorial: a practice table with step-by-step goals (no boss, no timer, HP never runs out) ----------
+const TUT_STEPS = [
+  { t: 'Flippers', d: () => COARSE ? 'Tap the left side of the screen for the left flipper and the right side for the right flipper. Try both.' : 'Press A for the left flipper and D for the right flipper (or ← →). Try both.', need: 2 },
+  { t: 'Hit things', d: () => 'Hit bumpers, slingshots and targets with the ball. In Duel every hit damages your opponent. Hit 6 things.', need: 6, ev: t => DMG[t] != null },
+  { t: 'Energy', d: () => 'Every hit fills your yellow energy bar at the top. Fill it up to the first mark.', need: 1 },
+  { t: 'Use a skill', d: () => COARSE ? 'MULTIBALL is READY! Tap its button on the left to fire it.' : 'MULTIBALL is READY! Press Q to fire it (or click its button on the left).', need: 1, ev: t => t === 'skill' },
+  { t: 'Power-ups', d: () => 'Hexagons are power-ups. Hit the one on the table with the ball. The ones with a rainbow ring are CHAOS.', need: 1, ev: t => t === 'power' },
+  { t: 'Save the ball', d: () => 'Losing the ball costs HP. ' + (COARSE ? 'On a keyboard you can nudge the table with S to save it, but nudge too much and you get TILT.' : 'Press S to nudge the table and save it, but nudge too much and you get TILT. Try a nudge.'), need: 1, ev: t => t === 'nudge', info: () => COARSE },
+  { t: 'Two ways to play', d: () => 'DUEL: one table each. Hurt your opponent until their HP runs out, best of 3. ARENA: pinball football on one table. Shoot the ball into your opponent\'s goal, first to 5. Pick 2 skills for each mode in the menu.', info: () => true },
+  { t: 'You\'re ready!', d: () => 'Try a match against the computer, beat bosses in the campaign, or find an opponent online. Press ? any time for the full guide.', info: () => true, last: 1 },
+];
+const TS = { i: 0, n: 0, l: 0, r: 0, done: -1 };
+function startTutorial() {
+  store.set('fd-tut', '1'); hide('tutAsk');
+  startCamp(TUT);
+  G.lo[0] = ['multi', 'big'];
+  const t = G.tables[0]; t.bossT = 1e9; t.misT = 1e9; t.tokenT = 1e9;
+  TS.i = 0; TS.done = -1; tutShow(); show('tut');
+}
+function tutShow() {
+  const S = TUT_STEPS[TS.i], info = S.info && S.info();
+  TS.n = 0; TS.l = TS.r = 0;
+  $('tutN').textContent = 'TUTORIAL · STEP ' + (TS.i + 1) + ' OF ' + TUT_STEPS.length;
+  $('tutT').textContent = S.t; $('tutD').textContent = S.d();
+  $('tutBar').hidden = !!info; $('tutFill').style.width = '0';
+  $('tutNext').hidden = !info; $('tutNext').textContent = S.last ? 'Play the computer' : 'Next';
+  $('tutAlt').hidden = !S.last; $('tutAlt').textContent = 'Menu';
+  $('tutSkip').textContent = S.last ? 'Play again' : info ? 'Skip tutorial' : 'Skip step';
+  const t = G.tables[0];
+  if (S.t === 'Power-ups' && t && !t.tokens.length) { const sp = t.freeSpot(); if (sp) t.tokens.push({ x: sp[0], y: sp[1], type: 'big', t: 0 }); }
+}
+function tutNext() {
+  if (TS.i >= TUT_STEPS.length - 1) return;
+  SFX.mission(); TS.i++; tutShow();
+}
+function tutProgress(k) {
+  $('tutFill').style.width = Math.round(Math.min(1, k) * 100) + '%';
+  if (k >= 1) { const t = G.tables[0]; if (t) t.ban('GREAT!', '#7dff9a', 1, ''); setTimeout(() => { if (G.camp === TUT) tutNext(); }, 700); TS.done = TS.i; }
+}
+function tutEvent(type) {
+  const S = TUT_STEPS[TS.i]; if (!S || !S.ev || (S.info && S.info()) || TS.done === TS.i || !S.ev(type)) return;
+  TS.n++; tutProgress(TS.n / S.need);
+}
+function tutTick(dt) {
+  G.drain[0] = 0; G.dealt[1] = 0; // practice: your HP never runs out
+  // on narrow screens sit just below the HUD so the energy bar stays visible
+  const R0 = LAY.rects[0], el = $('tut'); el.style.top = innerWidth < 900 && R0 ? Math.round(R0.y + 4) + 'px' : '';
+  const S = TUT_STEPS[TS.i], t = G.tables[0]; if (!S || !t || TS.done === TS.i) return;
+  t.bossT = 1e9; t.misT = 1e9; t.tokenT = Math.max(t.tokenT, 1e8);
+  if (TS.i === 0) { const [l, r] = humanInput(0); TS.l |= l; TS.r |= r; tutProgress((TS.l + TS.r) / 2); }
+  else if (TS.i === 2) { G.en[0] = Math.min(ENMAX, G.en[0] + dt * 3); skSync(0); tutProgress(G.en[0] / SKILLS.multi.cost); }
+  else if (TS.i === 3 && G.en[0] < SKILLS.multi.cost) { G.en[0] = SKILLS.multi.cost; skSync(0); }
+  else if (TS.i === 4 && !t.tokens.length) { const sp = t.freeSpot(); if (sp) t.tokens.push({ x: sp[0], y: sp[1], type: 'big', t: 0 }); }
+}
+$('tutNext').onclick = () => { SFX.init(); const S = TUT_STEPS[TS.i]; if (S.last) { hide('tut'); toMenu(); $('bCpu').click(); } else tutNext(); };
+$('tutAlt').onclick = () => { hide('tut'); toMenu(); };
+$('tutSkip').onclick = () => { SFX.init(); const S = TUT_STEPS[TS.i]; if (S.last) startTutorial(); else if (S.info && S.info()) { hide('tut'); toMenu(); } else tutNext(); };
+$('bTut').onclick = () => { SFX.init(); menuErr(); startTutorial(); };
+$('bTutYes').onclick = () => { SFX.init(); startTutorial(); };
+$('bTutNo').onclick = () => { store.set('fd-tut', '1'); hide('tutAsk'); show('menu'); };
 function startCamp(i) {
   const C = campC(i); if (!C) return;
   SFX.init(); menuErr(); hide('camp'); hide('daily');
@@ -3808,6 +3904,7 @@ setInterval(() => {
 
 // Boot
 setLang('en');
+if (!store.get('fd-tut', '') && !/^[0-9]{4}$/.test((location.hash || '').replace('#', ''))) { hide('menu'); show('tutAsk'); }
 G.mode = store.get('fd-mode', 'duel') === 'arena' ? 'arena' : 'duel';
 setMode(G.mode);
 startDemo(); layout();

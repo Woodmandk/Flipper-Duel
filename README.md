@@ -36,6 +36,8 @@ You pick **2 skills** (under "Your skills" in the menu and in the campaign). You
 
 Hexagons pop up on the table. Hit them with the ball. Regular ones include Multiball, Shield, Double damage, Repair, Giant flippers, Safety net and Double goal. **CHAOS power-ups** (with a rainbow ring) include Mega chaos +10 balls, Giant balls, Moon gravity, Invasion, Reverse gravity, Bumper rage, Lightning storm and Ball cannon.
 
+New players are offered a short interactive **tutorial** on a practice table the first time they open the game. It covers flippers, energy, skills, power-ups and nudging, and you can replay it from the menu any time.
+
 Press **?** in the game for an explanation of everything.
 
 ## Daily challenge, shop and chaos mode
