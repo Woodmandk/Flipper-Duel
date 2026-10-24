@@ -428,7 +428,7 @@ const EN = {"Næste mål vinder":"Next goal wins","To spillere. Én vinder. Mass
 for (const k of Object.keys(EN)) { const u = k.toUpperCase(); if (!(u in EN)) EN[u] = EN[k].toUpperCase(); }
 const EN_PAT = [
   [/^Ram (\d+) bumpere$/, 'Hit $1 bumpers'], [/^Ram slyngerne (\d+) gange$/, 'Hit the slingshots $1 times'], [/^Hop gennem portalen (\d+) gange$/, 'Go through the portal $1 times'],
-  [/^Tag (\d+) ramper$/, 'Take $1 ramps'], [/^Skyd (\d+) gange med ekstra-flipperen$/, 'Shoot $1 times with the extra flipper'], [/^FØRST TIL (\d+) MÅL$/, 'FIRST TO $1 GOALS'],
+  [/^Tag (\d+) ramper$/, 'Take $1 ramps'], [/^Skyd (\d+) gange med ekstra-flipperen$/, 'Shoot $1 times with the extra flipper'], [/^FØRST TIL (\d+) MÅL$/, 'FIRST TO $1 GOALS'], [/^(.+) på (\d+) sek\.$/, '$1 in $2 sec.'],
   [/^RIVAL: FØRSTE KAMP MOD (.+)$/, 'RIVAL: FIRST MATCH VS $1'], [/^RIVAL: DU FØRER (\d+)-(\d+) MOD (.+)$/, 'RIVAL: YOU LEAD $1-$2 VS $3'],
   [/^RIVAL: (.+) FØRER (\d+)-(\d+) MOD DIG$/, 'RIVAL: $1 LEADS $2-$3 VS YOU'], [/^RIVAL: (\d+)-(\d+) MOD (.+)\. HELT LIGE!$/, 'RIVAL: $1-$2 VS $3. DEAD EVEN!'], [/^(\d+) MIN · FØRST TIL (\d+) MÅL$/, '$1 MIN · FIRST TO $2 GOALS'],
   [/^Jeg udfordrer dig i Flipper Duel! Åbn (\S+) og deltag med koden (\d+)\.$/, 'I challenge you to Flipper Duel! Open $1 and join with the code $2.'],
@@ -1877,7 +1877,7 @@ function featureFx(t, type, d, c) {
     case 'bossBlink': t.burst(d.x, d.y, '#b98cff', 20, 260, .4); t.ring(d.x, d.y, 50, '#b98cff', .35, 3); return true;
     case 'bossGone': t.ban('BOSSEN FLYGTEDE', '#b8b2e8', 1.4, 'Den kommer igen senere'); t.burst(d.x, d.y, '#ffffff', 30, 300, .6); return true;
     case 'bossDown': SFX.bossDown(); t.boom(d.x, d.y, BOSS[d.k].col, true); t.boom(d.x, d.y, '#ffd84a', true); t.burst(d.x, d.y, '#ffffff', 80, 900, 1.4, 5, 250); t.shake = 20; return true;
-    case 'misNew': SFX.beep(true); t.ban('MISSION', '#7dff9a', 1.4, t.mis.txt + ' på ' + t.mis.max + ' sek.'); return true;
+    case 'misNew': SFX.beep(true); t.ban('MISSION', '#7dff9a', 1.4, tr(t.mis.txt) + ' på ' + t.mis.max + ' sek.'); return true;
     case 'misFail': t.text(t.L.cx, t.cam.y + 120, 'MISSION MISLYKKEDES', '#b8b2e8', 16); return true;
     case 'nudge': SFX.nudge(); return true;
     case 'tilt': SFX.tilt(); t.ban('TILT!', '#ff4060', 1.6, 'Du rystede for meget. Flipperne er døde i 3 sek.'); t.flash = .5; t.flashCol = '#ff2040'; return true;
@@ -3178,7 +3178,7 @@ function drawTable(t, R, pi, opt = {}) {
       ctx.font = '11px Bungee, sans-serif'; ctx.fillStyle = '#fff'; ctx.fillText((bo.rage ? 'RASENDE ' : 'BOSS: ') + (bo.mega ? 'MEGA-' : '') + BI.n + ' ' + bo.hp + '/' + bo.max + (G.type === 'boss' ? '' : ' · ' + Math.max(0, Math.ceil(45 - (bo.t || 0))) + 's'), bx + bw / 2, 18);
     }
     if (duel && t.mis && (pi === 0 || G.type === 'local' || G.demo)) {
-      const m = t.mis, txt = 'MISSION: ' + m.txt.toUpperCase() + (m.need > 1 ? ' ' + m.n + '/' + m.need : '') + ' · ' + Math.ceil(m.t);
+      const m = t.mis, txt = 'MISSION: ' + tr(m.txt).toUpperCase() + (m.need > 1 ? ' ' + m.n + '/' + m.need : '') + ' · ' + Math.ceil(m.t);
       ctx.font = '11px Bungee, sans-serif'; const w = Math.min(W - 10, ctx.measureText(txt).width + 18), y = H - 16;
       rr(W / 2 - w / 2, y - 10, w, 20, 10); ctx.fillStyle = 'rgba(6,4,18,.9)'; ctx.fill();
       rr(W / 2 - w / 2, y - 10, w * clamp(m.t / m.max, 0, 1), 20, 10); ctx.fillStyle = 'rgba(125,255,154,.18)'; ctx.fill();
