@@ -2079,7 +2079,9 @@ function onArenaEvent(t, type, d) {
     case 'goal':
       SFX.goal(); t.boom(d.x, d.y, COL[1 - d.p], true);
       if (!playing) break;
-      bigMoment(1.5); if (d.p === G.me) stat('goals', 1);
+      if (d.p === G.me) stat('goals', 1);
+      // the scorer's boosts end with the goal, so the other side gets a fair restart
+      if (t.homeP === d.p) t.eff.ahome = 0; t.bigP[d.p] = 0; t.slowP[1 - d.p] = 0; t.frz[1 - d.p] = 0; t.turbo = 0; t.fire = 0;
       { const two = t.dbl[d.p] > 0; t.score[d.p] = Math.min(goalsNeeded(), t.score[d.p] + (two ? 2 : 1)); t.dbl[d.p] = 0; t.goals++; t.ban(two ? 'DOBBELT MÅL!' : 'MÅL!', COL[d.p], 1.3, clean(G.names[d.p === G.me ? 0 : 1]).toUpperCase() + ' SCORER'); } pushFx('g', d.x, d.y, d.p); vibrate(150);
       chargeMeter(1 - d.p, 20);
       if (t.score[d.p] >= goalsNeeded() || G.sd) endRound(d.p);
@@ -2316,7 +2318,7 @@ function netFollow(op) {
   if (h.ph === 'count') G.countT = h.cl;
   else if (h.ph === 'play' && G.phase === 'count') goPlay();
   else if ((h.ph === 'roundover' || h.ph === 'matchover') && (G.phase === 'play' || G.phase === 'count')) {
-    G.phase = 'roundover'; G.winner = h.win === -1 ? -1 : 1 - h.win; SFX.music(false);
+    G.phase = 'roundover'; G.winner = h.win === -1 ? -1 : 1 - h.win; SFX.music(false); if (G.winner >= 0) bigMoment(2);
     if (G.winner >= 0) {
       SFX.win();
       const col = G.mode === 'arena' ? COL[G.winner === 0 ? 1 : 0] : COL[0];
@@ -2379,7 +2381,7 @@ function oppArenaGuest(op) {
     if (!Array.isArray(f) || f[0] <= G.fxSeen) continue; G.fxSeen = f[0];
     const [, ty, x, y, p, ex] = f;
     if (ty === 'b') { SFX.bumper(); t.burst(x, y, COL[Math.max(0, t.last)], 12, 300, .4); t.ring(x, y, 44, COL[Math.max(0, t.last)], .3, 3); }
-    else if (ty === 'g') { if (G.phase === 'play') bigMoment(1.5); SFX.goal(); t.boom(x, y, COL[1 - p], true); t.ban('MÅL!', COL[p], 1.3, clean(G.names[p === G.me ? 0 : 1]).toUpperCase() + ' SCORER'); }
+    else if (ty === 'g') { SFX.goal(); t.boom(x, y, COL[1 - p], true); t.ban('MÅL!', COL[p], 1.3, clean(G.names[p === G.me ? 0 : 1]).toUpperCase() + ' SCORER'); }
     else if (ty === 'p') { const k = POW_KEYS[ex]; if (k) powerFx(t, { x, y, type: k }); }
     else if (ty === 's') { SFX.boom(); t.boom(x, y, COL[p], false); }
     else if (ty === 'r') { SFX.ramp(); t.ring(x, y, 34, '#7dffea', .35, 3); }
@@ -3328,7 +3330,7 @@ function drawCenter() {
     ctx.globalAlpha = 1; ctx.fillStyle = '#fff'; ctx.fillText(txt, 0, 0);
     ctx.restore();
   }
-  if (G.phase === 'roundover' && !G.demo && !G.over) {
+  if (G.phase === 'roundover' && !G.demo && !G.over && !rpShowing()) {
     const w = G.winner, txt = w < 0 ? 'UAFGJORT' : `${clean(G.names[w]).toUpperCase()} TAGER ${G.mode === 'arena' ? 'SEJREN' : 'RUNDEN'}`;
     ctx.save(); ctx.translate(cw / 2, ch / 2); const sc = Math.min(cw / 640, 1.4); ctx.scale(sc, sc);
     ctx.fillStyle = 'rgba(5,3,15,.75)'; ctx.fillRect(-340, -44, 680, 88);
