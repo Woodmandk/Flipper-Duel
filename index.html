@@ -4,6 +4,16 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Flipper Duel</title>
+<meta name="description" content="Two-player neon pinball battles in your browser. Duel your friend online or on one screen, beat 20 bosses, or play pinball football. Free, no download.">
+<meta name="theme-color" content="#07060f">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Flipper Duel: 2-player neon pinball">
+<meta property="og:description" content="Pinball, but it's 1 vs 1. Challenge a friend online or on one screen. Free in your browser.">
+<meta property="og:url" content="https://woodmandk.github.io/Flipper-Duel/">
+<meta property="og:image" content="https://woodmandk.github.io/Flipper-Duel/og.png">
+<meta property="og:image:width" content="630">
+<meta property="og:image:height" content="500">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bungee&family=Chakra+Petch:wght@400;600;700&display=swap">
@@ -93,6 +103,7 @@ button.btn.ghost{background:transparent;font-size:14px;padding:9px;}
 .sw i{width:26px;height:26px;border-radius:50%;display:block;background:var(--c);box-shadow:0 0 10px rgba(255,255,255,.25);}
 .sw button:disabled{cursor:not-allowed;}
 .sw button:disabled i{filter:grayscale(1) brightness(.5);}
+#shop .sw button:disabled i{filter:none;opacity:.8;}
 .sw button.dn i{background:none;box-shadow:none;font-size:22px;font-style:normal;line-height:26px;text-align:center;}
 .coins{font-family:var(--display);color:var(--gold);text-align:center;font-size:20px;margin:-6px 0 0;}
 .tut{position:fixed;z-index:7;left:50%;transform:translateX(-50%);top:calc(env(safe-area-inset-top,0px) + 58px);width:min(440px,calc(100% - 32px));box-sizing:border-box;background:rgba(10,6,28,.92);border:1px solid var(--gold);border-radius:12px;padding:12px 14px;box-shadow:0 0 30px rgba(255,216,74,.25);display:flex;flex-direction:column;gap:8px;}
@@ -114,7 +125,7 @@ button.btn.ghost{background:transparent;font-size:14px;padding:9px;}
 .dinfo dd{margin:0;font-weight:700;text-align:right;}
 .stats{display:grid;grid-template-columns:1fr auto;gap:5px 14px;margin:0;font-size:14px;}
 .stats dt{color:var(--muted);} .stats dd{margin:0;text-align:right;font-family:var(--display);color:var(--gold);}
-.skills{position:fixed;z-index:6;display:flex;gap:6px;}
+.skills{position:fixed;z-index:6;display:flex;gap:6px;transform-origin:50% 0;}
 .skills.col{flex-direction:column;}
 .skills button{cursor:pointer;touch-action:manipulation;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;min-width:104px;padding:7px 10px;border-radius:14px;border:1.5px solid var(--c);background:linear-gradient(to top,var(--cf) var(--p,0%),rgba(10,8,26,.85) var(--p,0%));color:var(--fg);font-family:var(--display);font-size:12px;letter-spacing:.03em;opacity:.75;}
 .skills button b{font-size:22px!important;}
@@ -3310,7 +3321,7 @@ function drawCenter() {
   if (G.phase === 'count' && !G.demo) {
     const n = Math.ceil(G.countT), k = G.countT - Math.floor(G.countT);
     const txt = n > 0 ? String(n) : 'KØR!';
-    ctx.save(); ctx.translate(cw / 2, ch / 2); const sc = Math.min(cw, ch) / 500; ctx.scale(sc, sc);
+    ctx.save(); ctx.translate(cw / 2, ch / 2); const sc = Math.min(cw / 540, ch / 500); ctx.scale(sc, sc);
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     const CC = G.type === 'boss' && campC(), CL = G.mode === 'arena' ? G.tables[0].L : duelL(), CM = CC && MODS[CC.mod], KF = kaosFri(), RV = G.round === 1 && rivTxt();
     const BH = 70 + (CL.sigTxt ? 26 : 0) + (CM ? 46 : 0) + (KF ? 26 : 0) + (RV ? 26 : 0), up = Math.max(0, BH - 108); // keep the box clear of the big number
@@ -3458,8 +3469,10 @@ function placeBar(lp, n) {
   if (lp === 0 ? r.x >= 104 : cw - (r.x + tw) >= 104) return { col: 1, x: lp === 0 ? r.x - 12 : r.x + tw + 12, y: arena ? r.y + th * (lp === 0 ? .7 : .3) : r.y + th * .55, tf: lp === 0 ? 'translate(-100%,-50%)' : 'translate(0,-50%)' };
   if (arena && lp === 1) return { x: r.x + tw / 2, y: Math.max(4, r.y - 40 * r.s - 62), tf: 'translate(-50%,0) rotate(180deg)' };
   const below = r.y + th + (arena ? 40 * r.s : 6);
-  if (below + 60 < ch) return { x: r.x + tw / 2, y: below, tf: 'translate(-50%,0)' };
-  return { x: r.x + tw / 2, y: r.y + 96 * r.s, tf: 'translate(-50%,0)' };
+  // two small tables side by side (2 players on a phone): shrink the bars so they don't overlap
+  const k = Math.min(1, (tw + 24) / 216), tf = 'translate(-50%,0)' + (k < 1 ? ` scale(${k.toFixed(2)})` : '');
+  if (below + 60 * k < ch) return { x: r.x + tw / 2, y: below, tf };
+  return { x: r.x + tw / 2, y: r.y + 96 * r.s, tf };
 }
 function skillButtons() {
   for (let lp = 0; lp < 2; lp++) {
