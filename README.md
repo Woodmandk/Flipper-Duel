@@ -8,7 +8,7 @@ A neon pinball game for two players that runs right in the browser. No install, 
 
 - **Duel** – you each have your own table and 1200 HP. Everything you hit damages your opponent. Best of 3 rounds, each played on a random table (Neon Classic, Space Invasion, Chaos Factory, Deep Sea or Haunted House). After 2½ minutes the round goes into OVERDRIVE, where all damage counts double. 5 quick hits in a row give a combo with +25% damage.
 - **Campaign** – you alone against the bosses in 20 boss fights. Every 5th level is a **mega boss**: bigger, with every boss's attacks, a phase 2 invasion at half HP, and new skills unlocked when you beat it. Many levels have a special rule: low gravity, storm wind, darkness, bomb rain, mini flippers, heavy ball or mirror chaos. The last 5 levels are played on the giant table. You have 300 HP and 5–7 minutes, and the boss wears your HP down. Win to unlock the next level and earn 1–3 stars depending on how much HP you have left.
-- **Arena** – pinball football: the table is a pitch with no gravity. Each player has a goalkeeper (two flippers in front of the goal) and two strikers up on the opponent's half, just like table football. First to 5 goals, and the table changes every 2 goals. Each player has a ramp that shoots at the opponent's goal.
+- **Arena** – pinball football: the table is a pitch with no gravity. Each player has a goalkeeper (two flippers in front of the goal) and two strikers up on the opponent's half, just like table football. Matches last 3 minutes: most goals wins, first to 5 wins early, and a tie goes to sudden death (next goal wins). The table changes every 2 goals. Each player has a ramp that shoots at the opponent's goal.
 
 ## Tables
 
@@ -70,7 +70,7 @@ You can also play the computer or two players on one screen.
 | Player 2 (same screen) | `←` | `→` | `I` / `O` | `↓` |
 | Phone/tablet | Tap the left side | Tap the right side | Skill buttons | – |
 
-Online you can send emojis to your opponent with the keys 6–0.
+Online you can send emojis to your opponent with the keys 6–0. The game also remembers your record against each online opponent ("Rival: you lead 3-1 vs Mads") and shows it before and after the match.
 
 ## Tech
 
