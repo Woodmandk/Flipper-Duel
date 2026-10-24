@@ -1031,7 +1031,10 @@ class Table {
     this.sigReset(); this.mod = null; this.gmul = 1; this.modT = 8; this.darkWas = false;
     if (this.kind === 'duel') this.spawnLane(); else this.serve(Math.random() < .5 ? 1 : -1);
   }
-  setLayout(L) { this.L = L; this.bf = L.bumpers.map(() => 0); this.mf = L.movers.map(() => 0); this.labelT = 5; this.tokens = []; this.sigReset(); }
+  setLayout(L) {
+    // a giant table puts the flippers elsewhere, so rebuild them from the new layout
+    if (L.flippers.length === this.fl.length) this.fl = L.flippers.map((f, i) => Object.assign({}, f, { a: this.fl[i].a, w: 0, on: this.fl[i].on, base: f.len }));
+    this.L = L; this.bf = L.bumpers.map(() => 0); this.mf = L.movers.map(() => 0); this.labelT = 5; this.tokens = []; this.sigReset(); }
   sigReset() { const L = this.L; this.lit = L.bumpers.map(() => 0); this.lightT = 0; this.ufoDead = -1; this.bricks = (L.bricks || []).map(() => 0); }
   // UFO (Ruminvasion): crosses the top every 13 s unless it was shot down on this pass
   ufoPos() {
@@ -1782,10 +1785,37 @@ function doSkill(p, k, t) {
   else if (k === 'slowb') stack(t.eff, 'slowB', 10);
   else if (k === 'mega') { const dm = 60; G.dealt[p] += dm; SFX.boom(); t.boom(cx, t.cam.y + 40, '#ff7a30', true); t.text(cx, t.cam.y + 100, '-' + dm, COL[1 - p], 44); t.shake = 14; }
 }
-// big moments (boss down, goal, round won) play out in slow motion
-function bigMoment(d) {
-  if (G.demo) return;
-  G.slow = Math.max(G.slow, d); G.slowMax = G.slow; G.slowCd = d + 1.5; G.big = Math.max(G.big, d); G.bigMax = G.big; SFX.slowmo();
+// big moments (goal, boss down, round won) pause the game and replay the last seconds at half speed
+const RP_KEEP = 2.6, RP = { buf: [], on: null };
+function rpSnap(dt) {
+  if (G.demo || RP.on) return;
+  RP.buf.push({ dt, tb: G.tables.map(t => ({ balls: t.balls.map(b => Object.assign({}, b, { trail: b.trail ? b.trail.slice() : [] })), fl: t.fl.map(f => [f.a, f.on, f.len]), cam: Object.assign({}, t.cam) })) });
+  let s = 0; for (let i = RP.buf.length - 1; i > 0; i--) { s += RP.buf[i].dt; if (s > RP_KEEP) { RP.buf.splice(0, i); break; } }
+}
+function bigMoment(len) {
+  if (G.demo || RP.on) return;
+  len = Math.min(len, 2); let s = 0, i = RP.buf.length - 1;
+  for (; i > 0 && s < len; i--) s += RP.buf[i].dt;
+  const frames = RP.buf.slice(i); RP.buf = [];
+  if (frames.length < 20) return;
+  const wait = .55, speed = .5;
+  RP.on = { frames, wait, speed, pos: 0, len: s, k: 0 };
+  G.big = G.bigMax = wait + s / speed; SFX.slowmo();
+}
+function rpTick(dt) {
+  const r = RP.on; if (!r) return;
+  if (r.wait > 0) { r.wait -= dt; return; }
+  r.pos += dt * r.speed;
+  let acc = 0, k = 0; while (k < r.frames.length - 1 && acc + r.frames[k].dt < r.pos) { acc += r.frames[k].dt; k++; }
+  r.k = k; if (r.pos >= r.len) { RP.on = null; G.big = Math.min(G.big, .25); }
+}
+const rpShowing = () => RP.on && RP.on.wait <= 0;
+function drawTableR(t, R, i, opt) {
+  const f = rpShowing() && RP.on.frames[RP.on.k].tb[i];
+  if (!f || G.tables[i] !== t) return drawTable(t, R, i, opt);
+  const keep = { balls: t.balls, fl: t.fl.map(x => [x.a, x.on, x.len]), cam: t.cam, ban: t.banner };
+  t.balls = f.balls; t.fl.forEach((x, j) => { if (f.fl[j]) [x.a, x.on, x.len] = f.fl[j]; }); t.cam = f.cam; t.banner = null;
+  try { drawTable(t, R, i, opt); } finally { t.balls = keep.balls; t.fl.forEach((x, j) => [x.a, x.on, x.len] = keep.fl[j]); t.cam = keep.cam; t.banner = keep.ban; }
 }
 // online emoji reactions
 const EMOJI = ['😂', '😮', '🔥', '😈', '👏'];
@@ -1817,6 +1847,7 @@ const rawHp = p => MAXHP - G.dealt[1 - p] - G.drain[p];
 const duelL = () => DUELS[G.li] || DUELS[0];
 
 function startDemo() {
+  RP.on = null; RP.buf = [];
   G.demo = true; G.phase = 'play'; G.type = 'cpu';
   G.tables = G.mode === 'duel' ? [new Table('duel', pick(DUELS)), new Table('duel', pick(DUELS))] : [new Table('arena', pick(ARENAS))];
   G.ai = [new AI(.9), new AI(.9)];
@@ -1839,7 +1870,7 @@ function startGame(mode, type, names) {
 function startMatch() { G.wins = [0, 0]; G.round = 1; G.over = false; hide('over'); startRound(); }
 function resetRoundState() {
   G.t = 0; G.dealt = [0, 0]; G.drain = [0, 0]; G.meter = [0, 0]; G.sk = [[0, 0], [0, 0]]; G.en = [0, 0]; G.hpShow = [MAXHP, MAXHP]; G.hpLag = [MAXHP, MAXHP];
-  G.atkList = []; G.winner = -1; G.overdrive = false; G.sd = false; G.oppAtkSeen = 0; G.nextAtk = [null, null]; G.aiFire = [0, 0];
+  G.atkList = []; G.winner = -1; G.overdrive = false; G.sd = false; RP.on = null; RP.buf = []; G.big = 0; G.oppAtkSeen = 0; G.nextAtk = [null, null]; G.aiFire = [0, 0];
   for (const t of G.tables) { if (t.kind === 'duel') t.L = duelL(); else t.L = ARENAS[0]; t.reset(); }
   G.ghost.L = duelL(); G.ghost.reset(); G.ghost.balls = [];
   G.phase = 'count'; G.lastBeep = 4;
@@ -1857,7 +1888,7 @@ function endRound(w) {
   if (G.phase !== 'play') return;
   G.winner = w; if (w >= 0) G.wins[w]++;
   G.phase = 'roundover'; G.overT = 3.2;
-  if (w >= 0) bigMoment(2.6);
+  if (w >= 0) bigMoment(2);
   if (G.mode === 'duel' && G.type !== 'boss') stat('dmg', Math.round(G.dealt[0]));
   SFX.music(false);
   if (G.bot && w >= 0 && Math.random() < .55) botEmo(w === 1 ? pick([3, 0, 2]) : pick([4, 1, 1]), rnd(700, 1800));
@@ -2048,7 +2079,7 @@ function onArenaEvent(t, type, d) {
     case 'goal':
       SFX.goal(); t.boom(d.x, d.y, COL[1 - d.p], true);
       if (!playing) break;
-      bigMoment(1.8); if (d.p === G.me) stat('goals', 1);
+      bigMoment(1.5); if (d.p === G.me) stat('goals', 1);
       { const two = t.dbl[d.p] > 0; t.score[d.p] = Math.min(goalsNeeded(), t.score[d.p] + (two ? 2 : 1)); t.dbl[d.p] = 0; t.goals++; t.ban(two ? 'DOBBELT MÅL!' : 'MÅL!', COL[d.p], 1.3, clean(G.names[d.p === G.me ? 0 : 1]).toUpperCase() + ' SCORER'); } pushFx('g', d.x, d.y, d.p); vibrate(150);
       chargeMeter(1 - d.p, 20);
       if (t.score[d.p] >= goalsNeeded() || G.sd) endRound(d.p);
@@ -2348,7 +2379,7 @@ function oppArenaGuest(op) {
     if (!Array.isArray(f) || f[0] <= G.fxSeen) continue; G.fxSeen = f[0];
     const [, ty, x, y, p, ex] = f;
     if (ty === 'b') { SFX.bumper(); t.burst(x, y, COL[Math.max(0, t.last)], 12, 300, .4); t.ring(x, y, 44, COL[Math.max(0, t.last)], .3, 3); }
-    else if (ty === 'g') { if (G.phase === 'play') { G.big = G.bigMax = 1.8; SFX.slowmo(); } SFX.goal(); t.boom(x, y, COL[1 - p], true); t.ban('MÅL!', COL[p], 1.3, clean(G.names[p === G.me ? 0 : 1]).toUpperCase() + ' SCORER'); }
+    else if (ty === 'g') { if (G.phase === 'play') bigMoment(1.5); SFX.goal(); t.boom(x, y, COL[1 - p], true); t.ban('MÅL!', COL[p], 1.3, clean(G.names[p === G.me ? 0 : 1]).toUpperCase() + ' SCORER'); }
     else if (ty === 'p') { const k = POW_KEYS[ex]; if (k) powerFx(t, { x, y, type: k }); }
     else if (ty === 's') { SFX.boom(); t.boom(x, y, COL[p], false); }
     else if (ty === 'r') { SFX.ramp(); t.ring(x, y, 34, '#7dffea', .35, 3); }
@@ -2446,6 +2477,8 @@ function update(dt, now) {
   const authority = !online() || G.type === 'host';
   if (!G.demo && G.tables[0]) SFX.theme(G.tables[0].L.theme);
   if (G.big > 0) G.big -= dt;
+  rpTick(dt);
+  if (G.phase === 'play' && !RP.on) rpSnap(dt);
   G.emCd -= dt; G.emoList = G.emoList.filter(e => (e.t -= dt) > 0);
   { const eh = !(online() || G.bot) || G.demo; if (EMO.hidden !== eh) EMO.hidden = eh; }
   if (online() && Net.opp && Net.opp.presence) {
@@ -2465,26 +2498,13 @@ function update(dt, now) {
   }
   const sim = G.demo || G.phase === 'play' || G.phase === 'roundover';
   if (sim && !(G.mode === 'arena' && G.type === 'guest')) {
-    let ts = 1;
-    if (G.slow > 0) { G.slow -= dt; const m = G.slowMax || 1, e = Math.min(m - G.slow, G.slow); ts = e < .25 ? .2 + .8 * (1 - e / .25) : .2; }
-    G.slowCd -= dt;
-    acc += dt * ts;
-    while (acc >= 1 / 120) { for (const t of G.tables) t.step(1 / 120); acc -= 1 / 120; }
-    if (!G.demo && G.slowCd <= 0 && !REDUCED) {
-      for (const t of G.tables) for (const b of t.balls) {
-        if (t.balls.length > 2) break;
-        const dn = t.kind === 'duel' || b.vy > 0;
-        const TH = t.L.H;
-        if (dn && b.y > TH - 70 && b.y < TH - 40 && b.vy > 150 && Math.abs(b.x - t.L.cx) < 35 && !b.bomb) { G.slow = G.slowMax = .7; G.slowCd = 2.5; }
-        if (t.kind === 'arena' && b.y < 65 && b.y > 35 && b.vy < -150 && Math.abs(b.x - t.L.cx) < 35) { G.slow = G.slowMax = .7; G.slowCd = 2.5; }
-      }
-    }
+    if (!RP.on) { acc += dt; while (acc >= 1 / 120) { for (const t of G.tables) t.step(1 / 120); acc -= 1 / 120; } }
   } else if (G.mode === 'arena' && G.type === 'guest') {
     const t = G.tables[0]; t.stepFlippers(dt); t.tokens.forEach(k => k.t += dt);
   }
   if (G.phase === 'play' && !G.demo) {
     if (G.camp === TUT) tutTick(dt);
-    G.t += authority ? dt : 0; G.skCd[0] -= dt; G.skCd[1] -= dt;
+    G.t += authority && !RP.on ? dt : 0; G.skCd[0] -= dt; G.skCd[1] -= dt;
     for (let p = 0; p < 2; p++) if (G.ai[p] && G.type !== 'boss') {
       if (G.aiSk[p] == null) { const rd = [0, 1].filter(i => G.sk[p][i] >= 100); if (rd.length) { G.aiSk[p] = pick(rd); G.aiFire[p] = rnd(...cpuLv().f); } }
       else if ((G.aiFire[p] -= dt) <= 0) { trySkill(p, G.aiSk[p]); G.aiSk[p] = null; }
@@ -2495,7 +2515,7 @@ function update(dt, now) {
     if (G.mode === 'arena' && G.tables[0]) {
       const t = G.tables[0], a = t.score[0], b = t.score[1];
       if (G.t >= ARENA_TIME && authority && a !== b) endRound(a > b ? 0 : 1);
-      else if (G.t >= ARENA_TIME && !G.sd) { G.sd = true; SFX.music(true, 150); SFX.bossIn(); t.ban('SUDDEN DEATH!', '#ff3050', 2.2, 'Næste mål vinder'); t.flash = .7; t.flashCol = '#ff3050'; t.shake = 12; bigMoment(1.2); }
+      else if (G.t >= ARENA_TIME && !G.sd) { G.sd = true; SFX.music(true, 150); SFX.bossIn(); t.ban('SUDDEN DEATH!', '#ff3050', 2.2, 'Næste mål vinder'); t.flash = .7; t.flashCol = '#ff3050'; t.shake = 12; }
     }
     if (G.mode === 'duel') {
       if (!G.overdrive && G.t >= OVERDRIVE_AT && G.type !== 'boss') { G.overdrive = true; SFX.music(true, 140); for (const t of G.tables) { t.ban('OVERDRIVE ×2', '#ff7a30', 1.8, 'Al skade tæller dobbelt'); t.flash = .6; t.flashCol = '#ff7a30'; } }
@@ -2508,7 +2528,7 @@ function update(dt, now) {
     }
   }
   if (G.phase === 'roundover' && authority && !G.demo) {
-    G.overT -= dt;
+    if (!RP.on) G.overT -= dt;
     if (G.overT <= 0) {
       const need = G.mode === 'duel' && G.camp < 0 ? 2 : 1;
       if (G.wins[0] >= need || G.wins[1] >= need) { if (!G.over) { G.over = true; G.phase = 'matchover'; showOver(); } }
@@ -3376,8 +3396,8 @@ function drawMoments(now) {
     if (k > .3) {
       const fs = Math.max(14, Math.min(bh * .42, 34)), y = ch - bh / 2;
       ctx.save(); ctx.globalAlpha = k; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.font = fs + 'px Bungee, sans-serif';
-      ctx.fillStyle = '#ffffff'; ctx.fillText('SLOWMOTION', cw / 2, y);
-      const tw = ctx.measureText('SLOWMOTION').width; ctx.fillStyle = Math.sin(now / 120) > 0 ? '#ff3050' : 'rgba(255,48,80,.3)'; ctx.beginPath(); ctx.arc(cw / 2 - tw / 2 - fs * .7, y, fs * .25, 0, TAU); ctx.fill();
+      const lbl = rpShowing() ? 'REPLAY' : ''; ctx.fillStyle = '#ffffff'; ctx.fillText(lbl, cw / 2, y);
+      const tw = ctx.measureText(lbl).width; if (lbl) { ctx.fillStyle = Math.sin(now / 120) > 0 ? '#ff3050' : 'rgba(255,48,80,.3)'; ctx.beginPath(); ctx.arc(cw / 2 - tw / 2 - fs * .7, y, fs * .25, 0, TAU); ctx.fill(); }
       ctx.restore();
     }
   }
@@ -3401,12 +3421,12 @@ function render(now) {
   const R = LAY.rects;
   if (G.mode === 'arena') {
     const t = G.tables[0];
-    if (t && R[0]) { drawTable(t, R[0], 0, { rot: G.me === 1 }); if (!G.demo) drawArenaHud(R[0]); }
+    if (t && R[0]) { drawTableR(t, R[0], 0, { rot: G.me === 1 }); if (!G.demo) drawArenaHud(R[0]); }
   } else {
     const t0 = G.tables[0];
     const t1 = online() ? G.ghost : G.tables[1];
-    if (t0 && R[0]) drawTable(t0, R[0], 0);
-    if (t1 && R[1]) drawTable(t1, R[1], 1, { mini: LAY.kind === 'duelPortrait' || online() });
+    if (t0 && R[0]) drawTableR(t0, R[0], 0);
+    if (t1 && R[1]) drawTableR(t1, R[1], 1, { mini: LAY.kind === 'duelPortrait' || online() });
     if (!G.demo) {
       if (R[0]) drawHud(0, R[0], false);
       if (R[1] && LAY.kind !== 'duelPortrait') drawHud(1, R[1], online());
