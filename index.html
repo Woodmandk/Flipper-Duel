@@ -428,7 +428,7 @@ const EN = {"Næste mål vinder":"Next goal wins","To spillere. Én vinder. Mass
 for (const k of Object.keys(EN)) { const u = k.toUpperCase(); if (!(u in EN)) EN[u] = EN[k].toUpperCase(); }
 const EN_PAT = [
   [/^Ram (\d+) bumpere$/, 'Hit $1 bumpers'], [/^Ram slyngerne (\d+) gange$/, 'Hit the slingshots $1 times'], [/^Hop gennem portalen (\d+) gange$/, 'Go through the portal $1 times'],
-  [/^Tag (\d+) ramper$/, 'Take $1 ramps'], [/^Skyd (\d+) gange med ekstra-flipperen$/, 'Shoot $1 times with the extra flipper'], [/^FØRST TIL (\d+) MÅL$/, 'FIRST TO $1 GOALS'], [/^(.+) på (\d+) sek\.$/, '$1 in $2 sec.'],
+  [/^Tag (\d+) ramper$/, 'Take $1 ramps'], [/^Skyd (\d+) gange med ekstra-flipperen$/, 'Shoot $1 times with the extra flipper'], [/^FØRST TIL (\d+) MÅL$/, 'FIRST TO $1 GOALS'], [/^Venter på (.+)…$/, 'Waiting for $1…'], [/^(.+) på (\d+) sek\.$/, '$1 in $2 sec.'],
   [/^RIVAL: FØRSTE KAMP MOD (.+)$/, 'RIVAL: FIRST MATCH VS $1'], [/^RIVAL: DU FØRER (\d+)-(\d+) MOD (.+)$/, 'RIVAL: YOU LEAD $1-$2 VS $3'],
   [/^RIVAL: (.+) FØRER (\d+)-(\d+) MOD DIG$/, 'RIVAL: $1 LEADS $2-$3 VS YOU'], [/^RIVAL: (\d+)-(\d+) MOD (.+)\. HELT LIGE!$/, 'RIVAL: $1-$2 VS $3. DEAD EVEN!'], [/^(\d+) MIN · FØRST TIL (\d+) MÅL$/, '$1 MIN · FIRST TO $2 GOALS'],
   [/^Jeg udfordrer dig i Flipper Duel! Åbn (\S+) og deltag med koden (\d+)\.$/, 'I challenge you to Flipper Duel! Open $1 and join with the code $2.'],
@@ -1701,7 +1701,7 @@ const DLY = loadJ('fd-daily', { d: '', tries: 0, won: 0, hp: 0, t: 0, st: 0, str
 const dailyRec = () => { if (DLY.d !== dayKey()) Object.assign(DLY, { d: dayKey(), tries: 0, won: 0, hp: 0, t: 0, st: 0 }); return DLY; };
 for (const m in LO_KEY) { const a = SET[LO_KEY[m]]; if (!Array.isArray(a) || a.length < NSK || !a.slice(0, NSK).every(k => SKILLS[k] && SKILLS[k].m.includes(m))) SET[LO_KEY[m]] = LO_DEF[m].slice(); else SET[LO_KEY[m]] = a.slice(0, NSK); }
 const STATS = loadJ('fd-stats', { played: 0, won: 0, duelW: 0, arenaW: 0, online: 0, onlineW: 0, boss: 0, combo: 0, goals: 0, supers: 0, dmg: 0, camp: 0, fastBoss: 0, coins: 0 });
-const cpuLv = () => CPU_LV[SET.cpu] || CPU_LV[1];
+const cpuLv = () => G.bot ? G.bot.lv : CPU_LV[SET.cpu] || CPU_LV[1];
 const ballOpen = i => !!BALLS[i] && (BALLS[i].cost ? owns('b' + i) : !BALLS[i].need || BALLS[i].need());
 const saveSet = () => store.set('fd-set', JSON.stringify(SET));
 function stat(k, v, how) {
@@ -1790,8 +1790,9 @@ function bigMoment(d) {
 // online emoji reactions
 const EMOJI = ['😂', '😮', '🔥', '😈', '👏'];
 function sendEmo(i) {
-  if (!online() || G.demo || !EMOJI[i] || G.emCd > 0) return;
+  if (!(online() || G.bot) || G.demo || !EMOJI[i] || G.emCd > 0) return;
   G.emCd = .7; G.emSeq++; G.emIdx = i; G.emoList.push({ e: EMOJI[i], t: 2.2, me: 1, x: rnd(-20, 20) }); SFX.emo();
+  if (G.bot && Math.random() < .4) botEmo(pick([i, 0, 2, 3]), rnd(900, 2200));
 }
 const soloTime = () => (campC() && campC().time) || 300;
 const goalsNeeded = () => ARENA_GOALS;
@@ -1799,7 +1800,7 @@ const campStars = () => { try { const a = JSON.parse(store.get('fd-camp', '[]'))
 const online = () => G.type === 'host' || G.type === 'guest';
 // rivalry: head-to-head record against each online opponent, by name
 const RIV = loadJ('fd-riv', {});
-const rivKey = () => online() && G.names ? clean(G.names[1]).trim().toLowerCase().slice(0, 24) : '';
+const rivKey = () => (online() || G.bot) && G.names ? clean(G.names[1]).trim().toLowerCase().slice(0, 24) : '';
 function rivTxt() {
   const k = rivKey(); if (!k) return '';
   const r = RIV[k] || [0, 0], n = clean(G.names[1]).toUpperCase();
@@ -1824,7 +1825,7 @@ function startDemo() {
   SFX.music(false);
 }
 function startGame(mode, type, names) {
-  G.demo = false; G.mode = mode; G.type = type; G.names = names; if (type !== 'boss') G.camp = -1;
+  G.demo = false; G.bot = null; G.mode = mode; G.type = type; G.names = names; if (type !== 'boss') G.camp = -1;
   MAXHP = type === 'boss' ? SOLO_HP : 1200;
   G.me = (type === 'guest' && mode === 'arena') ? 1 : 0; G.supReq = 0; G.supSeen = 0;
   if (mode === 'duel') G.tables = online() || type === 'boss' ? [new Table('duel')] : [new Table('duel'), new Table('duel')];
@@ -1859,6 +1860,7 @@ function endRound(w) {
   if (w >= 0) bigMoment(2.6);
   if (G.mode === 'duel' && G.type !== 'boss') stat('dmg', Math.round(G.dealt[0]));
   SFX.music(false);
+  if (G.bot && w >= 0 && Math.random() < .55) botEmo(w === 1 ? pick([3, 0, 2]) : pick([4, 1, 1]), rnd(700, 1800));
   if (w >= 0) { SFX.win(); const t = tableOf(w); if (t) { t.ban('VINDER!', COL[w], 3); t.boom(t.L.cx, t.cam.y + t.cam.h * .4, COL[w], true); } }
 }
 function tableOf(p) { return G.mode === 'duel' ? G.tables[p] || null : G.tables[0]; }
@@ -2372,11 +2374,11 @@ addEventListener('keydown', e => {
   keys.add(e.code); if (e.code.startsWith('Arrow') || e.code === 'Space') e.preventDefault(); SFX.init();
   if (G.camp === TUT) { if ([...KL0, ...KL1].includes(e.code)) TS.l = 1; if ([...KR0, ...KR1].includes(e.code)) TS.r = 1; }
   if (!e.repeat && [...NUD0, ...NUD1].includes(e.code)) humanNudge(G.type === 'local' && NUD1.includes(e.code) ? 1 : 0);
-  if (!e.repeat && online()) { const em = { Digit6: 0, Digit7: 1, Digit8: 2, Digit9: 3, Digit0: 4 }[e.code]; if (em != null) sendEmo(em); }
+  if (!e.repeat && (online() || G.bot)) { const em = { Digit6: 0, Digit7: 1, Digit8: 2, Digit9: 3, Digit0: 4 }[e.code]; if (em != null) sendEmo(em); }
   if (!e.repeat) {
     const k0 = { Digit1: 0, Digit2: 1, KeyQ: 0, KeyE: 1, KeyW: 1, Space: 0 }[e.code], k1 = { Digit8: 0, Digit9: 1, KeyI: 0, KeyO: 1, ArrowUp: 0, Enter: 1, NumpadEnter: 1 }[e.code];
     if (k0 != null) useSkill(0, k0);
-    else if (k1 != null && !(online() && /^Digit/.test(e.code))) useSkill(G.type === 'local' ? 1 : 0, k1);
+    else if (k1 != null && !((online() || G.bot) && /^Digit/.test(e.code))) useSkill(G.type === 'local' ? 1 : 0, k1);
   }
 });
 addEventListener('keyup', e => keys.delete(e.code));
@@ -2445,7 +2447,7 @@ function update(dt, now) {
   if (!G.demo && G.tables[0]) SFX.theme(G.tables[0].L.theme);
   if (G.big > 0) G.big -= dt;
   G.emCd -= dt; G.emoList = G.emoList.filter(e => (e.t -= dt) > 0);
-  { const eh = !online() || G.demo; if (EMO.hidden !== eh) EMO.hidden = eh; }
+  { const eh = !(online() || G.bot) || G.demo; if (EMO.hidden !== eh) EMO.hidden = eh; }
   if (online() && Net.opp && Net.opp.presence) {
     const oe = Net.opp.presence.em;
     if (Array.isArray(oe) && oe[0] > G.emSeen) { G.emSeen = oe[0] | 0; if (EMOJI[oe[1]]) { G.emoList.push({ e: EMOJI[oe[1]], t: 2.4, me: 0, x: rnd(-40, 40) }); SFX.emo(); } }
@@ -3722,6 +3724,10 @@ $('bNext').onclick = () => { hide('over'); startCamp(G.camp + 1); };
 $('bRe').onclick = () => {
   SFX.init();
   if (G.type === 'guest') { G.wantRe = true; $('overStatus').textContent = 'Venter på at værten starter revanchen…'; $('bRe').disabled = true; return; }
+  if (G.bot) { const run = G.rid; G.wantRe = true; $('overStatus').textContent = 'Venter på ' + clean(G.names[1]) + '…'; $('bRe').disabled = true;
+    setTimeout(() => { if (!G.bot || G.rid !== run || !G.over) return; G.wantRe = false;
+      if (Math.random() < .2) { $('overStatus').textContent = clean(G.names[1]) + ' forlod spillet.'; return; }
+      $('bRe').disabled = false; startMatch(); }, rnd(1200, 3200)); return; }
   G.wantRe = false; if (G.camp >= 0) { startCamp(G.camp); return; } startMatch();
 };
 const NONET = 'Kunne ikke oprette forbindelse. Tjek internettet og prøv igen.';
@@ -3753,8 +3759,25 @@ async function mmProbe(run) {
   r.leave(); return null;
 }
 function mmStatus(txt) { if (!$('lobby').hidden && Net.mm) $('lobStatus').innerHTML = '<span class="dot"></span>' + txt; }
+// When nobody else is searching, the match falls back to a bot that plays like a person.
+const BOT_NAMES = ['Mads', 'Nova', 'Lukas', 'Emma', 'Jonas', 'Sofie', 'Max', 'Ida', 'Leo', 'Freja', 'Oscar', 'Alma', 'Noah', 'Clara', 'Theo', 'Liam', 'Mia', 'Elias', 'Ella', 'Victor',
+  'PinWizard', 'flipz', 'NeonKid', 'xXballXx', 'Kasper99', 'tiltmaster', 'Rasmus_dk', 'luna.g', 'bumperboi', 'Zoe', 'Jakob', 'Nora', 'MrFlip', 'ellie_k', 'Aksel', 'Vera', 'Milo', 'Sam', 'ballr', 'Hugo'];
+function botEmo(i, ms) { const r = G.rid; setTimeout(() => { if (G.bot && G.rid === r && EMOJI[i]) { G.emoList.push({ e: EMOJI[i], t: 2.4, me: 0, x: rnd(-40, 40) }); SFX.emo(); } }, ms); }
+function botName() {
+  let n; do { n = pick(BOT_NAMES); } while (n === store.get('fd-lastbot', '') || n.toLowerCase() === myName().toLowerCase());
+  store.set('fd-lastbot', n); return n;
+}
+function startBot(n) {
+  netLeave(); hide('lobby'); $('lobCode').hidden = false;
+  const s = rnd(.72, .94);
+  startGame(G.mode, 'cpu', [myName(), n]);
+  G.bot = { lv: { n: 'Bot', s, f: s > .88 ? [1.2, 3.5] : [2, 6] } };
+  G.ai[1] = new AI(s); layout();
+}
 async function findMatch() {
-  const run = Date.now(); Net.mm = run; const t0 = Date.now();
+  const run = Date.now(); Net.mm = run; const t0 = Date.now(), botAt = t0 + rnd(10000, 20000);
+  const toBot = async () => { const n = botName(); $('lobStatus').textContent = 'Modstander fundet: ' + n + '!'; await sleep(rnd(1000, 1600)); if (Net.mm === run && !findOpp()) startBot(n); };
+  (async () => { while (Net.mm === run) { if (Date.now() > botAt && !findOpp()) return toBot(); await sleep(250); } })();
   hide('menu'); show('lobby');
   $('lobTitle').textContent = 'Find modstander · ' + (G.mode === 'duel' ? 'DUEL' : 'ARENA');
   $('lobCode').hidden = true; $('lobLink').textContent = ''; $('bCopy').hidden = true; $('bStart').hidden = true; $('bMmCpu').hidden = true;
@@ -3778,7 +3801,6 @@ async function findMatch() {
     // a spot above the first is re-checked against the lower ones every few seconds
     const until = Date.now() + (slot === 1 ? 20000 : rnd(3500, 5500));
     while (Net.mm === run && Date.now() < until && !findOpp()) {
-      if (Date.now() - t0 > 40000 && $('bMmCpu').hidden) { $('bMmCpu').hidden = false; $('lobHint').textContent = 'Der er ikke nogen online lige nu. Du kan blive ved med at vente eller spille mod computeren i stedet.'; }
       await sleep(250);
     }
     if (Net.mm !== run) return;
@@ -3920,9 +3942,9 @@ function showOver() {
   else { const t = G.tables[0]; a = t.score[G.me]; b = t.score[1 - G.me]; }
   $('overScore').textContent = `${clean(G.names[0])} ${a} – ${b} ${clean(G.names[1])}`;
   $('overStatus').textContent = ''; $('bRe').disabled = false; G.wantRe = false;
-  if (online() && w >= 0) { rivSave(meWon); $('overRiv').textContent = rivTxt(); $('overRiv').hidden = false; }
-  if (vs) { stat('played', 1); if (meWon) { stat('won', 1); stat(G.mode === 'duel' ? 'duelW' : 'arenaW', 1); } if (online()) { stat('online', 1); if (meWon) stat('onlineW', 1); } }
-  const cn = earn(!vs ? 10 : online() ? (meWon ? 30 : 10) : meWon ? [10, 20, 30, 40][SET.cpu] || 20 : 5);
+  if ((online() || G.bot) && w >= 0) { rivSave(meWon); $('overRiv').textContent = rivTxt(); $('overRiv').hidden = false; }
+  if (vs) { stat('played', 1); if (meWon) { stat('won', 1); stat(G.mode === 'duel' ? 'duelW' : 'arenaW', 1); } if (online() || G.bot) { stat('online', 1); if (meWon) stat('onlineW', 1); } }
+  const cn = earn(!vs ? 10 : online() || G.bot ? (meWon ? 30 : 10) : meWon ? [10, 20, 30, 40][SET.cpu] || 20 : 5);
   $('overStatus').textContent = coinNote(cn).trim();
   unlockNote();
   if (meWon) playDance();
