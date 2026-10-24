@@ -1377,7 +1377,7 @@ class Table {
     if (!duel && this.serveT > 0) {
       this.serveT -= dt;
       if (this.serveT <= 0) {
-        if (this.queueL >= 0) { this.setLayout(ARENAS[this.queueL]); this.hook('layout', { li: this.queueL }); this.queueL = -1; }
+        if (this.queueL >= 0 && G.phase === 'play') { this.setLayout(ARENAS[this.queueL]); this.hook('layout', { li: this.queueL }); this.queueL = -1; }
         this.serve(this.serveDir);
       }
     }
@@ -1800,7 +1800,7 @@ function doSkill(p, k, t) {
 const RP_KEEP = 2.6, RP = { buf: [], on: null };
 function rpSnap(dt) {
   if (G.demo || RP.on) return;
-  RP.buf.push({ dt, tb: G.tables.map(t => ({ balls: t.balls.map(b => Object.assign({}, b, { trail: b.trail ? b.trail.slice() : [] })), fl: t.fl.map(f => [f.a, f.on, f.len]), cam: Object.assign({}, t.cam) })) });
+  RP.buf.push({ dt, tb: G.tables.map(t => ({ balls: t.balls.map(b => Object.assign({}, b, { trail: b.trail ? b.trail.slice() : [] })), fl: t.fl.map(f => [f.a, f.on, f.len]), cam: Object.assign({}, t.cam), boss: t.boss && Object.assign({}, t.boss) })) });
   let s = 0; for (let i = RP.buf.length - 1; i > 0; i--) { s += RP.buf[i].dt; if (s > RP_KEEP) { RP.buf.splice(0, i); break; } }
 }
 function bigMoment(len) {
@@ -1824,9 +1824,9 @@ const rpShowing = () => RP.on && RP.on.wait <= 0;
 function drawTableR(t, R, i, opt) {
   const f = rpShowing() && RP.on.frames[RP.on.k].tb[i];
   if (!f || G.tables[i] !== t) return drawTable(t, R, i, opt);
-  const keep = { balls: t.balls, fl: t.fl.map(x => [x.a, x.on, x.len]), cam: t.cam, ban: t.banner };
-  t.balls = f.balls; t.fl.forEach((x, j) => { if (f.fl[j]) [x.a, x.on, x.len] = f.fl[j]; }); t.cam = f.cam; t.banner = null;
-  try { drawTable(t, R, i, opt); } finally { t.balls = keep.balls; t.fl.forEach((x, j) => [x.a, x.on, x.len] = keep.fl[j]); t.cam = keep.cam; t.banner = keep.ban; }
+  const keep = { balls: t.balls, fl: t.fl.map(x => [x.a, x.on, x.len]), cam: t.cam, ban: t.banner, boss: t.boss };
+  t.balls = f.balls; t.fl.forEach((x, j) => { if (f.fl[j]) [x.a, x.on, x.len] = f.fl[j]; }); t.cam = f.cam; t.banner = null; t.boss = f.boss;
+  try { drawTable(t, R, i, opt); } finally { t.balls = keep.balls; t.fl.forEach((x, j) => [x.a, x.on, x.len] = keep.fl[j]); t.cam = keep.cam; t.banner = keep.ban; t.boss = keep.boss; }
 }
 // online emoji reactions
 const EMOJI = ['😂', '😮', '🔥', '😈', '👏'];
