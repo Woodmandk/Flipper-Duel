@@ -151,6 +151,7 @@ button.btn.ghost{background:transparent;font-size:14px;padding:9px;}
 @media (max-width:420px){.modes{grid-template-columns:1fr;}}
 @media (prefers-reduced-motion:reduce){.status .dot{animation:none;}}
 </style>
+<script data-goatcounter="https://flipperduel.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 </head>
 <body>
 
@@ -1866,6 +1867,8 @@ function startDemo() {
   G.me = 0; G.overdrive = false;
   SFX.music(false);
 }
+// Play counter (GoatCounter): one event per started match, e.g. 'duel-cpu', 'arena-online', 'campaign'
+function track(n) { try { if (window.goatcounter && goatcounter.count) goatcounter.count({ path: 'match-' + n, title: n, event: true }); } catch (e) {} }
 function startGame(mode, type, names) {
   G.demo = false; G.bot = null; G.mode = mode; G.type = type; G.names = names; if (type !== 'boss') G.camp = -1;
   MAXHP = type === 'boss' ? SOLO_HP : 1200;
@@ -1875,6 +1878,7 @@ function startGame(mode, type, names) {
   G.ai = [null, type === 'cpu' ? new AI(cpuLv().s) : null];
   { const m = type === 'boss' ? 'b' : mode === 'arena' ? 'a' : 'd', pool = skPool(m).sort(() => Math.random() - .5); G.lo = [null, type === 'cpu' ? pool.slice(0, NSK) : null]; G.aiSk = [null, null]; G.skCd = [0, 0]; G.skReqK = 0; }
   G.tables.forEach((t, i) => t.hook = (ty, d) => onEvent(i, ty, d));
+  track(type === 'boss' ? (G.camp === TUT ? 'tutorial' : G.camp === DAILY ? 'daily' : 'campaign') : mode + '-' + (type === 'host' || type === 'guest' ? 'online' : type === 'cpu' && names[1] !== 'CPU' ? 'bot' : type));
   hide('menu'); hide('lobby'); hide('over'); hide('help'); show('hud');
   startMatch();
 }
