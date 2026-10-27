@@ -1034,7 +1034,7 @@ class Table {
     this.laneRest = 0; this.save = 0; this.time = 0;
     this.grav = 1; this.last = -1; this.shield = [0, 0]; this.bigP = [0, 0]; this.slowP = [0, 0]; this.turbo = 0;
     this.tokens = []; this.tokenT = this.kind === 'duel' ? 6 : 5; this.serveT = 0; this.serveDir = 1; this.score = [0, 0]; this.goals = 0; this.queueL = -1;
-    this.calm = 0; this.lastKaos = -10; this.atkQ = []; this.atkCalm = 0; this.frz = [0, 0]; this.fire = 0; this.fhCd = [0, 0];
+    this.calm = 0; this.lastKaos = -10; this.atkQ = []; this.atkCalm = 0; this.atkLast = ''; this.frz = [0, 0]; this.fire = 0; this.fhCd = [0, 0];
     this.cam = { y: 0, h: this.camMin() }; this.cam.y = this.kind === 'duel' ? L.H - this.cam.h : 0;
     this.boss = null; this.solo = false; this.mega = false; this.rush = null; this.forceBoss = null; this.bossMul = 1; this.bossT = rnd(40, 50); this.mis = null; this.misT = rnd(12, 16); this.misDone = 0;
     this.rampN = 0; this.rampT = 0; this.tilt = 0; this.tiltW = 0;
@@ -1397,7 +1397,7 @@ class Table {
     this.sigStep(dt);
     // incoming attacks wait in line so they never land on top of each other
     this.atkCalm -= dt;
-    if (this.atkQ.length && this.atkCalm <= 0) { const ty = this.atkQ.shift(); this.atkCalm = (ty === 'fog' ? 7 : ty === 'bomb' || ty === 'rain' ? 6 : 6) + 3; this.hook('atkHit', { type: ty }); }
+    if (this.atkQ.length && this.atkCalm <= 0) { const a = this.atkQ.shift(); this.atkLast = a.ty; this.atkCalm = (a.ty === 'fog' ? 7 : 6) + 3; this.hook('atkHit', { type: a.ty, n: a.n }); }
     for (let p = 0; p < 2; p++) { this.frz[p] = Math.max(0, this.frz[p] - dt); this.fhCd[p] -= dt; }
     this.fire = Math.max(0, this.fire - dt);
     for (const t of this.tokens) t.t += dt;
@@ -1799,19 +1799,21 @@ function doSkill(p, k, t) {
 }
 // big moments (goal, boss down, round won) pause the game and replay the last seconds at half speed
 const RP_KEEP = 2.6, RP = { buf: [], on: null };
+// online Duel also records the opponent's table, so the loser gets to see the winning shot
+const rpTabs = () => G.mode === 'duel' && online() ? [G.tables[0], G.ghost] : G.tables;
 function rpSnap(dt) {
   if (G.demo || RP.on) return;
-  RP.buf.push({ dt, tb: G.tables.map(t => ({ balls: t.balls.map(b => Object.assign({}, b, { trail: b.trail ? b.trail.slice() : [] })), fl: t.fl.map(f => [f.a, f.on, f.len]), cam: Object.assign({}, t.cam), boss: t.boss && Object.assign({}, t.boss) })) });
+  RP.buf.push({ dt, tb: rpTabs().map(t => ({ balls: t.balls.map(b => Object.assign({}, b, { trail: b.trail ? b.trail.slice() : [] })), fl: t.fl.map(f => [f.a, f.on, f.len]), cam: Object.assign({}, t.cam), boss: t.boss && Object.assign({}, t.boss) })) });
   let s = 0; for (let i = RP.buf.length - 1; i > 0; i--) { s += RP.buf[i].dt; if (s > RP_KEEP) { RP.buf.splice(0, i); break; } }
 }
-function bigMoment(len) {
+function bigMoment(len, focus = 0) {
   if (G.demo || RP.on) return;
   len = Math.min(len, 2); let s = 0, i = RP.buf.length - 1;
   for (; i > 0 && s < len; i--) s += RP.buf[i].dt;
   const frames = RP.buf.slice(i); RP.buf = [];
   if (frames.length < 20) return;
   const wait = .55, speed = .5;
-  RP.on = { frames, wait, speed, pos: 0, len: s, k: 0 };
+  RP.on = { frames, wait, speed, pos: 0, len: s, k: 0, focus };
   G.big = G.bigMax = wait + s / speed; SFX.slowmo();
 }
 function rpTick(dt) {
@@ -1824,7 +1826,7 @@ function rpTick(dt) {
 const rpShowing = () => RP.on && RP.on.wait <= 0;
 function drawTableR(t, R, i, opt) {
   const f = rpShowing() && RP.on.frames[RP.on.k].tb[i];
-  if (!f || G.tables[i] !== t) return drawTable(t, R, i, opt);
+  if (!f || rpTabs()[i] !== t) return drawTable(t, R, i, opt);
   const keep = { balls: t.balls, fl: t.fl.map(x => [x.a, x.on, x.len]), cam: t.cam, ban: t.banner, boss: t.boss };
   t.balls = f.balls; t.fl.forEach((x, j) => { if (f.fl[j]) [x.a, x.on, x.len] = f.fl[j]; }); t.cam = f.cam; t.banner = null; t.boss = f.boss;
   try { drawTable(t, R, i, opt); } finally { t.balls = keep.balls; t.fl.forEach((x, j) => [x.a, x.on, x.len] = keep.fl[j]); t.cam = keep.cam; t.banner = keep.ban; t.boss = keep.boss; }
@@ -1903,7 +1905,7 @@ function endRound(w) {
   if (G.phase !== 'play') return;
   G.winner = w; if (w >= 0) G.wins[w]++;
   G.phase = 'roundover'; G.overT = 3.2;
-  if (w >= 0) bigMoment(2);
+  if (w >= 0) bigMoment(2, w);
   if (G.mode === 'duel' && G.type !== 'boss') stat('dmg', Math.round(G.dealt[0]));
   SFX.music(false);
   if (G.bot && w >= 0 && Math.random() < .55) botEmo(w === 1 ? pick([3, 0, 2]) : pick([4, 1, 1]), rnd(700, 1800));
@@ -2015,7 +2017,7 @@ function onEvent(i, type, d) {
     if (playing) { const h = G.type === 'boss' ? SOLO_HURT : BOSS_HURT; G.drain[p] += h; t.text(d.x, d.y, 'BOSS-ANGREB −' + h, '#ff4060', 20); }
     return;
   }
-  if (type === 'bossDown' && playing) { bigMoment(2.2); if (p === 0) stat('boss', 1); }
+  if (type === 'bossDown' && playing) { if (!online() && !G.bot) bigMoment(2.2); if (p === 0) stat('boss', 1); }
   if (type === 'bossDown' && G.type === 'boss') {
     if (playing) {
       const left = t.rush ? t.rush.length - 1 : 0;
@@ -2063,7 +2065,7 @@ function onEvent(i, type, d) {
       if (playing) { G.drain[p] += DRAIN; t.text(t.L.cx, t.L.H - 120, '-' + DRAIN, '#ff6060', 36); t.ban(type === 'bombDrain' ? 'BOOM!' : 'TABT KUGLE', '#ff5060', 1, '−' + DRAIN + ' liv'); }
       if (mine) vibrate(120);
       break;
-    case 'atkHit': doAttack(p, d.type); break;
+    case 'atkHit': doAttack(p, d.type, d.n); break;
     case 'lost': t.burst(d.x, d.y, '#ff9a3c', 14, 260, .4); break;
     case 'fade': t.burst(d.x, d.y, '#ffffff', 16, 200, .4); t.ring(d.x, d.y, 30, '#ffffff', .3, 2); break;
     case 'saucerIn': SFX.drop(); t.ring(d.x, d.y, 34, '#ff3fd2', .5, 3); break;
@@ -2184,15 +2186,18 @@ function sendAttack(p, type) {
 }
 function applyAttack(p, type) {
   const t = G.tables[p]; if (!t) return;
-  if (t.atkQ.length < 3) t.atkQ.push(type);
+  // the same attack again piles on top: right away while it is still hitting, otherwise it joins the one waiting in line
+  const q = t.atkQ, last = q[q.length - 1];
+  if (!q.length && t.atkCalm > 0 && t.atkLast === type && G.phase === 'play') { doAttack(p, type, 1); return; }
+  if (last && last.ty === type) { last.n = Math.min(5, last.n + 1); return; }
+  if (q.length < 4) q.push({ ty: type, n: 1 });
 }
-function doAttack(p, type) {
+function doAttack(p, type, n = 1) {
   const t = G.tables[p]; if (!t || G.phase !== 'play') return;
-  if (type === 'bomb') t.spawnBomb();
-  else if (type === 'rain') { t.spawnBomb(); t.spawnBomb(); t.spawnBomb(); }
+  if (type === 'bomb' || type === 'rain') for (let i = (type === 'rain' ? 3 : 1) * n; i > 0; i--) t.spawnBomb();
   else if (type === 'steal') { G.en[p] = 0; skSync(p); }
-  else t.eff[type] = type === 'fog' ? 7 : type === 'ice' ? 2.5 : 6;
-  t.ban(ATK[type].n, '#ff4060', 1.8, ATK[type].d); t.flash = .6; t.flashCol = '#ff2050'; t.shake = 12; t.punch = 1; SFX.alarm();
+  else stack(t.eff, type, (type === 'fog' ? 7 : type === 'ice' ? 2.5 : 6) * n);
+  t.ban(n > 1 ? tr(ATK[type].n) + ' ×' + n : ATK[type].n, '#ff4060', 1.8, ATK[type].d); t.flash = .6; t.flashCol = '#ff2050'; t.shake = 12; t.punch = 1; SFX.alarm();
   if (p === 0 || !online()) vibrate([60, 40, 60]);
 }
 
@@ -2214,32 +2219,40 @@ function loadPeer() {
 async function peerRoom(code, role, quiet) {
   await loadPeer();
   return new Promise((res, rej) => {
-    const id = role === 'probe' ? '' : 'flipperduel-' + code.toLowerCase();
+    const id = 'flipperduel-' + code.toLowerCase();
     const me = role === 'host' ? new Peer(id) : new Peer();
-    const S = { conn: null, opp: null, hs: [], last: {}, ok: false,
+    const S = { conn: null, opp: null, hs: [], last: {}, ok: false, kn: {}, connAt: 0,
       leave() { try { me.destroy(); } catch (e) {} return Promise.resolve(); },
       presence(p) { Object.assign(S.last, p); if (S.conn && S.conn.open) { try { S.conn.send(S.last); } catch (e) {} } return Promise.resolve(); },
       peers() { return S.opp ? [S.opp] : []; },
-      onPeers(fn) { S.hs.push(fn); return () => { S.hs = S.hs.filter(h => h !== fn); }; } };
+      onPeers(fn) { S.hs.push(fn); return () => { S.hs = S.hs.filter(h => h !== fn); }; },
+      // matchmaking: knock on other waiting spots and join the first host there that is still waiting
+      knock(cds) {
+        for (const cd of cds) {
+          const pid = 'flipperduel-' + cd; if (S.conn || S.kn[pid] || me.destroyed) continue;
+          const c = me.connect(pid, { reliable: true }); S.kn[pid] = c;
+          const end = () => { clearTimeout(t); if (S.kn[pid] === c) delete S.kn[pid]; };
+          const t = setTimeout(() => { end(); if (S.conn !== c) try { c.close(); } catch (e) {} }, 9000);
+          c.on('close', () => { end(); if (S.conn === c) { const o = S.opp; S.opp = null; S.conn = null; if (o) fire(o); } });
+          c.on('error', end);
+          c.on('data', d => {
+            if (S.conn === c) { if (d && typeof d === 'object') { S.opp = mk(d); fire(); } return; }
+            if (S.conn || !d || d.role !== 'host' || !d.mm || d.mode !== G.mode || d.ph !== 'lobby') { end(); try { c.close(); } catch (e) {} return; }
+            end(); S.conn = c; S.code = cd; S.opp = mk(d);
+            Object.values(S.kn).forEach(o => { try { o.close(); } catch (e) {} }); S.kn = {};
+            try { c.send(Object.assign({}, S.last, { role: 'guest' })); } catch (e) {} fire();
+          });
+        }
+      } };
+    const mk = d => ({ peer: 'opp', sameTab: false, isMe: false, presence: d, updatedAt: Date.now() });
     const fire = left => S.hs.forEach(h => h({ peers: S.peers(), joined: [], left: left ? [left] : [], updated: [] }));
     const wire = c => {
-      S.conn = c;
+      S.conn = c; S.connAt = Date.now();
       c.on('open', () => { c.send(S.last); fire(); });
-      c.on('data', d => { if (d && typeof d === 'object') { S.opp = { peer: 'opp', sameTab: false, isMe: false, presence: d, updatedAt: Date.now() }; fire(); } });
-      c.on('close', () => { const o = S.opp; S.opp = null; S.conn = null; S.dead = true; if (o) fire(o); });
+      c.on('data', d => { if (S.conn === c && d && typeof d === 'object') { S.opp = mk(d); fire(); } });
+      c.on('close', () => { if (S.conn !== c) return; const o = S.opp; S.opp = null; S.conn = null; if (o) fire(o); });
     };
     me.on('open', () => {
-      if (role === 'probe') { // matchmaking: knock on every waiting spot at once and take the first host that answers
-        const cs = code.map(cd => me.connect('flipperduel-' + cd, { reliable: true }));
-        cs.forEach((c, i) => c.on('data', d => {
-          if (S.conn || !d || d.role !== 'host' || !d.mm || d.mode !== G.mode || d.ph !== 'lobby') return;
-          S.conn = c; S.code = code[i]; cs.forEach(o => { if (o !== c) try { o.close(); } catch (e) {} });
-          S.opp = { peer: 'opp', sameTab: false, isMe: false, presence: d, updatedAt: Date.now() };
-          c.on('data', d2 => { if (d2 && typeof d2 === 'object') { S.opp = { peer: 'opp', sameTab: false, isMe: false, presence: d2, updatedAt: Date.now() }; fire(); } });
-          c.on('close', () => { const o = S.opp; S.opp = null; S.conn = null; S.dead = true; if (o) fire(o); });
-          try { c.send(S.last); } catch (e) {} fire();
-        }));
-      }
       if (role === 'guest') {
         const c = me.connect(id, { reliable: true }); wire(c);
         const t = setTimeout(() => { if (!S.opp && Net.r === S && !quiet) { netLeave(); toMenu('Fandt ikke et rum med den kode. Tjek koden, og at din ven stadig venter i rummet.'); } }, 10000);
@@ -2247,10 +2260,12 @@ async function peerRoom(code, role, quiet) {
       }
       S.ok = true; res(S);
     });
-    if (role === 'host') me.on('connection', c => { if (S.conn && S.conn.open) { c.close(); return; } wire(c); });
+    // one opponent per room; a knock that never got through is dropped after a while
+    if (role === 'host') me.on('connection', c => { if (S.conn && (S.conn.open || Date.now() - S.connAt < 9000)) { c.on('open', () => c.close()); return; } wire(c); });
+    me.on('disconnected', () => { if (!me.destroyed) try { me.reconnect(); } catch (e) {} });
     me.on('error', e => {
       if (!S.ok) { rej(new Error(e.type === 'unavailable-id' ? 'taken' : e.type === 'peer-unavailable' ? 'notfound' : 'net')); return; }
-      if (e.type === 'peer-unavailable' && quiet) { S.dead = true; return; }
+      if (e.type === 'peer-unavailable' && quiet) { const m = /flipperduel-\S+/.exec(e.message || ''), c = m && S.kn[m[0]]; if (c) { delete S.kn[m[0]]; try { c.close(); } catch (e2) {} } return; }
       if (e.type === 'peer-unavailable' && role === 'guest') { netLeave(); toMenu('Fandt ikke et rum med den kode. Tjek koden og prøv igen.'); }
     });
   });
@@ -2333,7 +2348,7 @@ function netFollow(op) {
   if (h.ph === 'count') G.countT = h.cl;
   else if (h.ph === 'play' && G.phase === 'count') goPlay();
   else if ((h.ph === 'roundover' || h.ph === 'matchover') && (G.phase === 'play' || G.phase === 'count')) {
-    G.phase = 'roundover'; G.winner = h.win === -1 ? -1 : 1 - h.win; SFX.music(false); if (G.winner >= 0) bigMoment(2);
+    G.phase = 'roundover'; G.winner = h.win === -1 ? -1 : 1 - h.win; SFX.music(false); if (G.winner >= 0) bigMoment(2, G.winner);
     if (G.winner >= 0) {
       SFX.win();
       const col = G.mode === 'arena' ? COL[G.winner === 0 ? 1 : 0] : COL[0];
@@ -3188,7 +3203,7 @@ function drawTable(t, R, pi, opt = {}) {
       if (e.giant > 0) chips.push(['KÆMPEKUGLER', e.giant, '#7dffea']); if (e.moon > 0) chips.push(['MÅNE', e.moon, '#c8c8ff']); if (e.rage > 0) chips.push(['RASERI ×3', e.rage, '#ff4040']); if (t.storm > 0) chips.push(['LYN ' + t.storm, 0, '#fff36b']);
       if (e.x2 > 0) chips.push(['×2 SKADE', e.x2, '#ff5c8a']); if (e.big > 0) chips.push(['KÆMPE', e.big, '#ffd84a']); if (t.dshield) chips.push(['SKJOLD', 0, '#5cf2ff']);
       if (e.flip > 0) chips.push(['OMVENDT TYNGDE', e.flip, '#c070ff']); if (t.save > 3) chips.push(['REDNINGSNET', t.save, '#7dff9a']); if (t.inv) chips.push(['INVASION', t.inv.t, '#7dff6b']);
-      if (t.atkQ.length) chips.push(['ANGREB I KØ ×' + t.atkQ.length, 0, '#ff4060']);
+      if (t.atkQ.length) chips.push(['ANGREB I KØ ×' + t.atkQ.reduce((s, a) => s + a.n, 0), 0, '#ff4060']);
       if (t.mod) { const M = MODS[t.mod], w = t.wind(); chips.push([t.mod === 'wind' ? (w < -60 ? '← ' : '') + M.n + (w > 60 ? ' →' : '') : M.n, 0, M.c]); }
       if (t.darkAmt() > 0) chips.push(['MØRKE', 0, '#b98cff']);
       if (t.combo >= 3) chips.push(['COMBO ×' + t.combo + (t.combo >= 5 ? ' (+25%)' : ''), 0, '#ffd84a']);
@@ -3413,7 +3428,7 @@ function drawMoments(now) {
     if (k > .3) {
       const fs = Math.max(14, Math.min(bh * .42, 34)), y = ch - bh / 2;
       ctx.save(); ctx.globalAlpha = k; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.font = fs + 'px Bungee, sans-serif';
-      const lbl = rpShowing() ? 'REPLAY' : ''; ctx.fillStyle = '#ffffff'; ctx.fillText(lbl, cw / 2, y);
+      const lbl = rpShowing() ? 'REPLAY' + (G.mode === 'duel' && RP.on.focus === 1 ? ' · ' + clean(G.names[1]).toUpperCase() : '') : ''; ctx.fillStyle = '#ffffff'; ctx.fillText(lbl, cw / 2, y);
       const tw = ctx.measureText(lbl).width; if (lbl) { ctx.fillStyle = Math.sin(now / 120) > 0 ? '#ff3050' : 'rgba(255,48,80,.3)'; ctx.beginPath(); ctx.arc(cw / 2 - tw / 2 - fs * .7, y, fs * .25, 0, TAU); ctx.fill(); }
       ctx.restore();
     }
@@ -3442,8 +3457,13 @@ function render(now) {
   } else {
     const t0 = G.tables[0];
     const t1 = online() ? G.ghost : G.tables[1];
-    if (t0 && R[0]) drawTableR(t0, R[0], 0);
-    if (t1 && R[1]) drawTableR(t1, R[1], 1, { mini: LAY.kind === 'duelPortrait' || online() });
+    // the winner's table goes on the big spot while their winning shot is replayed
+    if (rpShowing() && RP.on.focus === 1 && LAY.kind !== 'duel2' && t1 && R[0] && R[1]) {
+      drawTableR(t1, R[0], 1); drawTableR(t0, R[1], 0, { mini: true });
+    } else {
+      if (t0 && R[0]) drawTableR(t0, R[0], 0);
+      if (t1 && R[1]) drawTableR(t1, R[1], 1, { mini: LAY.kind === 'duelPortrait' || online() });
+    }
     if (!G.demo) {
       if (R[0]) drawHud(0, R[0], false);
       if (R[1] && LAY.kind !== 'duelPortrait') drawHud(1, R[1], online());
@@ -3788,15 +3808,10 @@ $('bOnline').onclick = async () => {
   lobbyRefresh();
 };
 /* ---- FIND A RANDOM OPPONENT: no server of our own. A few fixed PeerJS ids per mode act as waiting spots.
-   A searcher first tries to join a waiting host in each spot; if nobody waits, it waits in the lowest free spot.
-   Anyone waiting in a spot above the first one re-checks the lower spots now and then, so two searchers always meet. */
-const MM_SLOTS = 5, MM_VER = '1', sleep = ms => new Promise(r => setTimeout(r, ms));
+   A searcher takes the lowest free spot and keeps it. From there it knocks on every lower spot every second or so,
+   and joins the first player it finds waiting there. Spot 1 only waits, so two searchers always meet within seconds. */
+const MM_SLOTS = 8, MM_VER = '2', sleep = ms => new Promise(r => setTimeout(r, ms));
 const mmCode = n => 'q' + MM_VER + (G.mode === 'arena' ? 'a' : 'd') + n;
-async function mmProbe(run) {
-  let r; try { r = await peerRoom(Array.from({ length: MM_SLOTS }, (_, i) => mmCode(i + 1)), 'probe', true); } catch (e) { return null; }
-  for (let i = 0; i < 35 && Net.mm === run; i++) { if (r.conn && r.opp) return r; await sleep(100); }
-  r.leave(); return null;
-}
 function mmStatus(txt) { if (!$('lobby').hidden && Net.mm) $('lobStatus').innerHTML = '<span class="dot"></span>' + txt; }
 // When nobody else is searching, the match falls back to a bot that plays like a person.
 const BOT_NAMES = ['Mads', 'Nova', 'Lukas', 'Emma', 'Jonas', 'Sofie', 'Max', 'Ida', 'Leo', 'Freja', 'Oscar', 'Alma', 'Noah', 'Clara', 'Theo', 'Liam', 'Mia', 'Elias', 'Ella', 'Victor',
@@ -3814,38 +3829,38 @@ function startBot(n) {
   G.ai[1] = new AI(s); layout();
 }
 async function findMatch() {
-  const run = Date.now(); Net.mm = run; const t0 = Date.now(), botAt = t0 + rnd(10000, 20000);
-  const toBot = async () => { const n = botName(); $('lobStatus').textContent = 'Modstander fundet: ' + n + '!'; await sleep(rnd(1000, 1600)); if (Net.mm === run && !findOpp()) startBot(n); };
-  (async () => { while (Net.mm === run) { if (Date.now() > botAt && !findOpp()) return toBot(); await sleep(250); } })();
+  const run = Date.now(); Net.mm = run; const botAt = run + rnd(22000, 32000);
+  const live = () => Net.r && (Net.r.opp || (Net.r.conn && Net.r.conn.open));
+  const toBot = async () => { const n = botName(); $('lobStatus').textContent = 'Modstander fundet: ' + n + '!'; await sleep(rnd(1000, 1600)); if (Net.mm === run && !live() && !$('lobby').hidden) startBot(n); };
   hide('menu'); show('lobby');
   $('lobTitle').textContent = 'Find modstander · ' + (G.mode === 'duel' ? 'DUEL' : 'ARENA');
   $('lobCode').hidden = true; $('lobLink').textContent = ''; $('bCopy').hidden = true; $('bStart').hidden = true; $('bMmCpu').hidden = true;
   $('lobHint').textContent = 'Vi leder efter en anden spiller, der også søger ' + (G.mode === 'duel' ? 'DUEL' : 'ARENA') + ' lige nu.';
-  while (Net.mm === run) {
-    mmStatus('Søger modstander…');
-    // 1) is somebody already waiting?
-    { const r = await mmProbe(run);
-      if (r && Net.mm === run) { Net.r = r; await netAttach(r.code, 'guest'); Net.mm = run; mmStatus('Modstander fundet! Starter…'); lobbyRefresh(); return; }
-      if (r) r.leave(); }
-    if (Net.mm !== run) return;
-    // 2) nobody: wait in the lowest free spot
-    let slot = 0;
+  (async () => { while (Net.mm === run && !$('lobby').hidden) { if (Date.now() > botAt && !live()) return toBot(); await sleep(250); } })();
+  mmStatus('Søger modstander…');
+  // 1) take the lowest free waiting spot
+  let slot = 0;
+  while (Net.mm === run && !slot) {
     for (let n = 1; n <= MM_SLOTS && !slot && Net.mm === run; n++) {
-      try { Net.r = await peerRoom(mmCode(n), 'host', true); slot = n; } catch (e) { if (e.message !== 'taken') { await sleep(1500); break; } }
+      try { const r = await peerRoom(mmCode(n), 'host', true); if (Net.mm !== run) { r.leave(); return; } Net.r = r; slot = n; }
+      catch (e) { if (e.message !== 'taken') { await sleep(1500); break; } }
     }
-    if (Net.mm !== run) { if (slot && Net.r) netLeave(); return; }
-    if (!slot) continue;
-    await netAttach(mmCode(slot), 'host'); Net.mm = run;
-    mmStatus('Venter på en modstander…');
-    // a spot above the first is re-checked against the lower ones every few seconds
-    const until = Date.now() + (slot === 1 ? 20000 : rnd(3500, 5500));
-    while (Net.mm === run && Date.now() < until && !findOpp()) {
-      await sleep(250);
+    if (!slot) await sleep(1500);
+  }
+  if (Net.mm !== run) return;
+  await netAttach(mmCode(slot), 'host'); Net.mm = run;
+  mmStatus('Venter på en modstander…');
+  // 2) wait there, and knock on the spots below; whoever is found first wins
+  const lower = Array.from({ length: slot - 1 }, (_, i) => mmCode(i + 1));
+  while (Net.mm === run && !$('lobby').hidden && Net.r) {
+    const r = Net.r;
+    if (r.conn && !r.conn.open && !r.opp && Date.now() - r.connAt > 9000) r.conn = null; // a knock on us that never got through
+    if (Net.role === 'host' && r.opp && r.opp.presence.role === 'host') { // we found someone waiting below: join them
+      Net.unsub.forEach(u => { try { u(); } catch (e) {} }); Net.unsub = [];
+      await netAttach(r.code, 'guest'); Net.mm = run; mmStatus('Modstander fundet! Starter…'); lobbyRefresh(); return;
     }
-    if (Net.mm !== run) return;
-    if (findOpp()) return; // lobbyRefresh starts the match
-    // nobody came: give up the spot and search again
-    Net.unsub.forEach(u => { try { u(); } catch (e) {} }); Net.unsub = []; if (Net.r) Net.r.leave().catch(() => {}); Net.r = null; Net.role = null;
+    if (Net.role === 'host' && !r.conn && lower.length) r.knock(lower);
+    await sleep(lower.length ? 1000 : 300);
   }
 }
 $('bFind').onclick = () => {
