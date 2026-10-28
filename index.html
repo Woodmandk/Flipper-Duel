@@ -2494,6 +2494,8 @@ const ptrs = new Map();
 function ptrTarget(x, y) {
   const cw = innerWidth, ch = innerHeight;
   if (G.type === 'local') {
+    // facing tables: the top half belongs to player 2, whose left is our right
+    if (G.mode === 'duel' && LAY.kind === 'duelFace') { const p = y < LAY.mid ? 1 : 0, lt = x < cw / 2; return { p, s: lt === (p === 0) ? 'l' : 'r' }; }
     if (G.mode === 'duel') { const p = x < cw / 2 ? 0 : 1, r = LAY.rects[p]; return { p, s: x < r.x + W * r.s / 2 ? 'l' : 'r' }; }
     return { p: y < ch / 2 ? 1 : 0, s: x < cw / 2 ? 'l' : 'r' };
   }
@@ -2641,9 +2643,18 @@ function layout() {
       L.rects = [{ x, y: y0 + (TOP + HUDH + 10) * s, s }];
       L.timer = portrait ? { x: 10, y: y0 + 20 * s, s, left: true } : { x: cw / 2, y: y0 + 20 * s, s };
       L.kind = 'solo';
+    } else if (G.type === 'local' && faceS(cw, ch, BOXH) > sideS(cw, ch, BOXH) * (portrait ? .85 : 1)) {
+      // two players on one tall screen: tables face each other like Arena, the top one turned 180°
+      let s = faceS(cw, ch, BOXH), top = 0;
+      // keep the top player's flippers clear of the round buttons in the corner
+      if ((cw + W * s) / 2 > cw - 140) { top = 52; s = faceS(cw, ch - top, BOXH); }
+      const box = (HUDH + H) * s, x = (cw - W * s) / 2, y0 = top + (ch - top - (2 * box + TOP * s)) / 2, mid = y0 + box + TOP * s / 2;
+      L.rects = [{ x, y: y0 + box + TOP * s + HUDH * s, s }, { x, y: y0 + HUDH * s, s, flip: true }];
+      L.timer = { x: cw / 2, y: mid, s }; L.mid = mid;
+      L.kind = 'duelFace';
     } else if (two || !portrait) {
       const oppS = two ? 1 : .58, gap = 44;
-      const s = Math.min((cw - 24) / (W * (1 + oppS) + gap), (ch - 12) / BOXH);
+      const s = two ? sideS(cw, ch, BOXH) : Math.min((cw - 24) / (W * (1 + oppS) + gap), (ch - 12) / BOXH);
       const tw = (W * (1 + oppS) + gap) * s, x0 = (cw - tw) / 2, y0 = (ch - BOXH * s) / 2;
       L.rects = [{ x: x0, y: y0 + (TOP + HUDH) * s, s }, { x: x0 + (W + gap) * s, y: y0 + (TOP + HUDH) * s, s: s * oppS }];
       L.timer = { x: cw / 2, y: y0 + 20 * s, s };
@@ -2657,6 +2668,15 @@ function layout() {
     }
   }
   LAY = L;
+}
+const sideS = (cw, ch, BOXH) => Math.min((cw - 24) / (W * 2 + 44), (ch - 12) / BOXH);
+const faceS = (cw, ch, BOXH) => Math.min((cw - 12) / W, (ch - 12) / (2 * BOXH - 34));
+// draw a player's box (HUD + table) turned 180° when it sits at the top facing the other player
+function flipAt(R, fn) {
+  if (!R.flip) return fn();
+  const cx = R.x + W * R.s / 2, cy = R.y + (H - LAY.HUDH) * R.s / 2;
+  ctx.save(); ctx.translate(cx, cy); ctx.rotate(Math.PI); ctx.translate(-cx, -cy);
+  try { fn(); } finally { ctx.restore(); }
 }
 addEventListener('resize', layout);
 
@@ -3502,15 +3522,15 @@ function render(now) {
     const t0 = G.tables[0];
     const t1 = online() ? G.ghost : G.tables[1];
     // the winner's table goes on the big spot while their winning shot is replayed
-    if (rpShowing() && RP.on.focus === 1 && LAY.kind !== 'duel2' && t1 && R[0] && R[1]) {
+    if (rpShowing() && RP.on.focus === 1 && LAY.kind !== 'duel2' && LAY.kind !== 'duelFace' && t1 && R[0] && R[1]) {
       drawTableR(t1, R[0], 1); drawTableR(t0, R[1], 0, { mini: true });
     } else {
       if (t0 && R[0]) drawTableR(t0, R[0], 0);
-      if (t1 && R[1]) drawTableR(t1, R[1], 1, { mini: LAY.kind === 'duelPortrait' || online() });
+      if (t1 && R[1]) flipAt(R[1], () => drawTableR(t1, R[1], 1, { mini: LAY.kind === 'duelPortrait' || online() }));
     }
     if (!G.demo) {
       if (R[0]) drawHud(0, R[0], false);
-      if (R[1] && LAY.kind !== 'duelPortrait') drawHud(1, R[1], online());
+      if (R[1] && LAY.kind !== 'duelPortrait') flipAt(R[1], () => drawHud(1, R[1], online()));
       if (LAY.kind === 'duelPortrait' && R[0]) {
         const r = { x: R[0].x, y: R[0].y - (LAY.HUDH - 4) * R[0].s, s: R[0].s };
         ctx.save(); ctx.translate(r.x, r.y - 30 * r.s); ctx.scale(r.s, r.s);
@@ -3534,6 +3554,12 @@ const SKELS = [document.getElementById('skills'), document.getElementById('skill
 function placeBar(lp, n) {
   const R = LAY.rects, arena = G.mode === 'arena', r = arena ? R[0] : R[lp]; if (!r) return null;
   const tw = W * r.s, th = H * r.s, cw = innerWidth, ch = innerHeight;
+  if (LAY.kind === 'duelFace') { // facing tables: bars in the side margins, the top player's turned 180° on their side
+    const top = r.flip, ty = top ? r.y - LAY.HUDH * r.s : r.y, rot = top ? ' rotate(180deg)' : '', tfo = '50% 50%';
+    if (r.x >= 50) { const k = Math.min(1, (r.x - 8) / 108); return { col: 1, x: top ? cw - r.x / 2 : r.x / 2, y: ty + th * (top ? .45 : .55), tf: `translate(-50%,-50%)${rot} scale(${k.toFixed(2)})`, tfo }; }
+    const k = Math.min(1, (tw + 24) / 216), dy = (96 * r.s + 32 * k) * (top ? -1 : 1);
+    return { x: r.x + tw / 2, y: (top ? ty + th : ty) + dy, tf: `translate(-50%,-50%)${rot} scale(${k.toFixed(2)})`, tfo };
+  }
   if (lp === 0 ? r.x >= 104 : cw - (r.x + tw) >= 104) return { col: 1, x: lp === 0 ? r.x - 12 : r.x + tw + 12, y: arena ? r.y + th * (lp === 0 ? .7 : .3) : r.y + th * .55, tf: lp === 0 ? 'translate(-100%,-50%)' : 'translate(0,-50%)' };
   if (arena && lp === 1) return { x: r.x + tw / 2, y: Math.max(4, r.y - 40 * r.s - 62), tf: 'translate(-50%,0) rotate(180deg)' };
   const below = r.y + th + (arena ? 40 * r.s : 6);
@@ -3550,7 +3576,7 @@ function skillButtons() {
     if (!pos) { if (!el.hidden) { el.hidden = true; skKey[lp] = ''; } continue; }
     const lo = loadout(lp), key = lo.join() + '|' + Math.round(pos.x) + ',' + Math.round(pos.y) + pos.tf;
     if (key !== skKey[lp]) {
-      skKey[lp] = key; el.textContent = ''; el.style.left = Math.round(pos.x) + 'px'; el.style.top = Math.round(pos.y) + 'px'; el.style.transform = pos.tf; el.classList.toggle('col', !!pos.col);
+      skKey[lp] = key; el.textContent = ''; el.style.left = Math.round(pos.x) + 'px'; el.style.top = Math.round(pos.y) + 'px'; el.style.transform = pos.tf; el.style.transformOrigin = pos.tfo || ''; el.classList.toggle('col', !!pos.col);
       lo.slice(0, NSK).forEach((k, i) => {
         const S = SKILLS[k], b = document.createElement('button'); b.type = 'button'; b.style.setProperty('--c', S.c); b.style.setProperty('--cf', hexA(S.c, .38));
         b.title = S.n + ': ' + S.d;
