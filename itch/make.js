@@ -14,9 +14,14 @@ function zip() {
   const src = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
   const from = "location.href.split('#')[0]";
   if (!src.includes(from)) throw new Error('inviteLink() changed; update the patch in itch/make.js');
+  // GoatCounter skips pages inside an iframe unless allow_frame is set. Visits from itch
+  // are counted under the path /itch so they stand apart from the GitHub Pages ones.
+  const gc = '<script data-goatcounter=';
+  if (!src.includes(gc)) throw new Error('GoatCounter tag changed; update the patch in itch/make.js');
   const dir = path.join(OUT, 'build');
   fs.rmSync(dir, { recursive: true, force: true }); fs.mkdirSync(dir, { recursive: true });
-  fs.writeFileSync(path.join(dir, 'index.html'), src.replace(from, `'${LIVE}'`));
+  fs.writeFileSync(path.join(dir, 'index.html'), src.replace(from, `'${LIVE}'`)
+    .replace(gc, `<script data-goatcounter-settings='{"allow_frame":true,"path":"/itch"}' data-goatcounter=`));
   const z = path.join(OUT, 'flipper-duel-html5.zip'); fs.rmSync(z, { force: true });
   execFileSync('zip', ['-j', '-q', z, path.join(dir, 'index.html')]);
   console.log('wrote', z);
