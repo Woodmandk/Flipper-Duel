@@ -54,9 +54,9 @@ Coins, purchases, records and stats are stored only on your device.
 
 **Against a friend:**
 
-1. Open the game, type your name, pick a mode and press **Challenge a friend online**.
+1. Open the game, type your name, pick a mode, press **Play with friends** and then **Create a room**.
 2. Press **Copy invite** and send the link to your friend.
-3. Your friend opens the link (the code is already filled in) and presses **Join**.
+3. Your friend opens the link (the code is already filled in) and presses **Join**. Got the code some other way? Type it under **Play with friends**.
 4. Press **Start the match**.
 
 You can also play the computer or two players on one screen.
