@@ -184,6 +184,12 @@ body:has(#over:not([hidden])) :is(.skills,.sup){visibility:hidden;}
 @media (max-width:420px){.modes{grid-template-columns:1fr;}}
 @media (prefers-reduced-motion:reduce){.status .dot{animation:none;}}
 </style>
+<script>
+// Owner's own visits: open the game once with ?nocount (or tap the title 5 times) and GoatCounter
+// stops counting this browser via its skip_gc flag. ?count turns counting back on.
+try { const q = new URLSearchParams(location.search);
+  if (q.has('nocount')) localStorage.setItem('skip_gc', 't'); else if (q.has('count')) localStorage.removeItem('skip_gc'); } catch (e) {}
+</script>
 <script data-goatcounter="https://woodmandk.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 </head>
 <body>
@@ -1974,8 +1980,19 @@ function startDemo() {
   G.me = 0; G.overdrive = false;
   SFX.music(false);
 }
+// Tap the title 5 times within 3 s to stop (or resume) counting this browser, e.g. inside itch.io
+(() => { let taps = [];
+  document.querySelector('#menu h1').addEventListener('click', () => {
+    const now = Date.now(); taps = taps.filter(t => now - t < 3000); taps.push(now);
+    if (taps.length < 5) return; taps = [];
+    try { const off = localStorage.getItem('skip_gc') === 't';
+      if (off) localStorage.removeItem('skip_gc'); else localStorage.setItem('skip_gc', 't');
+      alert(off ? 'Visits from this browser are counted again.' : 'Your own visits on this browser are no longer counted.');
+    } catch (e) {}
+  });
+})();
 // Play counter (GoatCounter): one event per started match, e.g. 'duel-cpu', 'arena-online', 'campaign'
-function track(n) { try { if (window.goatcounter && goatcounter.count) goatcounter.count({ path: 'match-' + n, title: n, event: true }); } catch (e) {} }
+function track(n) { try { if (localStorage.getItem('skip_gc') === 't') return; if (window.goatcounter && goatcounter.count) goatcounter.count({ path: 'match-' + n, title: n, event: true }); } catch (e) {} }
 function startGame(mode, type, names) {
   G.demo = false; G.bot = null; G.mode = mode; G.type = type; G.names = names; if (type !== 'boss') G.camp = -1;
   MAXHP = type === 'boss' ? SOLO_HP : 1200;
