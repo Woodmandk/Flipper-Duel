@@ -3768,7 +3768,11 @@ function setMode(m) {
   if ($('mySk')) menuSkills();
 }
 $('mDuel').onclick = () => setMode('duel'); $('mArena').onclick = () => setMode('arena');
-function menuErr(msg) { for (const id of ['menuErr', 'frErr']) { const e = $(id); e.textContent = msg || ''; e.hidden = !msg; } }
+function menuErr(msg) {
+  for (const id of ['menuErr', 'frErr']) { const e = $(id); e.textContent = msg || ''; e.hidden = !msg; }
+  // the message sits under the buttons, often below the screen edge on phones: bring it into view
+  if (msg) setTimeout(() => { for (const id of ['frErr', 'menuErr']) { const e = $(id); if (e.offsetParent) { e.scrollIntoView({ block: 'center', behavior: 'smooth' }); return; } } }, 60);
+}
 function toMenu(msg) {
   netLeave(); for (const id of ['over', 'lobby', 'friends', 'hud', 'help', 'tut', 'pause', 'brief', 'solo', 'cpuPick']) hide(id); show('menu'); G.over = false; G.phase = 'menu'; G.paused = false;
   startDemo(); layout(); menuErr(msg);
