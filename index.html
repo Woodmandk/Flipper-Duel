@@ -135,11 +135,11 @@ button.btn.ghost{background:transparent;font-size:14px;padding:9px;}
 .stats{display:grid;grid-template-columns:1fr auto;gap:5px 14px;margin:0;font-size:14px;}
 .stats dt{color:var(--muted);} .stats dd{margin:0;text-align:right;font-family:var(--display);color:var(--gold);}
 .skills{position:fixed;inset:0;z-index:6;pointer-events:none;}
-.skills button{position:absolute;pointer-events:auto;box-sizing:border-box;width:76px;height:64px;cursor:pointer;touch-action:manipulation;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:4px 3px;border-radius:16px;border:1.5px solid var(--c);background:linear-gradient(to top,var(--cf) var(--p,0%),rgba(10,8,26,.85) var(--p,0%));color:var(--fg);font-family:var(--display);font-size:12px;letter-spacing:.03em;opacity:.75;}
-.skills button b{font-size:22px!important;}
+.skills button{position:absolute;pointer-events:auto;box-sizing:border-box;cursor:pointer;touch-action:manipulation;display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-rows:auto auto;column-gap:6px;align-content:center;align-items:center;justify-items:start;padding:3px 8px;border-radius:12px;border:1.5px solid var(--c);background:linear-gradient(to top,var(--cf) var(--p,0%),rgba(10,8,26,.85) var(--p,0%));color:var(--fg);font-family:var(--display);font-size:12px;letter-spacing:.03em;opacity:.75;}
+.skills button b{font-size:22px!important;grid-row:span 2;}
 .skills button span{font-size:9px;max-width:100%;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
 .skills button.on{animation:skP .6s ease-in-out infinite alternate;}
-@keyframes skP{to{box-shadow:0 0 26px var(--c);transform:scale(1.04);}}
+@keyframes skP{to{box-shadow:0 0 22px var(--c);}}
 @media (prefers-reduced-motion:reduce){.skills button.on{animation:none;}}
 .skills button b{font-family:var(--body);font-size:18px;line-height:1.1;color:var(--c);}
 .skills button small{font-family:var(--body);font-weight:700;font-size:11px;color:var(--fg);white-space:nowrap;}
@@ -1948,6 +1948,7 @@ function drawTableR(t, R, i, opt) {
 // online emoji reactions
 const EMOJI = ['😂', '😮', '🔥', '😈', '👏'];
 function sendEmo(i) {
+  return; // reactions removed: they cluttered the top of the screen
   if (!(online() || G.bot) || G.demo || !EMOJI[i] || G.emCd > 0) return;
   G.emCd = .7; G.emSeq++; G.emIdx = i; G.emoList.push({ e: EMOJI[i], t: 2.2, me: 1, x: rnd(-20, 20) }); SFX.emo();
   if (G.bot && Math.random() < .4) botEmo(pick([i, 0, 2, 3]), rnd(900, 2200));
@@ -2675,10 +2676,10 @@ function update(dt, now) {
   rpTick(dt);
   if (G.phase === 'play' && !RP.on) rpSnap(dt);
   G.emCd -= dt; G.emoList = G.emoList.filter(e => (e.t -= dt) > 0);
-  { const eh = !(online() || G.bot) || G.demo; if (EMO.hidden !== eh) EMO.hidden = eh; }
+  if (!EMO.hidden) EMO.hidden = true;
   if (online() && Net.opp && Net.opp.presence) {
     const oe = Net.opp.presence.em;
-    if (Array.isArray(oe) && oe[0] > G.emSeen) { G.emSeen = oe[0] | 0; if (EMOJI[oe[1]]) { G.emoList.push({ e: EMOJI[oe[1]], t: 2.4, me: 0, x: rnd(-40, 40) }); SFX.emo(); } }
+    if (Array.isArray(oe) && oe[0] > G.emSeen) { G.emSeen = oe[0] | 0; if (false) { G.emoList.push({ e: EMOJI[oe[1]], t: 2.4, me: 0, x: rnd(-40, 40) }); SFX.emo(); } }
   }
   if (G.type === 'guest') netFollow(Net.opp);
   if (G.mode === 'duel' && online()) oppDuel(Net.opp);
@@ -2743,43 +2744,79 @@ function update(dt, now) {
 
 /* ================= RENDER ================= */
 let LAY = { rects: [] }, DPR = 1;
-const AHB = 78, AHS = .62; // Arena HUD band height and its smallest scale
+const AHS = .62; // smallest scale of the Arena HUD bands
+// skill buttons in the HUD must stay at least this tall (px) to be easy to hit
+const BTNPX = 46, HDR = 54;
 function layout() {
   DPR = Math.min(2, devicePixelRatio || 1);
   const cw = innerWidth, ch = innerHeight;
   cv.width = Math.round(cw * DPR); cv.height = Math.round(ch * DPR);
-  const TOP = 34, HUDH = 120, BOXH = TOP + HUDH + H;
+  const btn = hasBtns(0) || hasBtns(1);
+  // the HUD's button row grows when the tables get small, so solve the size a few times
+  // (on a narrow table the buttons get their own row under the energy bar)
+  let hh = 122, L, row = false;
+  for (let k = 0; k < 5; k++) {
+    L = layoutH(cw, ch, hh, btn);
+    if (G.mode === 'arena') break;
+    const s0 = L.rects[0].s; row = row || (btn && W * s0 < 300);
+    const rc = btn ? Math.max(34, BTNPX / s0) : 34, need = row ? 128 + rc : 88 + rc;
+    if (Math.abs(need - hh) < 1) break;
+    hh = need;
+  }
+  L.btnRow = row;
+  LAY = L;
+}
+function layoutH(cw, ch, HUDH, btn) {
+  const TOP = 34, BOXH = TOP + HUDH + H;
   const L = { cw, ch, rects: [], kind: 'duel2', TOP, HUDH };
   if (G.mode === 'arena') {
     // a HUD band above and below the pitch; it never shrinks below a readable size (hs)
-    const fit = (top, barT, barB) => {
-      const room = ch - 12 - top - barT - barB;
-      let s = Math.min((cw - 12) / W, room / (H + 2 * AHB)), hs = s;
-      if (s < AHS) { hs = AHS; s = Math.min((cw - 12) / W, (room - 2 * AHB * hs) / H); }
-      return { s, hs, hw: Math.min(cw - 12, Math.max(W * s, 340 * hs)) };
+    const fit = top => {
+      const room = ch - 12 - top;
+      let ab = 82, s, hs, re;
+      for (let k = 0; k < 4; k++) {
+        s = Math.min((cw - 12) / W, room / (H + 2 * ab)); hs = s;
+        if (s < AHS) { hs = AHS; s = Math.min((cw - 12) / W, (room - 2 * ab * hs) / H); }
+        re = btn ? Math.max(30, BTNPX / hs) : 30; ab = re + 52;
+      }
+      return { s, hs, re, ab, hw: Math.min(cw - 12, Math.max(W * s, 340 * hs)) };
     };
-    let top = 0, barB = 0, barT = 0, F = fit(0, 0, 0);
-    // keep the top player's name and score clear of the round buttons in the corner
-    if ((cw + F.hw) / 2 > cw - 190) { top = 52; F = fit(top, 0, 0); }
-    // no room beside the pitch for the corner skill buttons: make room below it (and above, for 2 players)
-    if (!G.demo && (cw - W * F.s) / 2 < SKW + SKM + 4) { barB = 70; barT = G.type === 'local' ? 122 - top : 0; F = fit(top, barT, barB); }
-    const { s, hs, hw } = F, x = (cw - W * s) / 2, y = top + barT + (ch - top - barT - barB - H * s - 2 * AHB * hs) / 2 + AHB * hs;
-    L.hs = hs; L.hw = hw;
+    // wide screen: no bands, the pitch fills the height and the two panels sit beside it
+    // (yours at the bottom left, the other player's top right, under the round buttons)
+    { const s = Math.min((cw - 12) / W, (ch - 12) / H), side = (cw - W * s) / 2 - 24;
+      if (side >= 230) {
+        const pw = Math.min(side, 420), hs = Math.max(AHS, Math.min(1, pw / 400));
+        L.hs = hs; L.hw = pw; L.rowE = btn ? Math.max(30, BTNPX / hs) : 0; L.ahb = 92 + L.rowE; L.side = true;
+        L.kind = 'arena'; L.rects = [{ x: (cw - W * s) / 2, y: (ch - H * s) / 2, s }]; return L;
+      } }
+    let top = 0, F = fit(0);
+    // keep the top band clear of the round buttons in the corner
+    if ((cw + F.hw) / 2 > cw - 190) { top = 52; F = fit(top); }
+    const { s, hs, hw } = F, x = (cw - W * s) / 2, y = top + (ch - top - H * s - 2 * F.ab * hs) / 2 + F.ab * hs;
+    L.hs = hs; L.hw = hw; L.ahb = F.ab; L.rowE = F.re;
     L.kind = 'arena'; L.rects = [{ x, y, s }];
   } else {
     const portrait = cw / ch < 0.95;
     const two = G.type === 'local' || (G.demo && !portrait);
+    // on a phone held upright the top strip belongs to the clock and the round buttons
+    const hdrT = (tx) => ({ x: 12, y: HDR / 2, s: .8, left: true, maxW: cw - 210 });
     if (G.type === 'boss' && !G.demo) {
-      const s = Math.min((cw - 12) / W, (ch - 12) / (BOXH + 10));
-      const x = (cw - W * s) / 2, y0 = (ch - (BOXH + 10) * s) / 2;
-      L.rects = [{ x, y: y0 + (TOP + HUDH + 10) * s, s }];
-      L.timer = portrait ? { x: 10, y: y0 + 20 * s, s, left: true } : { x: cw / 2, y: y0 + 20 * s, s };
+      if (portrait) {
+        const s = Math.min((cw - 12) / W, (ch - HDR - 8) / (HUDH + H + 6));
+        const x = (cw - W * s) / 2, y0 = HDR + (ch - HDR - 8 - (HUDH + H + 6) * s) / 2;
+        L.rects = [{ x, y: y0 + (HUDH + 6) * s, s }]; L.timer = hdrT();
+      } else {
+        const s = Math.min((cw - 12) / W, (ch - 12) / (BOXH + 10));
+        const x = (cw - W * s) / 2, y0 = (ch - (BOXH + 10) * s) / 2;
+        L.rects = [{ x, y: y0 + (TOP + HUDH + 10) * s, s }];
+        L.timer = { x: cw / 2, y: y0 + 20 * s, s };
+      }
       L.kind = 'solo';
     } else if (G.type === 'local' && faceS(cw, ch, BOXH) > sideS(cw, ch, BOXH) * (portrait ? .85 : 1)) {
       // two players on one tall screen: tables face each other like Arena, the top one turned 180°
       let s = faceS(cw, ch, BOXH), top = 0;
-      // keep the top player's flippers clear of the round buttons in the corner
-      if ((cw + W * s) / 2 > cw - 140) { top = 52; s = faceS(cw, ch - top, BOXH); }
+      // keep the top player's HUD clear of the round buttons in the corner
+      if ((cw + W * s) / 2 > cw - 190) { top = 52; s = faceS(cw, ch - top, BOXH); }
       const box = (HUDH + H) * s, x = (cw - W * s) / 2, y0 = top + (ch - top - (2 * box + TOP * s)) / 2, mid = y0 + box + TOP * s / 2;
       L.rects = [{ x, y: y0 + box + TOP * s + HUDH * s, s }, { x, y: y0 + HUDH * s, s, flip: true }];
       L.timer = { x: cw / 2, y: mid, s }; L.mid = mid;
@@ -2792,14 +2829,15 @@ function layout() {
       L.timer = { x: cw / 2, y: y0 + 20 * s, s };
       L.kind = two ? 'duel2' : 'duelBig';
     } else {
-      const s = Math.min((cw - 12) / W, (ch - 12) / (BOXH + 44));
-      const x = (cw - W * s) / 2, y0 = (ch - (BOXH + 44) * s) / 2;
-      L.rects = [{ x, y: y0 + (TOP + HUDH + 44) * s, s }, { x: x + 4 * s, y: y0 + (TOP + HUDH + 48) * s, s: s * .17, mini: true }];
-      L.timer = { x: 10, y: y0 + 20 * s, s, left: true };
+      // phone upright vs one opponent: clock strip, the opponent's life line, then your HUD and table
+      const OPP = 40, s = Math.min((cw - 12) / W, (ch - HDR - 8) / (OPP + HUDH + H));
+      const x = (cw - W * s) / 2, y0 = HDR + (ch - HDR - 8 - (OPP + HUDH + H) * s) / 2;
+      L.rects = [{ x, y: y0 + (OPP + HUDH) * s, s }];
+      L.timer = hdrT(); L.opp = { x, y: y0 + 16 * s, s };
       L.kind = 'duelPortrait';
     }
   }
-  LAY = L;
+  return L;
 }
 const sideS = (cw, ch, BOXH) => Math.min((cw - 24) / (W * 2 + 44), (ch - 12) / BOXH);
 const faceS = (cw, ch, BOXH) => Math.min((cw - 12) / W, (ch - 12) / (2 * BOXH - 34));
@@ -3512,7 +3550,17 @@ function drawHud(p, R, compact) {
   ctx.restore();
   rr(0, HY, W, HB, 9); ctx.strokeStyle = `rgba(${COLRGB[p]},.8)`; ctx.lineWidth = 2; ctx.stroke();
   hudText('LIV ' + Math.ceil(hpOf(p)), 12, HY + HB / 2 + 1, 26, 'left');
-  if (!compact) drawEnergy(p, p, 0, HY + HB + 8, W, 32, 22, true);
+  if (!compact) {
+    const b = hasBtns(p);
+    if (LAY.btnRow) { // narrow table: energy bar, then a row with the two skill buttons
+      const RC = LAY.HUDH - 128; drawEnergy(p, p, 0, 80, W, 34, 22, true, !b);
+      if (b) { const bw = (W - 10) / 2; for (let i = 0; i < NSK; i++) hudBtn(p, i, i * (bw + 10), 120, bw, RC); }
+    } else { // energy on the left half, the two skill buttons on the right half
+      const RC = LAY.HUDH - 88, eh = Math.min(RC, 36), ey = 80 + (RC - eh) / 2;
+      drawEnergy(p, p, 0, ey, b ? W * .46 : W, eh, b ? 19 : 22, true, !b);
+      if (b) { const bw = (W * .54 - 18) / 2; for (let i = 0; i < NSK; i++) hudBtn(p, i, W * .46 + 10 + i * (bw + 8), 80, bw, RC); }
+    }
+  }
   ctx.restore();
 }
 // shrink a font until the text fits the width
@@ -3528,7 +3576,7 @@ function hudText(txt, x, y, px, align) {
 }
 // the shared energy bar: a big number, and a marker with the skill's icon at each skill's price
 // (the marker turns white and the icon lights up once you can afford it)
-function drawEnergy(wp, lp, x0, y, w, h, fs, known) {
+function drawEnergy(wp, lp, x0, y, w, h, fs, known, icons = true) {
   const lo = loadout(lp), now = performance.now(), en = clamp((G.en || [])[wp] || 0, 0, ENMAX), pulse = .7 + .3 * Math.sin(now / 80);
   const sx = v => x0 + w * clamp(v / ENMAX, 0, 1), anyReady = lo.some(k => SKILLS[k] && en >= SKILLS[k].cost);
   rr(x0, y, w, h, h / 3); ctx.fillStyle = 'rgba(255,216,74,.12)'; ctx.fill();
@@ -3538,24 +3586,33 @@ function drawEnergy(wp, lp, x0, y, w, h, fs, known) {
     const S = SKILLS[k]; if (!S) return;
     const x = sx(S.cost), ok = en >= S.cost;
     ctx.fillStyle = ok ? '#ffffff' : 'rgba(10,6,24,.85)'; ctx.fillRect(x - 2, y, 4, h);
-    if (S.cost < ENMAX - 6) { ctx.globalAlpha = ok ? 1 : .55; ctx.font = Math.round(h * .55) + 'px sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; ctx.fillStyle = S.c; ctx.fillText(S.i, x + 5, y + h / 2 + 1); ctx.globalAlpha = 1; }
+    if (icons && S.cost < ENMAX - 6) { ctx.globalAlpha = ok ? 1 : .55; ctx.font = Math.round(h * .55) + 'px sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; ctx.fillStyle = S.c; ctx.fillText(S.i, x + 5, y + h / 2 + 1); ctx.globalAlpha = 1; }
   });
   if (known) hudText('ENERGI ' + Math.floor(en), x0 + w - 10, y + h / 2 + 1, fs, 'right');
 }
 
 function drawArenaHud(R) {
-  const t = G.tables[0], hs = LAY.hs || R.s, hw = (LAY.hw || W * R.s) / hs, cx = R.x + W * R.s / 2;
+  const t = G.tables[0], hs = LAY.hs || R.s, hw = (LAY.hw || W * R.s) / hs, cx = R.x + W * R.s / 2, AB = LAY.ahb, RE = LAY.rowE;
   const bottomP = G.me, topP = 1 - G.me, gn = goalsNeeded();
   for (const p of [topP, bottomP]) {
     const lp = p === G.me ? 0 : 1, top = p === topP, mine = isHuman(lp) || G.type === 'guest' && lp === 0;
-    const known = mine || !online() || G.type === 'host', face = top && G.type === 'local';
+    const known = mine || !online() || G.type === 'host', face = top && G.type === 'local', btn = hasBtns(lp);
     ctx.save();
-    // each band hugs the pitch: the energy bar next to the pitch, the name and score outside it
-    const by = top ? R.y - AHB * hs : R.y + H * R.s;
-    ctx.translate(cx, by); ctx.scale(hs, hs);
-    if (face) { ctx.translate(0, AHB / 2); ctx.rotate(Math.PI); ctx.translate(0, -AHB / 2); }
-    const inner = top && !face, ey = inner ? AHB - 36 : 6, ny = inner ? 20 : AHB - 18, x0 = -hw / 2;
-    drawEnergy(p, lp, x0, ey, hw, 28, 19, known);
+    // each band hugs the pitch: the energy row next to the pitch, the name and score outside it
+    let by = top ? R.y - AB * hs : R.y + H * R.s, bx = cx;
+    if (LAY.side) { const pw = LAY.hw; bx = top ? R.x + W * R.s + 12 + pw / 2 : R.x - 12 - pw / 2; by = top ? Math.max(R.y, 60) : R.y + H * R.s - AB * hs; }
+    ctx.translate(bx, by); ctx.scale(hs, hs);
+    if (face) { ctx.translate(0, AB / 2); ctx.rotate(Math.PI); ctx.translate(0, -AB / 2); }
+    const x0 = -hw / 2;
+    let ny;
+    if (LAY.side) { // panel beside the pitch: name and score, a full energy bar, then the two buttons
+      ny = 20; drawEnergy(p, lp, x0, 44, hw, 32, 20, known, !btn);
+      if (btn) { const bw = (hw - 10) / 2; for (let i = 0; i < NSK; i++) hudBtn(lp, i, x0 + i * (bw + 10), 84, bw, RE); }
+    } else {
+      const inner = top && !face, ry = inner ? AB - RE - 6 : 6, eh = Math.min(RE, 30); ny = inner ? 20 : RE + 30;
+      drawEnergy(p, lp, x0, ry + (RE - eh) / 2, btn ? hw * .46 : hw, eh, 18, known, !btn);
+      if (btn) { const bw = (hw * .54 - 18) / 2; for (let i = 0; i < NSK; i++) hudBtn(lp, i, x0 + hw * .46 + 10 + i * (bw + 8), ry, bw, RE); }
+    }
     ctx.textBaseline = 'middle'; ctx.textAlign = 'left'; ctx.fillStyle = COL[p];
     const nm = clean(G.names[p === G.me ? 0 : 1]).toUpperCase(); fitFont(nm, 24, hw / 2 - 70); ctx.fillText(nm, x0 + 6, ny);
     ctx.textAlign = 'right'; ctx.font = '36px Bungee, sans-serif'; ctx.fillText(t.score[p], hw / 2 - 6, ny + 1);
@@ -3578,7 +3635,12 @@ function drawCenter() {
     ctx.save(); ctx.translate(T.x, T.y); ctx.scale(s, s); ctx.textAlign = T.left ? 'left' : 'center'; ctx.textBaseline = 'middle';
     ctx.font = '20px Bungee, sans-serif'; ctx.fillStyle = G.overdrive ? '#ff7a30' : '#ece9ff';
     const mm = Math.floor(rem / 60), ss = String(Math.floor(rem % 60)).padStart(2, '0');
-    if (G.type === 'boss') ctx.fillText(G.camp === TUT ? 'TUTORIAL · ' + duelL().name : `${G.camp === DAILY ? 'DAGENS UDFORDRING' : 'BOSS-KAMP ' + (G.camp + 1)} · ${duelL().name} · ${mm}:${ss}`, 0, 0); else ctx.fillText(T.left ? `R${G.round} · ${mm}:${ss}${G.overdrive ? ' · OVERDRIVE' : ' · ' + duelL().name}` : `RUNDE ${G.round} · ${duelL().name} · ${mm}:${ss}${G.overdrive ? ' · OVERDRIVE' : ''}`, 0, 0);
+    const bt = G.camp === TUT ? 'TUTORIAL' : G.camp === DAILY ? 'DAGENS UDFORDRING' : 'BOSS-KAMP ' + (G.camp + 1);
+    // the top strip on an upright phone is short: just the clock and the round (no table name)
+    const txt = T.left ? (G.type === 'boss' ? (G.camp === TUT ? bt : `${mm}:${ss} · ${bt}`) : `${mm}:${ss} · R${G.round}${G.overdrive ? ' · OVERDRIVE' : ''}`)
+      : G.type === 'boss' ? (G.camp === TUT ? 'TUTORIAL · ' + duelL().name : `${bt} · ${duelL().name} · ${mm}:${ss}`) : `RUNDE ${G.round} · ${duelL().name} · ${mm}:${ss}${G.overdrive ? ' · OVERDRIVE' : ''}`;
+    if (T.maxW) fitFont(tr(txt), 22, T.maxW / s);
+    ctx.fillText(txt, 0, 0);
     ctx.restore();
   }
   if (G.phase === 'count' && !G.demo) {
@@ -3709,6 +3771,7 @@ function render(now) {
   try { renderAll(now); } finally { lerpOff(sv); }
 }
 function renderAll(now) {
+  BTN[0] = BTN[1] = null;
   ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
   drawBackground(now);
   const R = LAY.rects;
@@ -3728,9 +3791,9 @@ function renderAll(now) {
     if (!G.demo) {
       if (R[0]) drawHud(0, R[0], false);
       if (R[1] && LAY.kind !== 'duelPortrait') flipAt(R[1], () => drawHud(1, R[1], online()));
-      if (LAY.kind === 'duelPortrait' && R[0]) {
-        const r = { x: R[0].x, y: R[0].y - (LAY.HUDH - 4) * R[0].s, s: R[0].s };
-        ctx.save(); ctx.translate(r.x, r.y - 30 * r.s); ctx.scale(r.s, r.s);
+      if (LAY.kind === 'duelPortrait' && LAY.opp) {
+        const r = LAY.opp;
+        ctx.save(); ctx.translate(r.x, r.y); ctx.scale(r.s, r.s);
         const ot = clean(G.names[1]).toUpperCase() + '  ' + Math.ceil(hpOf(1));
         fitFont(ot, 20, 175); ctx.fillStyle = COL[1]; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
         ctx.fillText(ot, 0, 4);
@@ -3749,30 +3812,27 @@ function renderAll(now) {
 const supEls = [document.getElementById('bSuper0'), document.getElementById('bSuper1')], supKey = ['', ''];
 supEls.forEach((el, lp) => el.addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); SFX.init(); humanFire(lp); }));
 const SKELS = [document.getElementById('skills'), document.getElementById('skills2')], skKey = ['', ''];
-// skill buttons sit in the screen corners, out of the way of the tables: one player gets a
-// button in each bottom corner; on a shared screen the top player gets the top corners
-// (turned to face them), and side-by-side players each get their own bottom corner
-const SKM = 8, SKW = 76, SKG = 6;
-function placeBtns(lp) {
-  const two = G.type === 'local', face = two && (G.mode === 'arena' || LAY.kind === 'duelFace');
-  const sl = 'env(safe-area-inset-left,0px)', sr = 'env(safe-area-inset-right,0px)', sb = 'env(safe-area-inset-bottom,0px)', st = 'env(safe-area-inset-top,0px)';
-  const at = (h, hx, v, vy, rot) => ({ [h]: `calc(${sl.replace('left', h)} + ${hx}px)`, [v]: `calc(${(v === 'top' ? st : sb)} + ${vy}px)`, rot });
-  if (lp === 1 && face) return [at('right', SKM, 'top', 58, 1), at('left', SKM, 'top', SKM, 1)]; // below the ♪ ? ✕ buttons
-  if (two && !face) return lp === 0 ? [at('left', SKM, 'bottom', SKM), at('left', SKM + SKW + SKG, 'bottom', SKM)] : [at('right', SKM + SKW + SKG, 'bottom', SKM), at('right', SKM, 'bottom', SKM)];
-  return [at('left', SKM, 'bottom', SKM), at('right', SKM, 'bottom', SKM)];
+// skill buttons live inside each player's HUD, next to their energy bar (never on the play
+// area, where taps work the flippers). The HUD drawing records where they go (hudBtn).
+const BTN = [null, null];
+const hasBtns = lp => !G.demo && (lp === 0 ? !G.ai[0] : G.type === 'local');
+function hudBtn(lp, i, x, y, w, h) {
+  const m = ctx.getTransform(), a = m.transformPoint({ x, y }), b = m.transformPoint({ x: x + w, y: y + h });
+  const r = { x: Math.round(Math.min(a.x, b.x) / DPR), y: Math.round(Math.min(a.y, b.y) / DPR), w: Math.round(Math.abs(b.x - a.x) / DPR), h: Math.round(Math.abs(b.y - a.y) / DPR), rot: m.a < 0 ? 1 : 0 };
+  (BTN[lp] || (BTN[lp] = []))[i] = r;
 }
 function skillButtons() {
   for (let lp = 0; lp < 2; lp++) {
     const el = SKELS[lp], human = lp === 0 ? !G.ai[0] : G.type === 'local';
     const on = human && !G.demo && (G.phase === 'play' || G.phase === 'count') && G.phase !== 'menu';
-    const pos = on ? placeBtns(lp) : null;
+    const pos = on && BTN[lp] && BTN[lp].length === NSK ? BTN[lp] : null;
     if (!pos) { if (!el.hidden) { el.hidden = true; skKey[lp] = ''; } continue; }
     const lo = loadout(lp), key = lo.join() + '|' + JSON.stringify(pos);
     if (key !== skKey[lp]) {
       skKey[lp] = key; el.textContent = '';
       lo.slice(0, NSK).forEach((k, i) => {
         const S = SKILLS[k], b = document.createElement('button'), P = pos[i]; b.type = 'button'; b.style.setProperty('--c', S.c); b.style.setProperty('--cf', hexA(S.c, .38));
-        for (const side of ['left', 'right', 'top', 'bottom']) if (P[side]) b.style[side] = P[side];
+        Object.assign(b.style, { left: P.x + 'px', top: P.y + 'px', width: P.w + 'px', height: P.h + 'px' });
         if (P.rot) b.style.rotate = '180deg';
         b.title = S.n + ': ' + S.d;
         const ic = document.createElement('b'), nm = document.createElement('span'), co = document.createElement('small');
@@ -4147,7 +4207,7 @@ function mmStatus(txt) { if (!$('lobby').hidden && Net.mm) $('lobStatus').innerH
 // When nobody else is searching, the match falls back to a bot that plays like a person.
 const BOT_NAMES = ['Mads', 'Nova', 'Lukas', 'Emma', 'Jonas', 'Sofie', 'Max', 'Ida', 'Leo', 'Freja', 'Oscar', 'Alma', 'Noah', 'Clara', 'Theo', 'Liam', 'Mia', 'Elias', 'Ella', 'Victor',
   'PinWizard', 'flipz', 'NeonKid', 'xXballXx', 'Kasper99', 'tiltmaster', 'Rasmus_dk', 'luna.g', 'bumperboi', 'Zoe', 'Jakob', 'Nora', 'MrFlip', 'ellie_k', 'Aksel', 'Vera', 'Milo', 'Sam', 'ballr', 'Hugo'];
-function botEmo(i, ms) { const r = G.rid; setTimeout(() => { if (G.bot && G.rid === r && EMOJI[i]) { G.emoList.push({ e: EMOJI[i], t: 2.4, me: 0, x: rnd(-40, 40) }); SFX.emo(); } }, ms); }
+function botEmo(i, ms) { return; const r = G.rid; setTimeout(() => { if (G.bot && G.rid === r && EMOJI[i]) { G.emoList.push({ e: EMOJI[i], t: 2.4, me: 0, x: rnd(-40, 40) }); SFX.emo(); } }, ms); }
 function botName() {
   let n; do { n = pick(BOT_NAMES); } while (n === store.get('fd-lastbot', '') || n.toLowerCase() === myName().toLowerCase());
   store.set('fd-lastbot', n); return n;
